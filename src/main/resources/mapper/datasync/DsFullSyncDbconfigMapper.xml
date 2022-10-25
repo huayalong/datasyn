@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.datasync.mapper.DsFullSyncDbconfigMapper">
+    
+    <resultMap type="DsFullSyncDbconfig" id="DsFullSyncDbconfigResult">
+        <result property="id"    column="ID"    />
+        <result property="sourceDbId"    column="SOURCE_DB_ID"    />
+        <result property="targetDbId"    column="TARGET_DB_ID"    />
+        <result property="sourceDbName"    column="SOURCE_DB_NAME"    />
+        <result property="targetDbName"    column="TARGET_DB_NAME"    />
+        <result property="sourceSchema"    column="SOURCE_SCHEMA"    />
+        <result property="targetSchema"    column="TARGET_SCHEMA"    />
+        <result property="sourceTable"    column="SOURCE_TABLE"    />
+        <result property="targetTable"    column="TARGET_TABLE"    />
+        <result property="syncLevel"    column="SYNC_LEVEL"    />
+        <result property="isUse"    column="IS_USE"    />
+        <result property="lastSyncTime"    column="LAST_SYNC_TIME"    />
+        <result property="createTime"    column="CREATE_TIME"    />
+    </resultMap>
+
+    <sql id="selectDsFullSyncDbconfigVo">
+        select ID, SOURCE_DB_ID, TARGET_DB_ID, SOURCE_SCHEMA, TARGET_SCHEMA, SOURCE_TABLE, TARGET_TABLE, SYNC_LEVEL, IS_USE, LAST_SYNC_TIME, CREATE_TIME from DS_FULL_SYNC_DBCONFIG
+    </sql>
+
+    <select id="selectDsFullSyncDbconfigList" parameterType="DsFullSyncDbconfig" resultMap="DsFullSyncDbconfigResult">
+        SELECT sd.ID, sd.SOURCE_DB_ID, sd.TARGET_DB_ID, sd.SOURCE_SCHEMA, sd.TARGET_SCHEMA, sd.SOURCE_TABLE, sd.TARGET_TABLE,
+            sd.SYNC_LEVEL, sd.IS_USE, sd.LAST_SYNC_TIME, sd.CREATE_TIME, dc1.INSTANCE_NAME AS SOURCE_DB_NAME, dc2.INSTANCE_NAME AS TARGET_DB_NAME
+        FROM DS_FULL_SYNC_DBCONFIG sd
+        LEFT JOIN DS_NODE_DB_CONFIG dc1 ON sd.SOURCE_DB_ID = dc1.id
+        LEFT JOIN DS_NODE_DB_CONFIG dc2 ON sd.TARGET_DB_ID = dc2.id
+        <where>  
+            <if test="sourceDbId != null  and sourceDbId != ''"> and sd.SOURCE_DB_ID = #{sourceDbId}</if>
+            <if test="targetDbId != null  and targetDbId != ''"> and sd.TARGET_DB_ID = #{targetDbId}</if>
+            <if test="syncLevel != null  and syncLevel != ''"> and SYNC_LEVEL = #{syncLevel}</if>
+            <if test="isUse != null  and isUse != ''"> and IS_USE = #{isUse}</if>
+        </where>
+    </select>
+    
+    <select id="selectDsFullSyncDbconfigByID" parameterType="Long" resultMap="DsFullSyncDbconfigResult">
+        <include refid="selectDsFullSyncDbconfigVo"/>
+        where ID = #{ID}
+    </select>
+        
+    <insert id="insertDsFullSyncDbconfig" parameterType="DsFullSyncDbconfig">
+        insert into DS_FULL_SYNC_DBCONFIG
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sourceDbId != null">SOURCE_DB_ID,</if>
+            <if test="targetDbId != null">TARGET_DB_ID,</if>
+            <if test="sourceSchema != null">SOURCE_SCHEMA,</if>
+            <if test="targetSchema != null">TARGET_SCHEMA,</if>
+            <if test="sourceTable != null">SOURCE_TABLE,</if>
+            <if test="targetTable != null">TARGET_TABLE,</if>
+            <if test="syncLevel != null">SYNC_LEVEL,</if>
+            <if test="isUse != null">IS_USE,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sourceDbId != null">#{sourceDbId},</if>
+            <if test="targetDbId != null">#{targetDbId},</if>
+            <if test="sourceSchema != null">#{sourceSchema},</if>
+            <if test="targetSchema != null">#{targetSchema},</if>
+            <if test="sourceTable != null">#{sourceTable},</if>
+            <if test="targetTable != null">#{targetTable},</if>
+            <if test="syncLevel != null">#{syncLevel},</if>
+            <if test="isUse != null">#{isUse},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDsFullSyncDbconfig" parameterType="DsFullSyncDbconfig">
+        update DS_FULL_SYNC_DBCONFIG
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sourceDbId != null">SOURCE_DB_ID = #{sourceDbId},</if>
+            <if test="targetDbId != null">TARGET_DB_ID = #{targetDbId},</if>
+            <if test="sourceSchema != null">SOURCE_SCHEMA = #{sourceSchema},</if>
+            <if test="targetSchema != null">TARGET_SCHEMA = #{targetSchema},</if>
+            <if test="sourceTable != null">SOURCE_TABLE = #{sourceTable},</if>
+            <if test="targetTable != null">TARGET_TABLE = #{targetTable},</if>
+            <if test="syncLevel != null">SYNC_LEVEL = #{syncLevel},</if>
+            <if test="isUse != null">IS_USE = #{isUse},</if>
+            <if test="lastSyncTime != null">LAST_SYNC_TIME = #{lastSyncTime},</if>
+        </trim>
+        where ID = #{id}
+    </update>
+
+    <delete id="deleteDsFullSyncDbconfigByID" parameterType="Long">
+        delete from DS_FULL_SYNC_DBCONFIG where ID = #{id}
+    </delete>
+
+    <delete id="deleteDsFullSyncDbconfigByIDs" parameterType="String">
+        delete from DS_FULL_SYNC_DBCONFIG where ID in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

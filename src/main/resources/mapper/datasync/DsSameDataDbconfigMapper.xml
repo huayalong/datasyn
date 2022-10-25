@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.datasync.mapper.DsSameDataDbConfigMapper">
+    
+    <resultMap type="DsSameDataDbConfig" id="DsSameDataDbConfigResult">
+        <result property="id"    column="ID"    />
+        <result property="sourceDbId"    column="SOURCE_DB_ID"    />
+        <result property="targetDbId"    column="TARGET_DB_ID"    />
+        <result property="sourceDbName"    column="SOURCE_DB_NAME"    />
+        <result property="targetDbName"    column="TARGET_DB_NAME"    />
+        <result property="sourceNodeId"    column="SOURCE_NODE_ID"    />
+        <result property="targetNodeId"    column="TARGET_NODE_ID"    />
+        <result property="sourceSchema"    column="SOURCE_SCHEMA"    />
+        <result property="targetSchema"    column="TARGET_SCHEMA"    />
+        <result property="sourceTable"    column="SOURCE_TABLE"    />
+        <result property="targetTable"    column="TARGET_TABLE"    />
+        <result property="isUse"    column="IS_USE"    />
+    </resultMap>
+
+    <sql id="selectDsSameDataDbConfigVo">
+        SELECT ID, SOURCE_DB_ID, TARGET_DB_ID, SOURCE_SCHEMA, TARGET_SCHEMA, SOURCE_TABLE, TARGET_TABLE, IS_USE
+        FROM DS_SAME_DATA_DBCONFIG
+    </sql>
+
+    <select id="selectDsSameDataDbconfigList" parameterType="DsSameDataDbConfig" resultMap="DsSameDataDbConfigResult">
+        SELECT dd.ID, dd.SOURCE_DB_ID, dd.TARGET_DB_ID, dd.SOURCE_TABLE, dd.TARGET_TABLE, dd.SOURCE_SCHEMA, dd.TARGET_SCHEMA ,dd.IS_USE,
+            dc1.INSTANCE_NAME AS SOURCE_DB_NAME, dc2.INSTANCE_NAME AS TARGET_DB_NAME,
+            dc1.NODE_ID AS SOURCE_NODE_ID, dc2.NODE_ID AS TARGET_NODE_ID
+        FROM DS_SAME_DATA_DBCONFIG dd
+        LEFT JOIN DS_NODE_DB_CONFIG dc1 ON dd.SOURCE_DB_ID = dc1.id
+        LEFT JOIN DS_NODE_DB_CONFIG dc2 ON dd.TARGET_DB_ID = dc2.id
+        <where>
+            <if test="sourceDbId != null  and sourceDbId != ''"> and dd.SOURCE_DB_ID = #{sourceDbId}</if>
+            <if test="targetDbId != null  and targetDbId != ''"> and dd.TARGET_DB_ID = #{targetDbId}</if>
+        </where>
+    </select>
+    
+    <select id="selectDsSameDataDbconfigById" parameterType="Long" resultMap="DsSameDataDbConfigResult">
+        <include refid="selectDsSameDataDbConfigVo"/>
+        where ID = #{id}
+    </select>
+        
+    <insert id="insertDsSameDataDbconfig" parameterType="DsSameDataDbConfig">
+        insert into DS_SAME_DATA_DBCONFIG
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sourceDbId != null">SOURCE_DB_ID,</if>
+            <if test="targetDbId != null">TARGET_DB_ID,</if>
+            <if test="sourceTable != null">SOURCE_SCHEMA,</if>
+            <if test="targetTable != null">TARGET_SCHEMA,</if>
+            <if test="sourceTable != null">SOURCE_TABLE,</if>
+            <if test="targetTable != null">TARGET_TABLE,</if>
+            <if test="isUse != null">IS_USE,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sourceDbId != null">#{sourceDbId},</if>
+            <if test="targetDbId != null">#{targetDbId},</if>
+            <if test="sourceTable != null">#{sourceSchema},</if>
+            <if test="targetTable != null">#{targetSchema},</if>
+            <if test="sourceTable != null">#{sourceTable},</if>
+            <if test="targetTable != null">#{targetTable},</if>
+            <if test="isUse != null">#{isUse},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDsSameDataDbconfig" parameterType="DsSameDataDbConfig">
+        update DS_SAME_DATA_DBCONFIG
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sourceDbId != null">SOURCE_DB_ID = #{sourceDbId},</if>
+            <if test="targetDbId != null">TARGET_DB_ID = #{targetDbId},</if>
+            <if test="sourceTable != null">SOURCE_SCHEMA = #{sourceSchema},</if>
+            <if test="targetTable != null">TARGET_SCHEMA = #{targetSchema},</if>
+            <if test="sourceTable != null">SOURCE_TABLE = #{sourceTable},</if>
+            <if test="targetTable != null">TARGET_TABLE = #{targetTable},</if>
+            <if test="isUse != null">IS_USE = #{isUse},</if>
+        </trim>
+        where ID = #{id}
+    </update>
+
+    <delete id="deleteDsSameDataDbconfigById" parameterType="Long">
+        delete from DS_SAME_DATA_DBCONFIG where ID = #{id}
+    </delete>
+
+    <delete id="deleteDsSameDataDbconfigByIds" parameterType="String">
+        delete from DS_SAME_DATA_DBCONFIG where ID in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

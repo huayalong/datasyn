@@ -1,0 +1,15 @@
+st.application.name=osrimp
+st.class.path=osrimpexp_obf.jar;lib/log4j.jar;lib/rsyntaxtextarea.jar;lib/ant.jar;lib/dom4j.jar;lib/jcommon-1.0.17.jar;lib/jide-common.jar;lib/looks.jar;lib/OscarHelp.jar;lib/oscarJDBC.jar;lib/jide-components.jar;lib/activation.jar;lib/dbswing.jar;lib/mail.jar;lib/anywhere.jar;lib/jide-grids.jar;lib/jfreechart-1.0.14.jar;lib/commons-io-2.2.jar;lib/poi-ooxml-schemas-3.10.1-20140818.jar;lib/poi-3.10.1-20140818.jar;lib/poi-ooxml-3.10.1-20140818.jar;
+st.command.line.args=
+st.main.class=com.oscar.bkrs.ui.RestoreMain
+st.current.vm=  
+st.current.vm.dir=../jre
+st.nl.java.option.java.heap.size.max=1024
+st.nl.java.option.java.heap.size.min=128
+st.nl.java.option.additional=
+st.nl.valid.vm.list=1.5+
+st.stderr.redirect=console
+st.stdout.redirect=console
+st.stdin.redirect=console
+st.system.property=
+st.user.dir=.

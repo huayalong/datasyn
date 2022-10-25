@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.datasync.mapper.BinlogEndPosMapper">
+
+    <resultMap type="BinlogEndPos" id="BinlogEndPosResult">
+        <result property="id"    column="id"    />
+        <result property="fileName"  column="file_name"      />
+        <result property="endPos"    column="end_pos"    />
+    </resultMap>
+    <insert id="insertBinlogEndPos">
+        insert into ds_binlog_end_pos
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fileName != null and fileName !=''">file_name,</if>
+            <if test="endPos != null">end_pos,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fileName != null and fileName !=''">#{fileName},</if>
+            <if test="endPos != null">#{endPos},</if>
+        </trim>
+    </insert>
+    <insert id="initEndPosByLog">
+        INSERT INTO  ds_binlog_end_pos (FILE_NAME,END_POS) (select logfile_name, file_size from v_sys_binary_logs)
+    </insert>
+    <delete id="deleteBinlogEndPos">
+        delete from ds_binlog_end_pos
+    </delete>
+
+    <select id="getEndPosByFileName" parameterType="String" resultMap="BinlogEndPosResult">
+        SELECT id, file_name, end_pos FROM ds_binlog_end_pos
+        WHERE file_name = #{fileName};
+	</select>
+
+    <update id="initEndPosByFileName" parameterType="String">
+        INSERT INTO TDCP.DS_BINLOG_END_POS (FILE_NAME, END_POS) VALUES(#{fileName}, '0');
+	</update>
+
+    <update id="updateEndPosByFileName" parameterType="String">
+        UPDATE ds_binlog_end_pos SET end_pos = #{endPos} WHERE file_name = #{fileName};
+	</update>
+
+
+
+    <select id="selectAtt" parameterType="String" resultMap="BinlogEndPosResult">
+        SELECT logfile_name as file_name, file_size as end_pos FROM v_sys_binary_logs
+    </select>
+
+
+
+
+</mapper>

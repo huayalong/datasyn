@@ -1,0 +1,159 @@
+R	070829090323Z	071215095528Z	01	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=192.9.200.49
+V	070831061111Z		02	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=192.9.200.49
+V	070926074154Z		03	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=192.9.200.74
+V	070926074309Z		04	unknown	/C=BJ/ST=BJ/L=BJ/O=BJ/OU=OSRDB/CN=SYSDBA
+V	070926080148Z		05	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB01/CN=SYSDBA
+V	070928065009Z		06	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=192.9.200.159
+V	071008081402Z		07	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	071008081714Z		08	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=192.9.200.74
+V	071020082637Z		09	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=192.9.200.43
+V	071020082835Z		0A	unknown	/C=BJ/ST=BJ/L=BJ/O=BJ/OU=OSRDB/CN=BJSASCOA
+V	071025013153Z		0B	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	071025075035Z		0C	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=DB2ADMIN
+V	080229020051Z		0D	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	080229020213Z		0E	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=192.9.200.69
+V	080229021832Z		0F	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	080302025416Z		10	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=192.9.200.69
+V	080302030132Z		11	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	080401031453Z		12	unknown	/C=bj/ST=bj/L=bj/O=bj\/OU=OSRDB/CN=192.9.200.74
+V	080401032629Z		13	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB1/CN=SYSDBA
+V	081214094708Z		14	unknown	/C=bj/ST=bj/L=bj/O=10.0.4.74/OU=OSRDB/CN=10.0.4.74
+V	081214095011Z		15	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=10.0.4.104
+V	081214095147Z		16	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	090918022843Z		17	unknown	/C=BJ/ST=BJ/L=BJ/O=BJ/OU=OSRDB/CN=10.0.4.74
+V	090918023852Z		18	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OOO/CN=SYSDBA
+V	090918031628Z		19	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	090918093250Z		1A	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB1111/CN=SYSDBA
+V	090918093541Z		1B	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA1111
+V	090918094053Z		1C	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	090918094827Z		1D	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB111/CN=10.0.4.74
+V	090918095135Z		1E	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=10.0.4.88
+V	090919005431Z		1F	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	091024062119Z		20	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	091024062454Z		21	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	091105075334Z		22	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	091105080016Z		23	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=10.0.4.74
+V	090106081203Z		24	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	100512103641Z		25	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=10.0.4.45
+V	100512103855Z		26	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	110222015032Z		27	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=10.0.4.148
+V	110222015342Z		28	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	110222024603Z		29	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSAUDIT
+V	110227153124Z		2A	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=10.0.4.242
+V	110227153516Z		2B	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	110329064125Z		2C	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=S2/CN=10.0.4.242
+V	110329064306Z		2D	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=S2/CN=SYSDBA
+V	111231081032Z		2E	unknown	/C=ch/ST=beijing/L=bj/O=bjsasc/OU=database/CN=lz/emailAddress=liuzhen@bjsasc.com
+V	120107094326Z		2F	unknown	/C=aa/ST=aa/L=aa/O=aa/OU=aa/CN=aa/emailAddress=aa
+V	120413031304Z		30	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=192.168.13.1
+V	120413031855Z		31	unknown	/C=bj/ST=bj/L=bj/O=bj/OU=OSRDB/CN=SYSDBA
+V	120416135413Z		32	unknown	/C=gg/ST=gg/L=gg/O=gg/OU=OSRDB1/CN=192.168.13.1/emailAddress=gg
+V	120416135643Z		33	unknown	/C=ff/ST=ff/L=ff/O=ff/OU=OSRDB1/CN=SYSDBA/emailAddress=dd
+V	121110030936Z		34	unknown	/C=12/ST=12/L=12/O=23/OU=osrdb/CN=10.0.5.176/emailAddress=qsA@qmail.com
+V	121110031819Z		35	unknown	/C=ee/ST=ee/L=ee/O=ee/OU=osrdb/CN=sysdba/emailAddress=rr
+V	121110050707Z		36	unknown	/C=ww/ST=ww/L=ww/O=ww/OU=OSRDB/CN=SYSDBA
+V	121115090318Z		37	unknown	/C=er/ST=er/L=er/O=er/OU=er/CN=192.168.44.130
+V	121115091816Z		38	unknown	/C=rt/ST=rt/L=rt/O=rt/OU=OSRDB/CN=ERRIP
+V	121115094125Z		39	unknown	/C=er/ST=er/L=er/O=er/OU=OSRDB/CN=192.168.44.130
+V	121115094353Z		3A	unknown	/C=ER/ST=ER/L=ER/O=ER/OU=OSRDB/CN=SYSDBA
+V	121121074440Z		3B	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.176
+V	121121075938Z		3C	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	121128024601Z		3D	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=TEST/CN=10.0.5.176
+V	121128024812Z		3E	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=TEST/CN=SYSDBA
+V	121129051919Z		3F	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB1/CN=SYSDBA
+V	121129053113Z		40	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=TEST13/CN=ERRDBA
+V	121129053429Z		41	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB1/CN=SYSDBA
+V	121129053551Z		42	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=ERRDBA
+V	121129054055Z		43	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	121129054506Z		44	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.176
+V	121129054653Z		45	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	121129055105Z		46	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB1/CN=SYSDBA
+V	121129055258Z		47	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=ERRDBA
+V	121129055508Z		48	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB1/CN=10.0.5.176
+V	121129055813Z		49	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=ERRIP
+V	121129061022Z		4A	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.176
+V	121227061349Z		4B	unknown	/C=AU/ST=Some-State/O=OSRDB/OU=OSRDB/CN=10.0.5.134
+V	121227061517Z		4C	unknown	/C=AU/ST=Some-State/O=OSRDB/OU=OSRDB/CN=10.0.5.134
+V	121227061754Z		4D	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	121229043914Z		4E	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.94
+V	121229044103Z		4F	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130103083120Z		50	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.176
+V	130103083304Z		51	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130305043147Z		52	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.233
+V	130305045256Z		53	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130305051410Z		54	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.75
+V	130305051513Z		55	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=\x09SYSDBA
+V	130305095913Z		56	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.75
+V	130305100019Z		57	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130312071531Z		58	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.75
+V	130312071626Z		59	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130412025252Z		5A	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.189
+V	130412025353Z		5B	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130628023256Z		5C	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.248
+V	130628025655Z		5D	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=sysdba
+V	130628032515Z		5E	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=osrdb/CN=127.0.0.1
+V	130628032850Z		5F	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=osrdb/CN=sysdba
+V	130628041014Z		60	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130628042010Z		61	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=127.0.0.1
+V	130628042228Z		62	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130628065242Z		63	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSAUDIT
+V	130628065407Z		64	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSSECURE
+V	130628090010Z		65	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=U1
+V	130703113739Z		66	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.223
+V	130703114125Z		67	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=U1
+V	130703114241Z		68	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=U1
+V	130703114814Z		69	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=U1
+V	130703115727Z		6A	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.223
+V	130703115921Z		6B	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=U1
+V	130701061012Z		6C	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.223
+V	130701061411Z		6D	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130827020818Z		6E	unknown	/C=AU/ST=Some-State/O=OSRDB/CN=SYSDBA
+V	130827021134Z		6F	unknown	/C=AU/ST=Some-State/O=OSRDB/CN=10.0.4.12
+V	130827030101Z		70	unknown	/C=AU/ST=Some-State/O=OSRDB/CN=SYSDBA
+V	130827030639Z		71	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.12
+V	130827031323Z		72	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.12
+V	130827031429Z		73	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130827031641Z		74	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.12
+R	130827031808Z	120827032057Z	75	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	130827032445Z		76	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	131122074849Z		77	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.191
+V	131130080336Z		78	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	131130081502Z		79	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.107
+V	131130081554Z		7A	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	131214051354Z		7B	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.12
+V	131214051501Z		7C	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	131214051608Z		7D	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSSECURE
+V	131214063949Z		7E	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=USER1
+V	131214064044Z		7F	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=USER
+V	131214071452Z		80	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=USER2
+V	131219050354Z		81	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.230
+V	131219050449Z		82	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	131226020826Z		83	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB_GD/CN=10.0.4.12
+V	131226020924Z		84	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB_GD/CN=SYSDBA
+V	140121062124Z		85	unknown	/C=AU/ST=Some-State/O=OSRDB/OU=OSRDB/CN=10.0.4.77
+V	140121062336Z		86	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	140121091508Z		87	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140121091549Z		88	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140121091927Z		89	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140121092004Z		8A	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140121093420Z		8B	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	140121113458Z		8C	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140122023100Z		8D	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140122023202Z		8E	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140122023829Z		8F	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.184
+V	140122024237Z		90	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	140122024855Z		91	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.184
+V	140122025025Z		92	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=sysdba
+V	140122030335Z		93	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.5.184
+V	140122030616Z		94	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	140122031456Z		95	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	140122031958Z		96	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	140122051729Z		97	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=osrdb/CN=10.0.5.184
+V	140122051736Z		98	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=osrdb/CN=sysdba
+V	140425055706Z		99	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140516081530Z		9A	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140606075813Z		9B	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140606075825Z		9C	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	140606080240Z		9D	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77
+V	140606080244Z		9E	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=SYSDBA
+V	140606080517Z		9F	unknown	/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/OU=OSRDB/CN=10.0.4.77

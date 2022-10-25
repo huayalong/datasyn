@@ -1,0 +1,14 @@
+st.application.name=migrate
+st.class.path=migration_obf.jar;lib/log4j.jar;lib/rsyntaxtextarea.jar;lib/ant.jar;lib/dom4j.jar;lib/jcommon-1.0.17.jar;lib/kunststoff.jar;lib/jide-common.jar;lib/looks.jar;lib/OscarHelp.jar;lib/oscarJDBC.jar;lib/lookandfeel.jar;lib/jide-components.jar;lib/syntheticaBlueIce.jar;lib/synthetica.jar;lib/activation.jar;lib/dbswing.jar;lib/mail.jar;lib/anywhere.jar;lib/jhbasic.jar;lib/jide-grids.jar;lib/jfreechart-1.0.14.jar;lib/commons-io-2.2.jar;lib/vtd-xml.jar;lib/poi-ooxml-schemas-3.10.1-20140818.jar;lib/poi-3.10.1-20140818.jar;lib/poi-ooxml-3.10.1-20140818.jar;lib/jide-synthetica.jar;lib/c3p0-0.9.1.2.jar;lib/javacsv.jar;lib/commons-lang3-3.1.jar;lib/quartz-2.1.4.jar;lib/xdb.org.jar;lib/jide-dock.jar;lib/jide-action.jar;lib/jide-dialogs.jar;
+st.command.line.args=
+st.main.class=com.oscar.command.Migrate
+st.current.vm=  
+st.current.vm.dir=../jre
+st.nl.java.option.java.heap.size.max=1024
+st.nl.java.option.java.heap.size.min=128
+st.nl.java.option.additional=
+st.nl.valid.vm.list=1.5+
+st.stderr.redirect=console
+st.stdout.redirect=console
+st.system.property=
+st.user.dir=

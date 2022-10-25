@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="GBK"?>
+<config>
+	<item key="SERVER_MAJOR_VERSION">57</item>			<!-- 数据库服务器的主版本号 -->
+	<item key="SERVER_MINOR_VERSION">57</item>			<!-- 数据库服务器的次版本号 -->
+	<item key="SECURE_SERVER">false</item>					<!-- 数据库服务器是否为安全数据库 -->
+	<item key="FINGERPRINT_AUTH">false</item>				<!-- 是否使用指纹认证登录 -->
+	<item key="FULL_TEXT_INDEX">true</item>					<!-- 是否支持全文索引 -->
+	<item key="SETUP_CREATE_DB_DATA">true</item>		<!-- 在安装数据库时，是否新建库 -->
+	<item key="CAN_COPY_DB_DATA">true</item>				<!-- 用户是否可以通过前台工具拷贝数据库中的数据 -->
+	<item key="SET_FETCH_SIZE">true</item>					<!-- 是否允许用户配置使用服务器端游标功能，即使用JDBC的FecthSize功能 -->
+	<item key="CAN_VIEW_MEMORY">true</item>					<!-- 是否开启【性能检测工具】中的查看内存使用情况功能 -->
+	<item key="AUTO_CONNECT">true</item>						<!-- 当前台工具与后台断开连接时，是否自动重新连接数据库服务器 -->
+	<item key="CAN_CHOOSE_CHARSET">false</item>			<!-- 是否可选择数据库编码格式 -->	
+	<item key="DISPLAY_HISTORY">0</item>						<!-- 历史纪录和提示信息的显示方式: 0：不显示历史纪录 , 不显示提示信息; 1：显示历史纪录 , 显示提示信息; 2：显示历史纪录 , 不显示提示信息 -->	
+	<item key="OPEN_ACCESS_RULE">false</item>				<!-- 是否开启用户登录规则功能 -->
+	<item key="OPEN_DB_LINK">false</item>						<!-- 是否开启数据库链接功能 -->
+	<item key="OPEN_DB_DUPLICATE">false</item>			<!-- 是否开启数据库复制功能 -->
+	<item key="AUDITOR_DUMP">false</item>						<!-- 是否开启审计转储功能 -->
+	<item key="MILITARY_USE">false</item>						<!-- 是否为军用合格目录版本 -->
+	<item key="MIGRATE_IMPORT">false</item>					<!-- 开启迁移工具 - 文件导入功能 -->
+	<item key="MIGRATE_EXPORT">false</item>					<!-- 开启迁移工具 - 文件导出功能 -->
+	<item key="MIGRATE_TIMER">false</item>					<!-- 开启迁移工具 - 定时迁移功能 -->
+        <item key="OPEN_PAGE_SIZE">true</item>			<!-- 是否开启数据页面设置，7.0以上版本才适用 -->
+	<item key="INTERNATIONAL_EDITION">true</item>	  <!-- 是否为国际版 -->
+	<item key="MULTIPLE_INSTANCE_EDITION">true</item>	  <!-- 是否为多实例版 -->
+	<item key="CHM_FILE_PATH">default</item>								
+	<item key="OPEN_HORIZONTAL_PARTITIONING">false</item>	<!-- 是否开启水平分区功能 -->
+	<item key="REQUEST_TIMEOUT">0</item>	          <!-- 判断服务器断开的时间间隔  0表示不判断-->	
+	<item key="ENABLE_ENCRYPT">true</item>          <!--是否开启透明加密功能-->
+	<item key="MERGE_HGJ">true</item>
+	<item key="DEBUG">false</item>
+	<item key="PRINT">true</item>
+	<item key="OLD_PROCEDURE_COMPATIBLE">false</item> <!-- 是否兼容旧存储过程语法-->
+	<item key="OLD_POLICY">false</item>             <!-- 是否兼容旧后台的策略管理 -->
+	<item key="OEM_SHOW_ENCRYPTED_STORAGE">true</item>  <!-- 维护工具物理备份是否显示加密压缩选项 -->
+	<imagepool>
+		<pool lang="zh_CN" dir="/images">
+			<image key="APP_TITLE" file="title.gif"/>
+			<image key="APP_HEAD" file="toub_01.gif"/>
+			<image key="SPLASH_LOGO" file="logosplash.gif"/>
+			<image key="SERIAL" file="serial.gif"/>
+			<image key="BACKGROUND" file="background.gif"/>
+			<image key="INSTALL" file="install.gif"/>
+			<image key="BK_BACKGROUND" file="bk_background.gif"/>
+			<image key="BK_TITLE" file="bk_title.gif"/>
+			<image key="RS_BACKUPGROUND" file="rs_background.gif"/>
+			<image key="LAUNCHER" file="launcher.jpg"/>
+			<image key="INTRO" file="Intro.gif"/>		
+			<image key="DM_TITLE" file="dm_title.gif"/>
+			<image key="DM_INTRO" file="dm_intro.gif"/>
+		</pool>
+		<pool lang="en en_GB en_US" dir="/images_en">
+			<image key="APP_TITLE" file="title.gif"/>
+			<image key="APP_HEAD" file="toub_01.gif"/>
+			<image key="SPLASH_LOGO" file="logosplash.gif"/>
+			<image key="SERIAL" file="serial.gif"/>
+			<image key="BACKGROUND" file="background.gif"/>
+			<image key="INSTALL" file="install.gif"/>
+			<image key="BK_BACKGROUND" file="bk_background.gif"/>
+			<image key="BK_TITLE" file="bk_title.gif"/>
+			<image key="RS_BACKUPGROUND" file="rs_background.gif"/>
+			<image key="LAUNCHER" file="launcher.jpg"/>
+			<image key="INTRO" file="Intro.gif"/>
+			<image key="DM_TITLE" file="dm_title.gif"/>
+			<image key="DM_INTRO" file="dm_intro.gif"/>		
+		</pool>
+	</imagepool>
+	<htmlpool>
+		<pool lang="zh_CN" dir="/html">
+			<html key="DBA_DB_INFO" file="dba/dbintro.html"/>
+			<html key="DBA_DISTRIBUTE" file="dba/distribute.html"/>
+			<html key="DBA_SECURITY" file="dba/security.html"/>
+			<html key="OEM_JOB_SCHEDULE" file="oem/jobschedule.html"/>
+			<html key="OEM_OEM" file="oem/oem.html"/>
+			<html key="OEM_HOST" file="oem/oemhost.html"/>
+			<html key="PM_BUFFER" file="pm/perf_buffer.html"/>
+			<html key="PM_DEADLOCK" file="pm/perf_deadlock.html"/>
+			<html key="PM_EXPLAIN" file="pm/perf_explain.html"/>
+			<html key="PM_HOST" file="pm/perf_host.html"/>
+			<html key="PM_IO" file="pm/perf_io.html"/>			
+			<html key="PM_MEMORY" file="pm/perf_memory.html"/>
+			<html key="PM_MONITOR" file="pm/perf_monitor.html"/>
+			<html key="PM_SESSION" file="pm/perf_session.html"/>
+			<html key="PM_SQL" file="pm/perf_sql.html"/>
+			<html key="PM_TOP" file="pm/perf_top.html"/>
+			<html key="PM_TRACE" file="pm/perf_trace.html"/>
+			<html key="PM_TRANSLOCK" file="pm/perf_translock.html"/>
+			<html key="SQLANALYZER_SEC" file="sqlAnalyzer/Sec.html"/>
+			<html key="SQLANALYZER_SCHEMA" file="sqlAnalyzer/SecShemaSecure.html"/>
+			<html key="SQLANALYZER_SUB_AUDIT" file="sqlAnalyzer/SecSubAudit.html"/>
+			<html key="SQLANALYZER_SUB_SECURE" file="sqlAnalyzer/SecSubSecure.html"/>
+			<html key="SQLANALYZER_SUB_SYSDBA" file="sqlAnalyzer/SecSubSysdba.html"/>
+			<html key="SQLANALYZER_TAB_AUDIT" file="sqlAnalyzer/SecTabAudit.html"/>
+			<html key="SQLANALYZER_TAB_SECURE" file="sqlAnalyzer/SecTabSecure.html"/>
+			<html key="SQLANALYZER_STAB_SYSDBA" file="sqlAnalyzer/SecTabSysdba.html"/>
+			<html key="AUDIT_AUDIT" file="auditor/audit.html"/>
+			<html key="POLICY_POLICY" file="policy/policy.html"/>
+		</pool>
+		<pool lang="en en_GB en_US" dir="/html_en">
+			<html key="DBA_DB_INFO" file="dba/dbintro.html"/>
+			<html key="DBA_DISTRIBUTE" file="dba/distribute.html"/>
+			<html key="DBA_SECURITY" file="dba/security.html"/>
+			<html key="OEM_JOB_SCHEDULE" file="oem/jobschedule.html"/>
+			<html key="OEM_OEM" file="oem/oem.html"/>
+			<html key="OEM_HOST" file="oem/oemhost.html"/>
+			<html key="PM_BUFFER" file="pm/perf_buffer.html"/>
+			<html key="PM_DEADLOCK" file="pm/perf_deadlock.html"/>
+			<html key="PM_EXPLAIN" file="pm/perf_explain.html"/>
+			<html key="PM_HOST" file="pm/perf_host.html"/>
+			<html key="PM_IO" file="pm/perf_io.html"/>			
+			<html key="PM_MEMORY" file="pm/perf_memory.html"/>
+			<html key="PM_MONITOR" file="pm/perf_monitor.html"/>
+			<html key="PM_SESSION" file="pm/perf_session.html"/>
+			<html key="PM_SQL" file="pm/perf_sql.html"/>
+			<html key="PM_TOP" file="pm/perf_top.html"/>
+			<html key="PM_TRACE" file="pm/perf_trace.html"/>
+			<html key="PM_TRANSLOCK" file="pm/perf_translock.html"/>
+			<html key="SQLANALYZER_SEC" file="sqlAnalyzer/Sec.html"/>
+			<html key="SQLANALYZER_SCHEMA" file="sqlAnalyzer/SecShemaSecure.html"/>
+			<html key="SQLANALYZER_SUB_AUDIT" file="sqlAnalyzer/SecSubAudit.html"/>
+			<html key="SQLANALYZER_SUB_SECURE" file="sqlAnalyzer/SecSubSecure.html"/>
+			<html key="SQLANALYZER_SUB_SYSDBA" file="sqlAnalyzer/SecSubSysdba.html"/>
+			<html key="SQLANALYZER_TAB_AUDIT" file="sqlAnalyzer/SecTabAudit.html"/>
+			<html key="SQLANALYZER_TAB_SECURE" file="sqlAnalyzer/SecTabSecure.html"/>
+			<html key="SQLANALYZER_STAB_SYSDBA" file="sqlAnalyzer/SecTabSysdba.html"/>
+			<html key="AUDIT_AUDIT" file="auditor/audit.html"/>
+			<html key="POLICY_POLICY" file="policy/policy.html"/>
+		</pool>
+	</htmlpool>
+</config>

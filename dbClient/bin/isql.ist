@@ -1,0 +1,8808 @@
+VERSION = 1.0
+COPYRIGHT 1992-2004 CASCC. ALL RIGHT RESERVED
+METADATANUM = 96
+
+SYNTAX_BEGIN
+	NAME = DROP ROLE
+	ID = ID_HELP_DROP_ROLE
+	CONTENT = DROP ROLE rolename
+	PARAM = 
+rolename
+角色名
+
+
+	REMARK = 
+删除者必须是DBA。
+
+不能删除系统内建的SYSDBA和AUDIT这两个角色。
+	EXAMPLE = 
+删除角色
+下面的示例将删除一个角色：
+DROP ROLE app_role1;
+
+
+	REF = 
+CREATE ROLE
+GRANT ROLE
+REVOKE ROLE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP DATABASE
+	ID = ID_HELP_DROP_DATABASE
+	CONTENT = DROP DATABASE dbname
+	PARAM = 
+dbname
+要删除的数据库名
+
+
+	REMARK = 
+删除数据库必须在启动状态进行。
+
+在没有MOUNT数据库时，DBA可以删除任何已有数据库；MOUNT后，该数据库不能被删除。
+	EXAMPLE = 
+删除一个物理数据库
+下面的示例将删除一个物理数据库：
+DROP DATABASE app_db;
+
+
+	REF = 
+ALTER DATABASE
+CREATE DATABASE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP TABLE
+	ID = ID_HELP_DROP_TABLE
+	CONTENT = DROP TABLE table_name [,...n] [RESTRICT | CASCADE];
+	PARAM = 
+table_name
+是要删除的表名。
+
+
+
+
+
+n
+是表示可以指定多个索引的占位符。
+
+RESTRICT
+默认选项，确保只有不存在相关视图或完整性约束的表才可以被删除． 
+
+CASCADE
+任何引用的视图或完整性约束都将被删除
+
+
+	REMARK = 
+表所有者可以除去任何数据库内的表。除去表时，表上的规则或默认值将解除绑定，任何与表关联的约束或触发器将自动除去。如果重新创建表，必须重新绑定适当的规则和默认值，重新创建任何触发器并添加必要的约束。
+
+ 
+
+在系统表上不能使用 DROP TABLE 语句。
+
+ 
+
+如果删除表内的所有行 (DELETE tablename) 或使用 TRUNCATE TABLE 语句，则表将一直存在到被除去。
+
+ 
+
+
+	EXAMPLE = 
+除去当前数据库内的表
+下例从当前数据库中删除表及其数据和索引。
+CREATE TABLE drop_a(column_a INT UNIQUE);
+
+DROP TABLE drop_a;
+
+
+
+除去当前数据库内的表
+下例从当前数据库中删除drop_b表及其数据和索引以及依赖的视图。
+CREATE TABLE drop_b(column_a INT PRIMARY KEY);
+
+CREATE VIEW  drop_b_v AS SELECT * FROM drop_b;
+
+/* 下面这条语句将删除表以及表依赖的视图 */
+
+DROP TABLE drop_b CASCADE;
+
+
+	REF = 
+ALTER TABLE
+CREATE TABLE
+DELETE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP INDEX
+	ID = ID_HELP_DROP_INDEX
+	CONTENT = DROP INDEX index_name [, ...n][RESTRICT | CASCADE];
+	PARAM = 
+index_name
+是要除去的索引名称。索引名必须符合标识符的规则。
+
+n
+是表示可以指定多个索引的占位符。
+
+RESTRICT
+默认选项，确保只有不存在相关视图或完整性约束的表才可以被删除． 
+
+CASCADE
+任何引用的视图或完整性约束都将被删除
+
+
+	REMARK = 
+执行 DROP INDEX 后，将重新获得以前由索引占用的空间。此后可将该空间用于任何数据库对象。
+
+
+
+在系统表的索引上不能指定 DROP INDEX。
+
+
+
+若要除去为实现 PRIMARY KEY 或 UNIQUE 约束而创建的索引，必须除去约束。有关除去约束的更多信息，请参见本卷中的"ALTER TABLE"。
+
+
+	EXAMPLE = 
+删除一个索引
+下例删除 project_a表内名为project_a_i的索引
+CREATE TABLE project_a(column_a INT, column_b CHAR(20));
+
+CREATE INDEX project_a_i ON project_a(column_a);
+
+DROP INDEX project_a_i;
+
+DROP TABLE project_a;
+
+
+	REF = 
+CREATE INDEX
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ALTER TRIGGER
+	ID = ID_HELP_ALTER_TRIGGER
+	CONTENT = ALTER TRIGGER oldname ON table RENAME TO newname
+	PARAM = 
+oldname
+要更改的触发器名
+
+table
+触发器作用的表名
+
+newname
+更改后的触发器名
+
+
+	REMARK = 
+ALTER TRIGGER 改变只能改变触发器名称，不能改变触发器的定义。
+
+只有表的拥有者才能更改触发器属性。
+	EXAMPLE = 
+更改触发器名
+下面的示例将更改触发器名为app_trigger2;
+ALTER TRIGGER app_trigger1 ON app_table1 RENAME TO app_trigger2;
+
+
+	REF = 
+CREATE TRIGGER
+DROP TRIGGER
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = UPDATE
+	ID = ID_HELP_UPDATE
+	CONTENT = UPDATE table_name SET column = expr [,...]
+
+ [ FROM table_reference [,...] ]
+
+ [ WHERE condition ]
+	PARAM = 
+table_name
+待更新的基本表或视图。
+
+column
+表或视图table_name中的字段名。
+
+expr
+一个表达式，用于赋予被更新字段的新值。
+
+table_reference
+OSCAR对标准的SQL92进行了扩展，允许UPDATE语句中带有FROM子句，详细含义参见下文的“FROM子句”。
+
+condition
+被更新的元组需要满足的条件。请参见SELECT语句中对WHERE子句的说明。
+
+
+	REMARK = 
+UPDATE语句更新指定的表或视图中满足条件的行，只更新那些在SET子句中出现的字段，保持其它的字段不变。
+
+
+
+并不是所有视图都是可更新的，关于视图是否可更新请参见“？”。
+
+
+
+为了执行UPDATE语句，用户必须拥有待更新的表上的UPDATE权限，或每个待更新的字段上的UPDATE权限。另外，在多用户状态下，系统表是不能通过UPDATE语句进行更新的，但在单用户状态下，系统管理员可以通过UPDATE语句更新系统表。
+
+
+
+FROM
+	EXAMPLE = 
+更新所有元组
+每逢过年，所有学生的年龄都大了一岁，这个功能可以用如下的SQL语句实现。
+UPDATE STUDENT SET SAGE = SAGE + 1;
+
+更新部分元组
+学校加强了对英语教学的力度，决定将英语课的学分改为6个学分，这一功能可用如下的SQL语句实现。
+
+
+UPDATE COURSE SET CCREDIT = 6.0 WHERE CNAME = '新编大学英语';
+
+复杂的赋值表达式
+在SET语句中的赋值表达式除了上面的常数与简单表达式外，还可以使用更为复杂的表达式，甚至是子查询。如使用下述查询可以将将学生的总学生修改为他所选的所有课程的学分之和：
+
+UPDATE STUDENT SET SCREDIT = (SELECT SUM(CCREDIT) FROM COURSE WHERE CNO IN (SELECT CNO FROM ELECT WHERE ELECT.SNO = STUDENT.SNO));
+
+更新之后的结果如下：
+
++----------+-------+--------+------+---------+---------+
+
+|   SNO    | SNAME | SDEPT  | SAGE | SGENDER | SCREDIT |
+
++----------+-------+--------+------+---------+---------+
+
+| S0000001 | 王某  | 计算机 |   23 | M       |    13.0 |
+
+| S0000002 | 李某  | 数学   |   21 | F       |    27.5 |
+
+| S0000003 | 刘某  | 计算机 |   24 | M       |     5.0 |
+
+| S0000004 | 孙某  | 信电   |   20 | F       |         |
+
++----------+-------+--------+------+---------+---------+
+
+
+
+上述查询在所有学生都至少选了一门课的条件下功能正确，但若有一个学生没有选任何课程(如孙某)，上述查询对就将他的SCREDIT更新为NULL，这可不是我们想要的，我们希望的是将它更新为0。这时就要使用CASE表达式，如下：
+
+UPDATE STUDENT 
+
+SET SCREDIT = CASE (SELECT COUNT(CNO) FROM ELECT WHERE ELECT.SNO = STUDENT.SNO) 
+
+ WHEN 0 THEN 0
+
+ ELSE (SELECT SUM(CCREDIT) FROM COURSE WHERE CNO IN (SELECT CNO FROM ELECT WHERE ELECT.SNO = STUDENT.SNO))
+
+ END;
+
+上述查询对每个学生，首先得到他共选了多少门课，若为0，则将总学分更新为0，若不为0，则将总学分更新为他所选的所有课的学分之和。更新之后的结果如下：
+
++----------+-------+--------+------+---------+---------+
+
+|   SNO    | SNAME | SDEPT  | SAGE | SGENDER | SCREDIT |
+
++----------+-------+--------+------+---------+---------+
+
+| S0000001 | 王某  | 计算机 |   23 | M       |    13.0 |
+
+| S0000002 | 李某  | 数学   |   21 | F       |    27.5 |
+
+| S0000003 | 刘某  | 计算机 |   24 | M       |     5.0 |
+
+| S0000004 | 孙某  | 信电   |   20 | F       |     0.0 |
+
++----------+-------+--------+------+---------+---------+
+ 
+
+
+	REF = 
+GRANT
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DELETE
+	ID = ID_HELP_DELETE
+	CONTENT = DELETE FROM table_name WHERE condition;
+	PARAM = 
+table_name
+一个现有的表或视图。
+
+condition
+将被删除的行所要满足的条件。请参见SELECT语句的WHERE子句说明。
+
+
+	REMARK = 
+DELETE语句从指定的表或视图中删除所有满足WHERE条件的行。要进行DELETE操作，用户必须拥有表table_name上的DELETE权限(注意DELETE没有列权限的概念，因为不可能只删除一个行中的部分属性)。
+
+
+
+并不是所有的视图都可以更新，关于视图是否可更新请参见“？”。
+	EXAMPLE = 
+删除所有元组
+以下的内容将删除STUDENT表中的所有记录：
+DELETE FROM STUDENT;
+
+删除部分元组
+在学生毕业后，学校将会删除该学生的所有记录，包括学生信息及学生的所有选课记录。设学生李某毕业了，学校删除李某的所有记录，这可以用如下的查询实现：
+DELETE FROM ELECT WHERE SNO = (SELECT SNO FROM STUDENT WHERE SNAME = '李某');
+
+DELETE FROM STUDENT WHERE SNAME = '李某';
+
+
+	REF = 
+GRANT
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = EXPLAIN
+	ID = ID_HELP_EXPLAIN
+	CONTENT = EXPLAIN [ANALYZE] sql_stmt;
+	PARAM = 
+ANALYZE
+指定该关键字时，表示在解释sql_stmt指定的SQL语句的执行计划的同时，还会统计其执行时间，执行时间以毫秒表示。
+
+不指定该关键字时，只解释sql_stmt指定的SQL语句的执行计划，不统计其执行时间。
+
+sql_stmt
+表示要解释的SQL语句，只能是数据操纵语句(DML语句)，包括SELECT、INSERT、UPDATE和DELETE。
+
+
+	REMARK = 
+EXPLAIN的结果形象地表示了执行器执行查询的步骤，这包括如下几点：
+
+
+
+1. 查询中只有单张表时，以什么方式扫描该表，顺序扫描还是使用索引扫描
+
+2.当查询中涉及到多张表时，以什么顺序访问这些表，对这些表使用什么方式进行联接（NestLoopJoin，MergeJoin、HashJoin），联接时哪张表作外表，哪张表作内表，对各张单个表使用什么方式扫描。
+
+除了上述信息外，EXPLAIN还会把执行每一步的启动代价和总代价显示出来。当使用索引时，还会指出使用哪一列上的索引，索引扫描时扫描键是什么，过滤条件是什么。
+
+加上ANALYZE后，还可以了解执行器执行查询的时间。
+
+了解EXPLAIN提供的这些信息有助于理解Oscar中优化器的行为，从而帮助用户通过建立索引或更改查询语句来控制查询优化器使之生成理想的执行计划，达到提高应用程序执行性能的目的。
+
+
+
+下面的示例将展示EXPLAIN的这些功能，在例子中用到的模式如下：
+
+CREATE TABLE STUDENT (
+
+  SNO CHAR(8),          -- 学号
+
+  SNAME VARCHAR(16),    -- 姓名
+
+  SDEPT VARCHAR(8),     -- 所在系
+
+  SAGE INT,             -- 年龄
+
+  SGENDER CHAR(1),      -- 性别('M'表示男，'F'表示女)
+
+  SCREDIT NUMERIC(4,1), -- 总学分
+
+  PRIMARY KEY(SNO));
+
+CREATE TABLE COURSE (
+
+  CNO CHAR(4),         -- 课程号
+
+  CNAME VARCHAR(64),   -- 课程名
+
+  CDEPT VARCHAR(8),    -- 开课的系
+
+  CCREDIT NUMERIC(3,1), -- 学分
+
+  PRIMARY KEY(CNO));
+
+CREATE TABLE ELECT (
+
+  SNO CHAR(8),         -- 学号
+
+  CNO CHAR(4),         -- 课程号
+
+  SCORE NUMERIC(4,1),  -- 成绩
+
+  FOREIGN KEY(SNO) REFERENCES STUDENT(SNO) ON UPDATE CASCADE ON DELETE CASCADE,
+
+  FOREIGN KEY(CNO) REFERENCES COURSE(CNO) ON UPDATE CASCADE ON DELETE CASCADE);
+	EXAMPLE = 
+SeqScan:顺序扫描
+
+查看所有学生的信息：
+
+explain select *from student;
+
+结果如下：
+
++-------------------------------------------------------------+
+
+|                         QUERY PLAN                          |
+
++-------------------------------------------------------------+
+
+| Seq Scan on STUDENT  (cost=0.00..20.00 rows=1000 width=164) |
+
++-------------------------------------------------------------+
+
+由于要选出表STUDENT中的所有元组，所以执行计划为顺序扫描表STUDENT。cost表示了此执行计划代价，前面为启动代价，为0.00；后面为总代价，为20.00。rows和width分别表示优化器根据统计信息得到的对查询结果有多少行和每行的平均宽度的估计值。
+
+如果想看其执行信息，再运行
+
+explain analyze select *from STUDENT;
+
+结果如下：
+
++-----------------------------------------------------------------------------------------------------+
+
+|                                             QUERY PLAN                                              |
+
++-----------------------------------------------------------------------------------------------------+
+
+| Seq Scan on STUDENT  (cost=0.00..20.00 rows=1000 width=164) (actual time=0.07..0.19 rows=4 loops=1) |
+
+| Total runtime: 0.30 msec                                                                            |
+
++-----------------------------------------------------------------------------------------------------+
+
+可以看到此查询的实际结果有4行，扫描了一趟，启动时间为0.07毫秒，总处理时间为0.19毫秒，加上其它的时间消耗(如网络开销等)，总执行时间为0.30毫秒。
+
+IndexScan：索引扫描
+查看学号为S0000001的学生的信息：
+
+explain select *from STUDENT where SNO = 'S0000001';
+结果如下：
+
++------------------------------------------------------------------------------+
+
+|                                  QUERY PLAN                                  |
+
++------------------------------------------------------------------------------+
+
+| Index Scan using STUDENT_PKEY on STUDENT  (cost=0.00..1.97 rows=1 width=164) |
+
+|   Index Cond: (SNO = 'S0000001'::BPCHAR)                                     |
+
++------------------------------------------------------------------------------+
+
+可以看出，执行计划为索引扫描，使用了表STUDENT的主键，扫描条件(Index Cond)为(SNO = 'S0000001'::BPCHAR),启动代价为0.00，总代价为1.97，估计会选出一行(因为SNO是主键， 不可能有重复，所以只有一行)，结果元组的平均宽度为164。
+
+NestLoopJoin:嵌套循环联接
+explain select * from student,  elect where STUDENT.SNO = ELECT.SNO and STUDENT.SNO='S0000001';
+结果如下：
+
++------------------------------------------------------------------------------------+
+
+|                                     QUERY PLAN                                     |
+
++------------------------------------------------------------------------------------+
+
+| Nested Loop  (cost=0.00..34.47 rows=1 width=260)                                   |
+
+|   Join Filter: ("outer".SNO = "inner".SNO)                                         |
+
+|   ->  Index Scan using STUDENT_PKEY on STUDENT  (cost=0.00..1.97 rows=1 width=164) |
+
+|         Index Cond: (SNO = 'S0000001'::BPCHAR)                                     |
+
+|   ->  Seq Scan on ELECT  (cost=0.00..20.00 rows=1000 width=96)                     |
+
++------------------------------------------------------------------------------------+
+
+可以看出查询计划中对两张表STUDENT和ELECT使用NestLoop进行联接，联接条件是外表的SNO等于内表的SNO，其中STUDENT作为外表，使用主键索引来扫描；ELECT作为内表，由于表上没有索引，所以使用顺序扫描。
+
+如果想查看时间信息，可以运行 
+
+explain analyze select *from STUDENT, COURSE, ELECT where STUDENT.SNO = ELECT.SNO AND COURSE.CNO = ELECT.CNO;
+
+可以看到结果中显示了执行每一步的时间信息。
+
+MergeJoin：归并联接
+详细查看每个学生和它的选课信息：
+
+explain select *from STUDENT, COURSE, ELECT where STUDENT.SNO = ELECT.SNO AND COURSE.CNO = ELECT.CNO;
+结果如下：
+
++--------------------------------------------------------------------------------------------------+
+
+|                                            QUERY PLAN                                            |
+
++--------------------------------------------------------------------------------------------------+
+
+| Merge Join  (cost=160.66..201.66 rows=1000 width=388)                                            |
+
+|   Merge Cond: ("outer".SNO = "inner".SNO)                                                        |
+
+|   ->  Index Scan using STUDENT_PKEY on STUDENT  (cost=0.00..21.00 rows=1000 width=164)           |
+
+|   ->  Sort  (cost=160.66..163.16 rows=1000 width=224)                                            |
+
+|         Sort Key: ELECT.SNO                                                                      |
+
+|         ->  Merge Join  (cost=69.83..110.83 rows=1000 width=224)                                 |
+
+|               Merge Cond: ("outer".CNO = "inner".CNO)                                            |
+
+|               ->  Index Scan using COURSE_PKEY on COURSE  (cost=0.00..21.00 rows=1000 width=128) |
+
+|               ->  Sort  (cost=69.83..72.33 rows=1000 width=96)                                   |
+
+|                     Sort Key: ELECT.CNO                                                          |
+
+|                     ->  Seq Scan on ELECT  (cost=0.00..20.00 rows=1000 width=96)                 |
+
++--------------------------------------------------------------------------------------------------+
+
+可以看出，三张表的联接顺序为先联接COURSE和ELECT,其中COURSE作外表，使用索引扫描，ELECT作内表，顺序扫描；二者作MergeJoin，都需要根据CNO进行排序,但由于对COURSE是使用CNO上的索引进行扫描的，结果就已经排好序了，所以不需要再排一次，但ELECT是顺序扫描的，需要再排序，排序关键字(Sort Key)为ELECT.CNO。
+
+COURSE和ELECT的联接结果再与STUDENT进行MergeJoin，STUDENT作外表，使用主键上的索引进行扫描，不需要再排序；COURSE和ELECT的联接结果作为内表，需要再排序，排序关键字为ELECT.SNO。
+
+INSERT
+
+插入一条学生信息：
+
+explain INSERT INTO STUDENT VALUES( 'S0000005', '张某', '建筑', 22, 'F' );
+
+结果如下：
+
++------------------------------------------+
+
+|                QUERY PLAN                |
+
++------------------------------------------+
+
+| Result  (cost=0.00..0.01 rows=1 width=0) |
+
++------------------------------------------+
+
+插入数据时，不需要扫描表，生成一个Result计划。
+
+UPDATE语句
+
+把学号为'S0000005'的学生的年龄加1：
+
+explain update student set SAGE = 23 WHERE SNO = 'S0000005';
+
+结果如下：
+
++----------------------------------------------------------------------------+
+
+|                                 QUERY PLAN                                 |
+
++----------------------------------------------------------------------------+
+
+| Index Scan using STUDENT_PKEY on STUDENT  (cost=0.00..1.97 rows=1 width=8) |
+
+|   Index Cond: (SNO = 'S0000005'::BPCHAR)                                   |
+
++----------------------------------------------------------------------------+
+
+更新时，先要找到满足更新条件的元组，这就需要扫描表，表上有索引，且使用索引时代价较小，就生成了索引扫描。
+
+DELETE
+
+删除学号为'S0000005'的学生的信息：
+
+explain delete from  student WHERE SNO = 'S0000005';
+
+结果如下：
+
++----------------------------------------------------------------------------+
+
+|                                 QUERY PLAN                                 |
+
++----------------------------------------------------------------------------+
+
+| Index Scan using STUDENT_PKEY on STUDENT  (cost=0.00..1.97 rows=1 width=8) |
+
+|   Index Cond: (SNO = 'S0000005'::BPCHAR)                                   |
+
++----------------------------------------------------------------------------+
+
+可以找到要删除的学生时使用主键上的索引来扫描表。
+
+
+	REF = 
+DELETE
+INSERT
+SELECT
+UPDATE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = INSERT
+	ID = ID_HELP_INSERT
+	CONTENT = INSERT INTO table_name [ (column [,...]) ]
+
+ {DEFAULT VALUES | VALUES( expr [,...]) | select_stmt }
+	PARAM = 
+table_name
+一个现有的表或视图。
+
+column
+要插入数据的表中的字段名。具体请参见注释中的“字段列表”及“示例”。
+
+
+
+expr
+一个表达式，用于为新插入元组中对应的字段赋值。
+
+select_stmt
+一个SELECT语句，其结果将被插入到表table_name中。关于SELECT语句，其参见“SELECT”。
+
+DEFAULT VALUES
+DEFAULT VALUES相当于一个包含表中所有字段值的列表，对于那些在定义时声明了缺省值的列使用缺省值，其它的列为NULL。若使用DEFAULT VALUES插入数据，则不能同时使用字段列表。
+
+
+	REMARK = 
+INSERT语句用于向一个基本表或可更新视图中插入数据，关于视图是否可更新请参见“CREATE VIEW”。
+
+
+
+在进行数据插入时可以使用一个字段列表，这有两个用途：
+
+1、通过使用字段列表，在指定字段的值时就可以与它们在表定义中的顺序不同。
+
+２、通过使用字段列表，可以只显式指定部分字段的值，对于那些不在字段列表中的字段，若定义时指定了缺省值，则使用缺省值，否则将被初始化为NULL。
+
+
+
+在向一个基本表或视图中插入数据之前，用户必须拥有在该表或视图上的INSERT权限。关于权限管理，请参见“GRANT”与“REVOKE”。
+	EXAMPLE = 
+增加一个学生
+新生“汪某”入学了，学校需要将新生信息插入到STUDENT表中，这一功能可用如下的SQL语句实现：
+
+INSERT INTO STUDENT(SNO, SNAME, SDEPT, SAGE, SGENDER) VALUES('S0000005', '汪某', '数学', 19, 'M'); 
+
+在上述查询中没有指定SCREDIT的值，但由于在定义时声明了SCREDIT的缺省值为0，学生“汪某”的总学分将被初始化为0。
+　
+
+使用SELECT一次插入多行数据
+设计算机系想单独维护本系所开课程的信息，为此，建立如下的表：
+
+CREATE TABLE CS_COURSE (
+
+  CNO CHAR(4),		-- 课程号
+
+  CNAME VARCHAR(64),	-- 课程名
+
+  CCREDIT NUMERIC(3,1),	-- 学分
+
+  PRIMARY KEY(CNO));
+
+并使用如下查询将计算机系开的课的信息插入到CS_COURSE中：
+
+INSERT INTO CS_COURSE SELECT CNO, CNAME, CCREDIT FROM COURSE WHERE CDEPT = '计算机';
+
+执行完毕后CS_COURSE的内容如下：
+
++------+----------------+---------+
+
+| CNO  |     CNAME      | CCREDIT |
+
++------+----------------+---------+
+
+| C001 | C程序设计      |     3.0 |
+
+| C004 | 计算机网络     |     2.0 |
+
+| C005 | 数据库管理系统 |     3.0 |
+
++------+----------------+---------+
+ 
+
+
+	REF = 
+CREATE VIEW
+GRANT
+REVOKE
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = EXPRESSION
+	ID = ID_HELP_EXPRESSION
+	CONTENT = <expression> ::= <value expression>
+
+               | <conditional  expression>
+
+               | <subquery expression>
+
+     ;
+	PARAM = 
+
+	REMARK = 
+
+	EXAMPLE = 
+
+	REF = 
+conditional expression
+subquery expression
+table expression
+value expression
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = VALUE EXPRESSION
+	ID = ID_HELP_VALUE_EXPRESSION
+	CONTENT = <value expression> ::= <constant>
+
+                     | <column reference>
+
+                     | <positional parameter reference>
+
+                     | <operator invocation>
+
+                     | <function call>
+
+                     | <aggregate expression>
+
+                     | <type cast>
+
+                     | <scalar subquery>
+
+                     | ( <value expression> )
+
+    ;
+	PARAM = 
+column reference
+一个字段可以用下面形式的引用： 
+
+correlation.columnname
+
+或者 
+
+correlation.columnname[subscript]
+
+（这里，方括弧 [ ] 意思是按文本出现。） 
+
+correlation 是一个表的名字(可能是全称)， 或者是用FROM子句这样的方法定义的表的别名，如果在当前查询中所使用的所有表中，该字段名字是唯一的， 那么这个相关名字和分隔用的点就可以省略． 
+
+如果 column 是一个数组类型，那么可选的 subscript 选择该数组中指定的一个或多个元素． 如果没有提供脚标，那么选出整个数组。
+
+positional parameter reference
+位置参数引用用于标识一个 SQL 函数里的一个参数． 通常它用于 SQL 函数定义语句．一个参数的形式如下： 
+
+$number
+
+比如，看看一个函数 dept 的定义， 如下 
+
+CREATE FUNCTION dept (text) RETURNS dept
+
+  AS 'SELECT * FROM dept WHERE name = $1'
+
+  LANGUAGE SQL;
+
+在函数被调用的时候这里的 $1 将被第一个函数的参数代替
+
+
+
+operator invocation
+操作符调用有以下两种∶ 
+
+expression operator expression (双目中缀操作符)
+
+operator expression (单目前缀操作符)
+
+
+
+function call
+函数调用的语法是合法函数名字(可能有模式名修饰)， 后面跟着在圆括弧里的它的参数列表： 
+
+function ([expression [, expression ... ]] )
+
+
+
+aggregate expression
+一个聚集表达式代表一个聚集函数对 一个查询选出的行的处理．一个聚集函数把多个输入缩减为一个输出值， 比如给输入求和或平均．一个聚集表达式的语法是下列之一： 
+
+aggregate_name (expression)
+
+aggregate_name (ALL expression)
+
+aggregate_name (DISTINCT expression)
+
+aggregate_name ( * )
+
+这里 aggregate_name 是前面定义的聚集， (可能是全称)， 而 expression 是一个本身不包含聚集表达式 的任意值表达式． 
+
+第一种形式的聚集表达式为所有表达式生成非空值的输入行调用聚集． (实际上，是否忽略空值由聚集函数决定 --- 但是所有标准的聚集 函数都忽略它们．) 第二种形式和第一种一样，因为 ALL 是缺省值．第三种形式为所有输入行里找到 表达式的所有唯一的非空值调用聚集． 最后一种形式为每个输入行（不管是空还是非空）调用一次聚集； 因为没有声明特定的输入值．通常它只是对 count() 聚集函数有用． 
+
+比如，count(*) 生成输入行的总数； count(f1) 生成 f1 为非空的 输入行数；count(distinct f1) 生成 f1 唯一非空的行数．
+
+
+
+type cast
+一个类型转换声明一个从一种数据类型到另外一种数据类型的转换． OSCAR接受两种等效的类型转换语法∶ 
+
+CAST ( expression AS type )
+
+expression::type
+
+
+
+scalar subquery
+一个标量子查询是一个放在圆括弧里的普通 SELECT， 它只返回只有一个字段的一行．该 SELECT 将被执行， 而其单个返回值将在周围的值表达式中使用． 把一个返回超过一行或者超过一列的查询用做标量查询是错误的． (不过，在特定的执行中，子查询不返回行则不算错误；标量结果认为是 NULL．)该子查询可以引用周围查询的变量， 那些变量也是在计算任意子查询的时候当做常量使用的．
+
+
+	REMARK = 
+
+	EXAMPLE = 
+
+	REF = 
+CONSTANT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CONSTANT
+	ID = ID_HELP_CONSTANT
+	CONTENT = <constant> ::= <string constants>
+
+              |<bitstring constants>
+
+              |<numeric constants>
+
+              |<constants of other types>
+
+              |<array constants>
+
+    ;
+	PARAM = 
+string constants
+SQL 里的字符串常量是一个由单引号（"'"） 圈定范围的任意字符的序列，比如， 'This is a string'． SQL 允许你在字符串里嵌入单引号，方法是敲入两个连续的单引号 （比如，'Dianne''s horse'）． 或者用 一个反斜扛（"\"）来逃逸，比如， 'Dianne\'s horse'． 
+
+还可以使用 C-风格的反斜扛逃逸： \b 是一个退格，\f 是一个进纸，\n 是一个换行符， \r 是一个回车，\t 是一个水平制表符，而\xxx， 这里 xxx 是一个八进制数，是对应 ASCII 码的字符．任何其它跟在反斜扛后面的字符都当做文本看待． 因此，要在字符串常量里包含反斜扛，你可以敲两个反斜扛． 
+
+编码为零的字符不能出现在字符串常量中． 
+
+两个只是通过至少有一个换行符的空白 分隔的字符串常量会被连接在一起，并当做它们是写成一个常量处理． 比如： 
+
+SELECT 'foo'
+
+'bar';
+
+等效于 
+
+SELECT 'foobar';
+
+而 
+
+SELECT 'foo'      'bar';
+
+
+
+bitstring constants
+位串常量看起来很象在开引号前面有一个 B （大写或小写）的字符串（它们之间没有空白）， 比如 B'1001'．位串常量里可以用的字符只有 0 和 1．位串常量可以象普通字符串常量那样跨多个行． 
+
+另外，位串常量可以用十六进制表示法声明，方法是使用前缀的 X （大写或者小写），比如，X'1FF'。 这种表示法等效于一个每个十六进制位四个二进制位地位串常量。 
+
+两种形式的位串常量都可以象普通字串常量那样跨行连续。
+
+
+
+numeric constants
+数值常量接受下列通用的形式： 
+
+digits
+
+digits.[digits][e[+-]digits]
+
+[digits].digits[e[+-]digits]
+
+digitse[+-]digits
+
+这里的 digits 是一个或多个十进制位 （0 到 9）。 如果有小数点，那么至少有一位在小数点前面或后面．如果出现了指数分隔符 ( e)，那么至少有一个位跟在它后面． 在常量里不能有空格或者其他字符嵌入在内． 请注意任何前导地正号或者负号实际上都不认为是常量的一部分； 它是施加于常量的一个操作符。 
+
+这里是一些合法的数值常量的例子： 
+
+42
+
+3.5
+
+4.
+
+.001
+
+5e2
+
+1.925e-3
+
+如果一个数值常量既不包含小数点，也不包含指数操作符， 那么如果它的数值可以放在integer类型中（32位）， 则认为它是integer类型；如果它的数值可以放在 bigint中（64位），则认为它是 bigint； 否则认为它是 decimal类型。包含小数点和/或指数操作符 的常量总是被认为是decimal类型。 
+
+给一个数值常量赋予初始数据类型只是类型解析算法的开端。 在大多数情况下该常量会根据环境被自动强制转换成最合适的类型。 必要时，你可以通过强制类型转换把一个数值解析成特定的数据类型。
+
+constants of other types
+任意类似的常量可以用下列表示法中的 任何一种来输入： 
+
+type 'string'
+
+'string'::type
+
+CAST ( 'string' AS type )
+
+在字符串的文本将传递给那种叫 type 的类型的输入转换过程．结果是这种类型的一个常量． 如果不存在该常量所属类型的歧义，那么明确的类型映射可以省略 （比如，当你把它当做一个没有重载的函数的参数传递时）， 这种情况下它会自动转换
+
+
+
+array constants
+数组常量的通用格式如下： 
+
+'{ val1 , val2 , ... }'
+
+ 每个 val 要么是该数组元素类型的常量， 要么是一个子数组．下面是一个数组常量的例子 
+
+'{{1,2,3},{4,5,6},{7,8,9}}'
+
+这个常量是两维，3 乘 3数组，组成三个整数的子数组． 
+
+独立的数组元素可以放在双引号（" ） 中间以避免 因空白带来的歧义． 如果没有引号，那么数组值分析器就会忽略开头的空白． 
+
+（数组常量实际上只是我们前面讨论的通用类型常量的一种特例． 该常量开始是当做字符串对待的然后传递给数组输入转换过程． 可能需要明确地类型声明．） 
+
+
+
+
+	REMARK = 
+
+	EXAMPLE = 
+
+	REF = 
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CONDITIONAL EXPRESSION
+	ID = ID_HELP_CONDITIONAL_EXPRESSION
+	CONTENT = <conditional expression> ::= <case>
+
+                            |<coalesce>
+
+                            |<nullif>
+
+    ;
+	PARAM = 
+CASE
+CASE WHEN condition THEN result
+
+     [WHEN ...]
+
+     [ELSE result]
+
+END
+
+SQL CASE 是一种通用的条件表达式，类似于其他语言里的 if/else 语句． CASE 子句可以用于任何表达式可以有效存在的地方． condition 是一个返回boolean 的表达式． 如果结果为真，那么 CASE 表达式的结果就是 result． 如果结果为假，那么以相同方式搜寻任何随后的 WHEN 子句． 如果没有 WHEN condition 为真，那么 case 表达式的结果就是在 ELSE 子句里的值． 如果省略了 ELSE 子句而且没有匹配的条件， 结果为 NULL． 
+
+例子： 
+
+=> SELECT * FROM test;
+
+ a
+
+---
+
+ 1
+
+ 2
+
+ 3
+
+
+
+=> SELECT a,
+
+		CASE 	WHEN a=1 THEN 'one'
+
+			WHEN a=2 THEN 'two'
+
+			ELSE 'other'
+
+		END
+
+	FROM test;
+
+ a | case
+
+---+-------
+
+ 1 | one
+
+ 2 | two
+
+ 3 | other
+
+
+
+CASE expression
+
+    WHEN value THEN result
+
+    [WHEN ...]
+
+    [ELSE result]
+
+END
+
+这个"简单的" CASE 表达式是上面 的通用形式的一个特殊的变种． 先计算 expression 的值， 然后与所有在WHEN 子句里的 value 对比，直到找到一个相等的． 如果没有找到匹配的，则返回在 ELSE 子句里的 result （或者 NULL）． 这个类似于 C 里的 switch 语句． 
+
+上面的例子可以用简单 CASE 语法来写： 
+
+=> SELECT a,
+
+	CASE a	WHEN 1 THEN 'one'
+
+		WHEN 2 THEN 'two'
+
+		ELSE 'other'
+
+	END
+
+	FROM test;
+
+ a | case
+
+---+-------
+
+ 1 | one
+
+ 2 | two
+
+ 3 | other
+
+
+
+COALESCE
+COALESCE(value[, ...])
+
+COALESCE 返回它的第一个非 NULL 的参数的值． 它常用于在为显示目的检索数据时用缺省值替换 NULL 值． 比如： 
+
+SELECT COALESCE(description, short_description, '(none)') ...
+
+
+
+NULLIF
+NULLIF(value1, value2)
+
+当且仅当 value1 和 value2 相等时，NULLIF 才返回 NULL． 否则它返回 value1． 这些可以用于执行上面给出的 COALESCE 例子的反例： 
+
+SELECT NULLIF(value, '(none)') ...
+
+
+
+
+	REMARK = 
+COALESCE 和 NULLIF 都只是 CASE 表达式的缩写．实际上它们在处理的很早的阶段 转换成 CASE 表达式，然后随后的处理认为它在处理 CASE． 因此，错误的COALESCE 或 NULLIF 的使用可能产生一个引用 CASE 的错误信息.
+	EXAMPLE = 
+
+	REF = 
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SUBQUERY EXPRESSION
+	ID = ID_HELP_SUBQUERY_EXPRESSION
+	CONTENT = <subquery expression> ::= <exists>
+
+                         |<scalar_in>
+
+                         |<subquery_in>
+
+                         |<scalar_not_in>
+
+                         |<subquery_not_in>
+
+                         |<any_some>
+
+                         |<all>
+
+                         |<rowwise_comparison>
+
+     ;
+	PARAM = 
+EXISTS
+EXISTS ( subquery )
+
+EXISTS 的参数是一个任意的 SELECT 语句， 或者说子查询．系统对子查询进行运算以判断它 是否返回行．如果它至少返回一行，那么 EXISTS 的结果就为真； 如果子查询没有返回行，那么 EXISTS 的结果是 FALSE． 
+
+子查询可以引用来自周围的查询的变量，这些变量在该子查询的任何一次 计算中都起常量的作用． 
+
+这个子查询通常只是运行到能判断它是否可以生成至少一行为止， 而不是等到全部结束．在这里写任何有副作用的子查询都是不明智的 (比如调用序列函数)；这些副作用是否发生是很难判断的． 
+
+因为结果只取决于是否会返回行，而不取决于这些行的内容， 所以这个子查询的输出列表通常是无关紧要的．一个常用的 编码习惯是用下面的形式写所有的 EXISTS 测试 EXISTS(SELECT 1 WHERE ...)．不过这条规则有例外， 比如那些使用 INTERSECT 的子查询． 
+
+下面这个简单的例子类似在 col2 上的一次内联接，但是它为每个 tab1 的行生成最多一个输出，即时存在多个匹配 tab2 的行也如此∶ 
+
+SELECT col1 FROM tab1
+
+    WHERE EXISTS(SELECT 1 FROM tab2 WHERE col2 = tab1.col2);
+
+
+
+SCALAR_IN
+expression IN (value[, ...])
+
+IN 的这种形式的右手边是一个用圆括弧括起来的 标量表达式的列表．如果左手边的表达式的结果等于任何右手边表达式的结果 中的一个，那么整个表达式的结果就是真．它是下面的表示法的缩写 
+
+expression = value1
+
+OR
+
+expression = value2
+
+OR
+
+...
+
+请注意如果左手边的表达式生成 NULL，或者没有相等的右手边数值， 并且右手边表达式至少有一个生成 NULL，那么 IN 构造的 结果将为 NULL，而不是 FALSE．这个行为是遵照 SQL 处理布尔和 NULL 值组合时的规则定的
+
+
+
+SUBQUERY_IN
+expression IN (subquery)+ 
+
+IN 的这种形式的右手边是一个圆括弧括起来的子查询， 它必须只返回一列．左手边表达式对子查询的结果的每一行进行一次计算和 比较．如果找到任何等于子查询行的情况，那么 IN 的结果就是 TRUE．如果没有找到相等行，那么结果是 FALSE(包括子查询没有返回任何行 的特殊例子)． 
+
+请注意如果左手边表达式生成 NULL，或者没有相等的右手边数值， 并且至少有一个右手边行生成 NULL，那么 IN 构造的 结果将是 NULL，而不是 FALSE．这个行为是遵照 SQL 处理布尔和 NULL 值组合时的规则定的． 
+
+和 EXISTS 一样，假设子查询将被运行完全是不明智的． 
+
+(expression, expression[, ...]) IN (subquery)
+
+这种形式的 IN 的右手边是一个圆括弧括起来的子查询， 它必须返回和左手边表达式列表中完全一样多的字段． 左手边表达式就子查询结果的每一行进行计算很比较．如果找到任意 相等的子查询行，则 IN 的结果为 TRUE．如果没有找到相等行， 那么结果为 FALSE(包括子查询不返回行的特殊例子)． 
+
+通常，表达式或者子查询行里的 NULL 是按照 SQL 布尔表达式的一般规则 进行组合的．如果两个行对应的成员都是非空并且相等，那么认为这两行 相等；如果任意对应成员为非空且不等，那么该两行不等； 否则这样的行比较的结果是未知(NULL)．如果所有行的结果要么是不等， 要么是 NULL，并且至少有一个 NULL，那么 IN 的结果是 NULL
+
+
+
+SCALAR_NOT_IN
+expression NOT IN (value[, ...])
+
+这种形式的 NOT IN 的右手边是一个圆括弧括起来的 标量表达式的列表．如果左手边表达式的结果与所有右手边表达式的结果 都不相等，那么结果是 TRUE．它是下面表示法的缩写 
+
+expression <> value1
+
+AND
+
+expression <> value2
+
+AND
+
+...
+
+请注意如果左手边表达式生成 NULL，或者存在相等的右手边数值， 并且至少有一个右手边行生成 NULL，那么 NOT IN 构造的 结果将是 NULL，而不是 FALSE．这个行为是遵照 SQL 处理布尔和 NULL 值组合时的规则定的
+
+
+
+SUBQUERY_NOT_IN
+expression NOT IN (subquery)
+
+NOT IN 的这种形式的右手边是一个圆括弧括起来的子查询， 它必须只返回一列．左手边表达式对子查询的结果的每一行进行一次计算和 比较．如果只出现不等于子查询行的情况，那么 NOT IN 的结果就是 TRUE．(包括子查询没有返回任何行的特殊例子)． 如果找到相等行，那么结果是 FALSE． 
+
+请注意如果左手边表达式生成 NULL，或者没有相等的右手边数值， 并且至少有一个右手边行生成 NULL，那么 NOT IN 构造的 结果将是 NULL，而不是 TRUE．这个行为是遵照 SQL 处理布尔和 NULL 值组合时的规则定的． 
+
+和 EXISTS 一样，假设子查询将被运行完全是不明智的． 
+
+(expression, expression[, ...]) NOT IN (subquery)
+
+这种形式的 NOT IN 的右手边是一个圆括弧括起来的子查询， 它必须返回和左手边表达式列表中完全一样多的字段． 左手边表达式就子查询结果的每一行进行计算和比较．如果只存在不 相等的子查询行，则 NOT IN 的结果为 TRUE． (包括子查询不返回行的特殊例子). 如果找到任何相等行， 那么结果为 FALSE． 
+
+通常，表达式或者子查询行里的 NULL 是按照 SQL 布尔表达式的一般规则 进行组合的．如果两个行对应的成员都是非空并且相等，那么认为这两行 相等；如果任意对应成员为非空且不等，那么该两行不等； 否则这样的行比较的结果是未知(NULL)．如果所有行的结果要么是不等， 要么是 NULL，并且至少有一个 NULL，那么 NOT IN 的结果是 NULL
+
+
+
+ANY_SOME
+expression operator ANY(subquery)
+
+expression operator SOME (subquery)
+
+ANY 的这种形式的右手边是一个圆括弧括起来的子查询， 它必须只返回一列．左手边表达式将使用给出的 operator对子查询的结果的每一行进行一次计算和比较．该操作符必须生成布尔结果． 如果获得任何真值结果，那么 ANY 的结果就是 TRUE．如果没有找到真值结果，那么结果是 FALSE(包括子查询没有返回任何行 的特殊例子)． 
+
+SOME 是 ANY 的同意词． IN 等效于 = ANY． 
+
+请注意如果没有任何成功并且至少有一个右手边行为该操作符结果生成 NULL， 那么 ANY 构造的结果将是 NULL，而不是 FALSE． 这个行为是遵照 SQL 处理布尔和 NULL 值组合时的规则定的． 
+
+和 EXISTS 一样，假设子查询将被运行完全是不明智的． 
+
+(expression,expres[,]optiona ANY (subquery)
+
+(expression,expres[,]optiona SOME (subquery)
+
+ANY 的这种形式的右手边是一个圆括弧括起来的子查询， 它必须返回和左手边列表给出的表达式一样多的列．左手边表达式将使用给出的 operator对子查询的结果的每一行进行一次计算和 比较．目前系统只允许使用 = 很 <> 操作符处理逐行的 ANY 查询． 如果分别找到相等或者不相等的行，那么 ANY 的结果就是 TRUE．如果没有找到这样的行，那么结果是 FALSE(包括子查询没有返回任何行 的特殊例子)． 
+
+通常，表达式或者子查询行里的 NULL 是按照 SQL 布尔表达式的一般规则 进行组合的．如果两个行对应的成员都是非空并且相等，那么认为这两行 相等；如果任意对应成员为非空且不等，那么该两行不等； 否则这样的行比较的结果是未知(NULL)．如果至少有一个 NULL 行结果， 那么 ANY 的结果将是TRUE 或者 NULL.
+
+
+
+ALL
+expression operator ALL(subquery)
+
+ALL 的这种形式的右手边是一个圆括弧括起来的子查询， 它必须只返回一列．左手边表达式将使用给出的 operator对子查询的结果的每一行进行一次计算和 比较．该操作符必须生成布尔结果． 如果所有行的结果都为 TRUE，(包括子查询没有返回任何行的特殊例子)． 那么 ALL 的结果就是 TRUE．如果没有存在任何假值结果，那么结果是 FALSE． 
+
+NOT IN 等效于 <> ALL． 
+
+请注意如果没有运算失败但是至少有一个右手边行为该操作符的结果 生成 NULL 值，那么 ALL 构造的结果将是 NULL，而不是 TRUE． 这个行为是遵照 SQL 处理布尔和 NULL 值组合时的一般规则定的． 
+
+和 EXISTS 一样，假设子查询将被运行完全是不明智的． 
+
+(expression, expression[, ...]) operator ALL (subquery)
+
+ALL 的这种形式的右手边是一个圆括弧括起来的子查询， 它必须返回和左手边列表给出的表达式一样多的列．左手边表达式将使用给出的 operator对子查询的结果的每一行进行一次计算和 比较．目前系统只允许使用 = 和 <> 操作符处理逐行的 ALL 查询． 如果所有子查询都是相等或者不相等的行，那么 ALL 的结果就是 TRUE．(包括子查询没有返回任何行的特殊例子)． 如果分别有任何不相等或者相等的行，那么结果是 FALSE． 
+
+通常，表达式或者子查询行里的 NULL 是按照 SQL 布尔表达式的一般规则 进行组合的．如果两个行对应的成员都是非空并且相等，那么认为这两行 相等；如果任意对应成员为非空且不等，那么该两行不等； 否则这样的行比较的结果是未知(NULL)．如果至少有一个 NULL 行结果， 那么 ALL 的结果就不可能是TRUE；它将会是 FALSE 或者 NULL
+
+
+
+ROWWISE COMPARISON
+(expression, expression[, ...]) operator (subquery)
+
+(expression, expression[, ...]) operator (expression, expression[, ...])
+
+左手边是一个标量表达式列表．右手边可以是一个等长的标量表达式的列表， 或者一个圆括弧括起来的子查询，该查询必须返回很左手边表达式书目完全 一样的字段．另外，该子查询不能返回超过一行的数量．(如果它返回零行， 那么结果就是 NULL．)左手边逐行与右手边的子查询结果行，或者右手边 表达式列表进行比较．目前，只允许使用 = 和 <> 操作符进行逐行比较． 如果两行分别是相等或者不等，那么结果为真． 
+
+通常，表达式或者子查询行里的 NULL 是按照 SQL 布尔表达式的一般规则 进行组合的．如果两个行对应的成员都是非空并且相等，那么认为这两行 相等；如果任意对应成员为非空且不等，那么该两行不等； 否则这样的行比较的结果是未知(NULL)．
+
+
+
+
+	REMARK = 
+
+	EXAMPLE = 
+
+	REF = 
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: WHERE
+	ID = ID_HELP_SELECT:_WHERE
+	CONTENT = WHERE condition
+	PARAM = 
+
+	REMARK = 
+WHERE子句对FROM子句输出结果的每一行进行判断，只输出那些满足条件的行给后续的处理。WHERE条件中可以包含任意结果为布尔类型的表达
+
+
+式，通常形如：
+
+  expr logic_op expr
+
+或
+
+  expr cond_op expr
+
+logic_op可以是AND, OR, NOT(此时没有左手边的表达式，即形如NOT expr)，cond_op除了常用的<, <=, =, >=, >, <>等操作外，实际上可以
+
+
+包含任意合法的操作，如LIKE。
+
+
+
+WHERE子句中还可以使用子查询。子查询体现了SQL的可扩展性，通过使用子查询，可以写出任何复杂的SQL语句。对于子查询的结果，可以使用
+
+
+如下操作进行判断：
+
+1、expr op ALL (子查询)：当且仅当对子查询结果中的每一行A，expr op A都成立时表达式才成立。
+
+2、expr op ANY (子查询)：只需对子查询结果中的某一行A，expr op A成立，表达式即成立。
+
+3、expr [NOT] IN (子查询)：判断expr是否在子查询的结果之中，若不指定NOT，则等价于expr = ANY (子查询)，若指定NOT，则等价于expr 
+
+
+<> ALL (子查询)。
+
+4、[NOT] EXISTS (子查询)：判断子查询的结果是否为空，若不为空，则EXISTS (子查询)成立，否则NOT EXISTS (子查询)成立。
+
+5、expr op (子查询)：此时子查询称为标量子查询，必须返回一行结果且只返回一行，否则系统将会报错。
+
+
+
+
+
+若右手边表达式为一个子查询，则还可以使用IN, [NOT] EXISTS等操作，及形如expr cond_op [ALL | ANY] (subquery)的表达式，详细说明请
+
+
+参见下面的SELECT语句的示例。
+	EXAMPLE = 
+使用WHERE子句对查询结果进行筛选
+可以在WHERE子句中指定查询条件，用于限制查询的结果集。如获取所有计算机系学生的信息可用如下语句实现：
+
+SELECT * FROM STUDENT WHERE SDEPT = '计算机';
+
+查询结果如下：
+
++----------+-------+--------+------+---------+---------+
+
+|   SNO    | SNAME | SDEPT  | SAGE | SGENDER | SCREDIT |
+
++----------+-------+--------+------+---------+---------+
+
+| S0000001 | 王某  | 计算机 |   23 | M       |    14.0 |
+
+| S0000003 | 刘某  | 计算机 |   24 | M       |     6.0 |
+
++----------+-------+--------+------+---------+---------+
+　
+
+使用IN操作
+IN操作可以判断一个表达式是否在子查询的结果之中，如使用以下的查询可以获得没有选修过任何一门课的学生：
+
+SELECT SNAME FROM STUDENT 
+
+WHERE SNO NOT IN(SELECT SNO FROM ELECT);
+
+查询结果如下：
+
++-------+
+
+| SNAME |
+
++-------+
+
+| 孙某  |
+
++-------+
+
+
+ 
+
+判断子查询的结果是否为空
+使用EXISTS关键字可以判断子查询的结果是否为空，如上述的查询与以下的查询是等价的：
+
+SELECT SNAME FROM STUDENT
+
+WHERE NOT EXISTS (SELECT * FROM ELECT WHERE ELECT.SNO = STUDENT.SNO);
+ 
+
+使用ALL关键字
+ALL关键字可用来判断一个表达式是否对子查询的所有结果都成立。如得到平均分最高的学生也可以用如下的
+
+查询实现：
+
+SELECT SNAME, AVG(SCORE)
+
+FROM STUDENT NATURAL JOIN ELECT
+
+GROUP BY SNAME
+
+HAVING AVG(SCORE) >= ALL(SELECT AVG(SCORE) FROM STUDENT NATURAL JOIN ELECT GROUP BY SNAME);
+ 
+
+标量子查询
+标量子查询为只返回一行的查询，标量子查询的结果可以像变通的表达式一样使用。如得到所有平均分在85分以上的学分，可以对每一个学生使用标量子查询计算出学生的平均分，然后判断该平均分是否大于85，如下所示：
+
+SELECT SNAME FROM STUDENT
+
+WHERE (SELECT AVG(SCORE) FROM ELECT WHERE ELECT.SNO = STUDENT.SNO) > 85;
+
+查询结果如下：
+
++-------+
+
+| SNAME |
+
++-------+
+
+| 王某  |
+
++-------+
+ 
+
+
+	REF = 
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: SETOP
+	ID = ID_HELP_SELECT:_SETOP
+	CONTENT = [UNION|INTERSECT|EXCEPT][ALL] <select_stmt>
+	PARAM = 
+select_stmt
+一个查询语句，与普通查询语句的唯一区别在于：若该查询语句没有用括号括起，则不能包含ORDER BY, FOR UPDATE和LIMIT子句。
+
+
+	REMARK = 
+SETOP子句将左右的结果进行集合操作。左右子查询可以是任意的SELECT语句，但若它们没有用圆括号括起，则不能使用ORDER BY、LIMIT、FOR UPDATE子句(在右子查询之后可以使用这些子句，但此时这些子句是对集合操作的结果起作用)。
+
+
+
+进行集合操作的两个子查询的结果中要求拥有相同数目的字段，并且每个对应的字段必须拥有兼容的数据类型。
+
+
+
+集合操作可以是UNION, INTERSECT或EXCEPT。在缺省情况下，集合操作将消除结果中的重复行，用户可以使用ALL关键字指定保留结果中的重复行。各种集合操作的含义如下：
+
+
+
+UNION操作的结果为左右两个子查询结果的并集，同时消除重复；UNION ALL操作的结果为左右两个子查询结果的并，不消除重复。INTERSECT操作的结果为左右两个子查询的交集，同时消除重复；INTERSECT ALL操作的结果为左右两个子查询结果的交集，不消除重复，即若元组A在左右子查询中分别出现M次和N次，则INTERSECT ALL操作的结果中将包含min(M, N)个A元组。EXCEPT操作的结果为左右两个子查询结果的差，同时消除重复；EXCEPT ALL操作的结果为左右两个子查询结果的差，不消除重复，即若元组A在左右子查询中分别出现M次和N次，则EXCEPT ALL操作的结果中将包含M-N个A元组(若M<=N，则结果中将不包含A)。
+
+
+
+三个集合操作的优化级不同，UNION和EXCEPT的优化级相同，INTERSECT的优化级比它们俩都高。即A UNION B INTERSECT C相当于A UNION (B INTERSECT C)。
+
+
+
+设现有两个表T1和T2，内容如下：
+
+SELECT * FROM T1;
+
++---+
+
+| A |
+
++---+
+
+| 1 |
+
+| 1 |
+
+| 3 |
+
+| 3 |
+
++---+
+
+SELECT * FROM T2;
+
++---+
+
+| A |
+
++---+
+
+| 2 |
+
+| 3 |
+
+| 3 |
+
+| 4 |
+
++---+
+
+则进行各种集合操作时的结果分别如下所示：
+
+SELECT * FROM T1 UNION SELECT * FROM T2;
+
++---+
+
+| A |
+
++---+
+
+| 1 |
+
+| 2 |
+
+| 3 |
+
+| 4 |
+
++---+
+
+SELECT * FROM T1 UNION ALL SELECT * FROM T2;
+
++---+
+
+| A |
+
++---+
+
+| 1 |
+
+| 1 |
+
+| 3 |
+
+| 3 |
+
+| 2 |
+
+| 3 |
+
+| 3 |
+
+| 4 |
+
++---+
+
+SELECT * FROM T1 INTERSECT SELECT * FROM T2;
+
++---+
+
+| A |
+
++---+
+
+| 3 |
+
++---+
+
+SELECT * FROM T1 INTERSECT ALL SELECT * FROM T2;
+
++---+
+
+| A |
+
++---+
+
+| 3 |
+
+| 3 |
+
++---+
+
+SELECT * FROM T1 EXCEPT SELECT * FROM T2;
+
++---+
+
+| A |
+
++---+
+
+| 1 |
+
++---+
+
+SELECT * FROM T1 EXCEPT ALL SELECT * FROM T2;
+
++---+
+
+| A |
+
++---+
+
+| 1 |
+
+| 1 |
+
++---+
+	EXAMPLE = 
+选出没有选修过外语课的学生
+学校里想检查是否有学生至今还没有选修过外语课。这可以通过集合操作实现，即首先选出所有学生，然后减去所有选修过外语课的学生。查询如下：
+
+SELECT SNO, SNAME FROM STUDENT
+
+EXCEPT
+
+SELECT SNO, SNAME 
+
+FROM STUDENT NATURAL JOIN ELECT NATURAL JOIN COURSE
+
+WHERE CDEPT = '外语';
+
+查询结果如下：
+
++----------+-------+
+
+|   SNO    | SNAME |
+
++----------+-------+
+
+| S0000003 | 刘某  |
+
+| S0000004 | 孙某  |
+
++----------+-------+
+ 
+
+验证数据库一致性
+对于我们的通用运行示例来说，若数据是一致的，则应该满足以下的条件：
+
+1、ELECT表中出现的SNO必须在STUDENT表中出现；
+
+2、ELECT表中出现的CNO必须在COURSE表中出现；
+
+可以通过使用如下查询来验证上述的一致性：
+
+SELECT SNO FROM ELECT EXCEPT SELECT SNO FROM STUDENT;
+
+SELECT CNO FROM ELECT EXCEPT SELECT CNO FROM COURSE;
+
+在数据库一致的情况下，上述查询应该都返回0行。
+
+
+ 
+
+
+	REF = 
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: LIMIT
+	ID = ID_HELP_SELECT:_LIMIT
+	CONTENT = LIMIT { count | ALL } [ OFFSET start ]
+	PARAM = 
+count
+至多返回count行。
+
+ALL
+返回offset之后的所有行。
+
+offset
+在开始返回第一行之前要忽略的行数。
+
+
+	REMARK = 
+LIMIT子句用于对返回结果的范围进行限制，一个完整的LIMIT子句形如IMIT count OFFSET start，其含义为返回查询结果中从start行开始之后的count个行(或count为关键字ALL，则返回之后的所有行)。OFFSET start部分是可选的，若不指定，则返回结果集中的前count行。
+
+
+
+LIMIT子句通常与ORDER BY子句联用，因为不使用ORDER BY子句，SQL是不保证结果的顺序的。若不使用ORDER BY子句对结果进行排序，在不同的时刻运行同一查询，你有可能会发现结果的顺序变了。
+	EXAMPLE = 
+使用LIMIT子句限定要返回的结果
+LIMIT子句是OSCAR对SQL92扩展，如可用如下查询得到平均分最高的学生：
+
+SELECT SNAME, AVG(SCORE) AS AVG_SCORE 
+
+FROM STUDENT NATURAL JOIN ELECT
+
+GROUP BY SNAME
+
+ORDER BY AVG_SCORE DESC
+
+LIMIT 1;
+
+查询结果如下：
+
++-------+--------------------+
+
+| SNAME |     AVG_SCORE      |
+
++-------+--------------------+
+
+| 王某  | 85.500000000000000 |
+
++-------+--------------------+
+  
+
+
+	REF = 
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: FOR UPDATE
+	ID = ID_HELP_SELECT:_FOR_UPDATE
+	CONTENT = FOR UPDATE [ OF {table_name [, ...]|column_name [,...]} ]
+	PARAM = 
+table_name
+一个基本表或视图。
+
+column_name
+只有在进行游标操作定义时才可以指定列声明FOR UPDATE。关于游标定义，请参见“DECLARE”。
+
+
+	REMARK = 
+FOR UPDATE指定对扫描经过的行加排它锁。若不详细指定表名，则对扫描经过的所有行都会加排它锁，若指定，则只会对指定的表中扫描经过的行加排它锁。若对一个视图指定FOR UPDATE，则会对视图所依赖的所有基本表中扫描经过的行加排它锁。
+	EXAMPLE = 
+通过使用FOR UPDATE防止死锁
+FOR UPDATE子句最常见的用途是用于防止死锁。为说明这一问题，考虑有两个客户端，并发的执行以下的语句序列：
+
+BEGIN;
+
+SELECT * FROM STUDENT WHERE SNAME = '孙某';
+
+UPDATE STUDENT SET SAGE = 23 WHERE SNAME = '孙某';
+
+COMMIT;
+
+若当前事务隔离级别为可重复读或可串行化级别，则若两个客户端以以下的顺序交叉执行上述语句：
+
+客户端1: BEGIN;
+
+客户端2: BEGIN;
+
+客户端1: SELECT * FROM STUDENT WHERE SNAME = '孙某';
+
+客户端2: SELECT * FROM STUDENT WHERE SNAME = '孙某';
+
+客户端1: UPDATE STUDENT SET SAGE = 23 WHERE SNAME = '孙某';
+
+客户端2: UPDATE STUDENT SET SAGE = 23 WHERE SNAME = '孙某';
+
+则会发生死锁，这是由于在执行SELECT语句时两个客户端都对STUDENT表中'孙某'对应的行加了共享锁，在执行UPDATE语句时又都需要对同一行加排它锁，由此就产生了锁的循环等待。
+
+可以通过对SELECT语句增加FOR UPDATE解决死锁问题，即将上述的SELECT语句修改为：
+
+SELECT * FROM STUDENT WHERE SNAME = '孙某' FOR UPDATE;
+
+这样在执行SELECT语句时就会对STUDENT表中'孙某'对应的行加排它锁。这样，在客户端1执行了SELECT语句后，客户端2也去执行SELECT语句时就会被阻塞，到客户端1成功执行了UPDATE语句并提交事务后，客户端2又会被重新激活并继续执行。
+
+
+ 
+
+
+	REF = 
+DECLARE
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: INTO
+	ID = ID_HELP_SELECT:_INTO
+	CONTENT = INTO [ TEMPORARY | TEMP ] [ TABLE ] new_table
+	PARAM = 
+TEMPORARY, TEMP
+指定创建一个临时表。
+
+new_table
+要创建的表的名称。
+
+
+	REMARK = 
+INTO子句首先进行建表操作，然后将SELECT语句的执行结果插入到该表中。SELECT INTO语句与CREATE AS语句的作用是相同的。
+
+
+
+可以使用TEMPORARY或TEMP关键字指定创建一个临时表，该表只对当前连接有效，在连接退出时就会被自动删除。
+
+
+
+若通过SELECT INTO语句创建的表不是临时表，则不能与现有的非临时表重名；若创建的表是临时表，则可以与现有的非临时表重名，但不能与现有的临时表重名。
+
+
+
+
+	EXAMPLE = 
+使用SELECT INTO创建表
+通过以下的语句可以创建一个表CS_COURSE，并把所有计算机系开的课的信息插入到新建的表中：
+
+SELECT * INTO CS_COURSE FROM COURSE WHERE CDEPT = '计算机';
+
+语句执行成功后CS_COURSE表的内容如下：
+
++------+----------------+--------+---------+
+
+| CNO  |     CNAME      | CDEPT  | CCREDIT |
+
++------+----------------+--------+---------+
+
+| C001 | C程序设计      | 计算机 |     3.0 |
+
+| C004 | 计算机网络     | 计算机 |     2.0 |
+
+| C005 | 数据库管理系统 | 计算机 |     3.0 |
+
++------+----------------+--------+---------+
+ 
+
+
+	REF = 
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: HAVING
+	ID = ID_HELP_SELECT:_HAVING
+	CONTENT = HAVING condition
+	PARAM = 
+condition
+一个结果为布尔类型的表达式。
+
+
+	REMARK = 
+HAVING子句对GROUP BY子句输出的每个组计算HAVING条件，若结果为TRUE，则输出该组中的所有行，若结果为FALSE，则忽略该组中的所有行。
+
+
+
+虽然HAVING子句与WHERE子句有相同的形式，意义却有很大的不同。WHERE子句用于在分组之前对FROM子句的输出进行过滤，其条件是针对每一个单独的行进行衡量的，因此其中不允许出现聚集函数(除非来自于父查询)；HAVING子句用于在分组之后对GROUP BY子句的输出进行过滤，其条件是针对一个组中的所有行进行衡量的，因此其中可以包含聚集函数，但不能引用那些不在GROUP BY子句中的字段，如：
+
+SELECT ... FROM STUDENT GROUP BY SDEPT HAVING SGENDER = 'M';
+
+是一合法的。
+	EXAMPLE = 
+对分组的结果进行判断
+可以使用HAVING子句对分组的结果进行判断，如以下查询将选出那些至少选了两门课的学生：
+
+SELECT SNAME, COUNT(*)
+
+FROM STUDENT NATURAL JOIN ELECT
+
+GROUP BY SNAME
+
+HAVING COUNT(*) >= 2;
+
+查询结果如下：
+
++-------+-------+
+
+| SNAME | COUNT |
+
++-------+-------+
+
+| 李某  |     6 |
+
+| 刘某  |     2 |
+
+| 王某  |     4 |
+
++-------+-------+
+ 
+
+
+	REF = 
+SELECT
+SELECT: GROUP BY
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: EXAMPLE
+	ID = ID_HELP_SELECT:_EXAMPLE
+	CONTENT = 无
+	PARAM = 
+
+	REMARK = 
+以下给出在说明SELECT, INSERT, UPDATE, DELETE语句时的通用示例。该示例中包含三个表：STUDENT, COURSE, ELECT，其定义及内容分别如下：
+	EXAMPLE = 
+STUDENT
+STUDENT表为学生信息表，定义如下：
+
+CREATE TABLE STUDENT (
+
+  SNO CHAR(8),		-- 学号
+
+  SNAME VARCHAR(16),	-- 姓名
+
+  SDEPT VARCHAR(8),	-- 所在系
+
+  SAGE INT,		-- 年龄
+
+  SGENDER CHAR(1),	-- 性别('M'表示男，'F'表示女)
+
+  SCREDIT NUMERIC(4,1) DEFAULT 0, -- 总学分
+
+  PRIMARY KEY(SNO));
+
+内容如下：
+
++----------+-------+--------+------+---------+---------+
+
+|   SNO    | SNAME | SDEPT  | SAGE | SGENDER | SCREDIT |
+
++----------+-------+--------+------+---------+---------+
+
+| S0000001 | 王某  | 计算机 |   23 | M       |    14.0 |
+
+| S0000002 | 李某  | 数学   |   21 | F       |    28.5 |
+
+| S0000003 | 刘某  | 计算机 |   24 | M       |     6.0 |
+
+| S0000004 | 孙某  | 信电   |   20 | F       |     0.0 |
+
++----------+-------+--------+------+---------+---------+
+ 
+
+COURSE
+COURSE表为课程信息表，定义如下：
+
+CREATE TABLE COURSE (
+
+  CNO CHAR(4),		-- 课程号
+
+  CNAME VARCHAR(64),	-- 课程名
+
+  CDEPT VARCHAR(8),	-- 开课的系
+
+  CCREDIT NUMERIC(3,1),	-- 学分
+
+  PRIMARY KEY(CNO));
+
+内容如下：
+
++------+----------------+--------+---------+
+
+| CNO  |     CNAME      | CDEPT  | CCREDIT |
+
++------+----------------+--------+---------+
+
+| C001 | C程序设计      | 计算机 |     3.0 |
+
+| C002 | 数学分析       | 数学   |    11.5 |
+
+| C003 | 新编大学英语   | 外语   |     5.0 |
+
+| C004 | 计算机网络     | 计算机 |     2.0 |
+
+| C005 | 数据库管理系统 | 计算机 |     3.0 |
+
+| C006 | 线性代数       | 数学   |     3.0 |
+
++------+----------------+--------+---------+   
+ 
+
+ELECT
+ELECT表为学生选课信息表，定义如下：
+
+CREATE TABLE ELECT (
+
+  SNO CHAR(8),		-- 学号
+
+  CNO CHAR(4),		-- 课程号
+
+  SCORE NUMERIC(4,1),	-- 成绩
+
+  FOREIGN KEY(SNO) REFERENCES STUDENT(SNO) ON UPDATE CASCADE ON DELETE CASCADE,
+
+  FOREIGN KEY(CNO) REFERENCES COURSE(CNO) ON UPDATE CASCADE ON DELETE CASCADE);
+
+内容如下：
+
++----------+------+-------+
+
+|   SNO    | CNO  | SCORE |
+
++----------+------+-------+
+
+| S0000001 | C001 |  84.0 |
+
+| S0000001 | C003 |  75.0 |
+
+| S0000001 | C004 |  95.0 |
+
+| S0000001 | C005 |  88.0 |
+
+| S0000002 | C001 |  86.0 |
+
+| S0000002 | C002 |  69.0 |
+
+| S0000002 | C003 |  75.0 |
+
+| S0000002 | C004 |  81.0 |
+
+| S0000002 | C006 |  92.0 |
+
+| S0000002 | C005 |  83.0 |
+
+| S0000003 | C001 |  84.0 |
+
+| S0000003 | C004 |  79.0 |
+
++----------+------+-------+
+ 
+
+
+	REF = 
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = IDETIFIER
+	ID = ID_HELP_IDETIFIER
+	CONTENT = 
+	PARAM = 
+
+	REMARK = 
+   关键字是指在SQL语言里有固定含义的单词，关键字和标示符有着同样的词法结构。关键字中有一些是保留关键字，保留关键字不能用作标示符。  
+
+   SQL 标识符和关键字必须以一个字母开头 （a-z 以及带可区别标记的 字母以及非拉丁字母 ）或下划线开头 （_）开头．标识符和关键字里随后的字符可以是 字母，数字（0-9）， 或者下划线.
+
+标识符和关键字名字都是大小写无关的．因此 
+
+UPDATE MY_TABLE SET A = 5;
+
+也可以等效地写成 
+
+uPDaTE my_TabLE SeT a = 5;
+
+一种好习惯是把关键字写成大写，而名字等用小写． 
+
+UPDATE my_table SET a = 5;
+
+还有第二种标识符：分隔标识符 或引起标识符． 它是通过在双引号（" ） 里包围任意字符序列形成的． 分隔标识符总是一个标识符，而不是关键字．因此，你可以用 "SELECT" 表示一个字段名字或者名字叫 "SELECT" 的表，而一个没有引号的 SELECT 将被当做一条命令的一部分，因此如果把它 当做一个表的名字或者字段名字用的话就会产生一个分析错误． 上面的例子可以用引起的标识符这么写： 
+
+UPDATE "my_table" SET "a" = 5;
+
+引起标识符可以包含除引号本身以外的任何其它字符． 要包含一个双引号，我们可以写两个双引号。 这样我们就可以构造那些原本是不允许的表或者字段名字， 比如那些包含空白或与号的名字．
+
+把一个标识符引起来同时也令它大小写相关，而没有引起来的名字 总是转成大写．比如，我们认为标识符 FOO，foo 和 "FOO" 是一样的名字， 但 "Foo" 和 "foo" 与上面三个以及它们之间都是不同的.
+
+  标示符的长度不能大于或等于64。
+
+
+	EXAMPLE = 
+
+	REF = 
+KEYWORD
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP STATISTICS
+	ID = ID_HELP_DROP_STATISTICS
+	CONTENT = DROP STATISTICS statistics_name ON table;
+	PARAM = 
+statistics_name
+要删除的统计名称，统计名必须符合标识符规则并且有效。
+
+table
+该统计基于的表名。
+
+
+	REMARK = 
+删除统计信息需要特别小心，因为查询优化器可能会用到统计信息来生成合理的查询计划。
+	EXAMPLE = 
+删除表上的统计信息
+下例删除USER表上名为stat_user_age的统计。
+DROP STATISTICS stat_user_age on USER
+
+
+	REF = 
+ALTER STATISTICS
+CREATE STATISTICS
+UPDATE STATISTICS
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ALTER STATISTICS
+	ID = ID_HELP_ALTER_STATISTICS
+	CONTENT = ALTER STATISTICS statistics_name ON table
+
+[ WITH INDEX [index_value]
+
+  | SCAN BY FULL
+
+  | SCAN BY DEFAULT
+
+  | SCAN BY PERCENT value
+
+  | SCAN BY MINVALUE value
+
+]
+
+[WITH NORECOMPUTE];
+	PARAM = 
+statistics_name
+要修改统计的名称。统计名必须符合标识符规则并且是一个合法有效的名称。
+
+table
+该统计基于的表名。
+
+SCAN BY DEFAULT
+指定按缺省的方式读取表中的行以更新统计信息。
+
+SCAN BY FULL
+指定应读取表中的所有行以更新统计信息。
+
+SCAN BY PERCENT value
+按指定比例的方法读取表中的行以更新统计信息。value是指定的比例，必须介于1到100之间。
+
+SCAN BY MINVALUE value
+按指定的最小数目对表中的行进行采样以更新统计信息。value是采样的最小数目，可以是从0到n的总行数。
+
+WITH INDEX value
+基于给定列上的索引读取列的信息以更新统计信息。value是等高直方图中桶的数目。
+
+NORECOMPUTE
+指定应禁用统计的自动重新计算功能。如果指定了该选项，则即使表中的数据进行了更新，统计信息也不会自动更新。
+
+
+	REMARK = 
+修改统计信息是指修改默认的统计方法，在调用create statistics生成一个统计时，需要指定统计默认采样方法以及自动更新等行为。但是当该统计默认方法不在合理时，用户不得不在执行update statistics命令时附加更合理的采样方式。这时，用户可以通过调用alter statistics命令来修改默认统计方法，使下次统计更新时更加快捷，简便。
+	EXAMPLE = 
+修改统计的采样方式为全扫描
+假定系统中有一个名为USER的用户表并且在其AGE列上建有一个统计，假设原有统计信息是基于最少值采样，而现在需要该成全扫描采样。
+ALTER STATISTICS stat_user_age on USER SCAN BY FULL;
+
+修改统计的采样方式为基于索引
+假设现在为用户表上的AGE列建立了索引，因此，可以将采样的方法修改为基于索引的方式，通常来说，基于索引的统计在更新时速度会更快一些。
+ALTER STATISTICS stat_user_age on USER WITH INDEX 100;
+
+
+	REF = 
+CREATE STATISTICS
+DROP STATISTICS
+UPDATE STATISTICS
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = UPDATE STATISTICS
+	ID = ID_HELP_UPDATE_STATISTICS
+	CONTENT = UPDATE STATISTICS statistics_name ON table
+
+[ WITH INDEX [index_value]
+
+  | SCAN BY FULL
+
+  | SCAN BY DEFAULT
+
+  | SCAN BY PERCENT value
+
+  | SCAN BY MINVALUE value
+
+];
+	PARAM = 
+statistics_name
+要更新的统计的名称。统计名必须符合标识符规则并且是一个合法有效的名称。
+
+table
+该统计基于的表名。
+
+SCAN BY DEFAULT
+指定按缺省的方式读取表中的行以更新统计信息。
+
+SCAN BY FULL
+指定应读取表中的所有行以更新统计信息。
+
+SCAN BY PERCENT value
+按指定比例的方法读取表中的行以更新统计信息。value是指定的比例，必须介于1到100之间。
+
+SCAN BY MINVALUE value
+按指定的最小数目对表中的行进行采样以更新统计信息。value是采样的最小数目，可以是从0到n的总行数。
+
+WITH INDEX value
+基于给定列上的索引读取列的信息以更新统计信息。value是等高直方图中桶的数目。
+
+
+	REMARK = 
+对于一个已经建立的统计，可以随时计算更新统计值，尤其是当统计基于的表和列的信息已经发生了大量的插入、修改和删除操作以后。
+
+在更新统计中，依然可以指定统计采样的方式，这与create statistics中是不矛盾的，当执行更新统计信息时，不指定任何采样方式情况下，系统会利用在create statistics中指定的采样方式作为缺省的采样方式。而如果update statistics语句中指定了采样方式，则系统将采用指定的采样方式来计算更新统计信息。
+	EXAMPLE = 
+以CREATE STATISTICS中指定的方式更新统计信息
+假定我们有一张记录用户信息的表USER，并且在表中的AGE列上生成了一个统计，现在我们利用update statistics来计算和更新这个统计信息。
+UPDATE STATISTICS stat_user_age on USER;
+
+用全扫描的方式更新统计信息
+忽略缺省的采样方式，用指定的全扫描采样方式来更新统计信息
+UPDATE STATISTICS stat_user_age on USER SCAN BY FULL;
+
+采用基于索引的方式来更新统计信息
+忽略缺省的采样方式，采用指定的基于索引的采样方式来更新统计信息。WITH INDEX后的数字是可选的，如果用户不指定，则系统会选用缺省值来进行统计更新
+UPDATE STATISTICS stat_user_age ON USER WITH INDEX 100;
+
+
+	REF = 
+ALTER STATISTICS
+CREATE STATISTICS
+DROP STATISTICS
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = OPEN
+	ID = ID_HELP_OPEN
+	CONTENT = OPEN cursor_name [ USING parameter [, ...] ] ;
+	PARAM = 
+cursor_name
+曾经用 DECLARE 定义过的游标的名字。
+
+parameter
+如果曾经 DECLARE 定义的游标来自于一个查询计划，同时该查询计划需要参数，则打开游标时参数的值在这里给出。
+
+
+	REMARK = 
+    OPEN 是系统扩展。不仅可以用于嵌入式 SQL（E-SQL）中，也可以用于交互式 SQL 中。
+
+    OPEN 打开一个游标。如果游标来自于一个查询计划同时该查询计划需要参数才能执行，则在打开游标时需要使用 USING 关键字按顺序给出各参数的值。
+
+    如果在一个事务中打开游标，那么当事务提交或者回滚时，事务中打开的游标自动被关闭。
+	EXAMPLE = 
+打开游标
+
+-- CREATE TABLE tab1 (s CHAR(10));
+
+DECLARE c1 CURSOR FOR SELECT * FROM tab1;
+
+OPEN c1;
+
+使用参数打开游标
+只有使用查询计划定义一个游标并且该查询计划需要参数时，打开游标的时候才需要传递参数。
+-- CREATE TABLE tab1 (col1 int, col2 int);
+
+PREPARE p1 AS SELECT * FROM tab1 WHERE col1 > ? AND col2 < ?;
+
+DECLARE c1 CURSOR FOR p1;
+
+OPEN c1 USING 1, 2; -- 对应于查询计划中的两个参数
+
+
+	REF = 
+CLOSE
+DEALLOCATE
+DECLARE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CLOSE
+	ID = ID_HELP_CLOSE
+	CONTENT = CLOSE cursor_name ;
+	PARAM = 
+cursor_name
+曾经用DECLARE定义过的游标名。
+
+
+	REMARK = 
+    CLOSE 是系统扩展。
+
+    CLOSE 关闭一个打开过的游标。可供后来再次打开。同时在 DEALLOCATE 一个游标前，游标必须处于关闭状态。
+	EXAMPLE = 
+关闭游标
+
+-- CREATE TABLE tab1 (s CHAR(10));
+
+DECLARE c1 CURSOR FOR SELECT * FROM tab1;
+
+OPEN c1;
+
+-- 做一些FETCH、MOVE操作
+
+CLOSE c1;
+
+
+	REF = 
+DEALLOCATE
+DECLARE
+OPEN
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DEALLOCATE
+	ID = ID_HELP_DEALLOCATE
+	CONTENT = DEALLOCATE cursor_name ;
+	PARAM = 
+cursor_name
+曾经定义过的游标名。
+
+
+	REMARK = 
+    DEALLOCATE 是系统扩展。
+
+    DEALLOCATE 删除一个游标同时释放其所占用的系统资源。注意不要与 DEALLOCATE PREPARE 释放查询计划相混淆。
+	EXAMPLE = 
+释放游标
+DEALLOCATE 之前游标必须处于关闭状态。
+-- CREATE TABLE tab1 (s CHAR(10));
+
+DECLARE c1 CURSOR FOR SELECT * FROM tab1;
+
+OPEN c1;
+
+-- 做一些FETCH、MOVE操作
+
+CLOSE c1;
+
+-- 可以多次打开、关闭c1
+
+DEALLOCATE c1;
+
+
+	REF = 
+CLOSE
+DECLARE
+OPEN
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = FETCH
+	ID = ID_HELP_FETCH
+	CONTENT = FETCH [ dir ] [ cnt ] cursor_name ;
+
+dir ::= BACKWARD | FORWARD | RELATIVE | ABSOLUTE
+
+cnt ::= [ count | ALL | NEXT | PRIOR ] IN | FROM
+	PARAM = 
+BACKWARD
+相对于游标当前位置向后获取元组。
+
+FORWARD
+相对于游标当前位置，向前获取元组。
+
+RELATIVE
+指示相对于游标当前位置开始获取元组。这是默认情况。
+
+ABSOLUTE
+从相对于游标开头的绝对位置开始获取元组。
+
+count
+按指定方向和相对位置从游标中获取的元组的数量。为 0 时与 ALL 意义相同。为负数时，相当于取数据方向反向（如 BACKWARD -2 相当于 FORWARD 2 ）。如果 count 大于游标中该方向的所有元组数，则相当于 ALL 。
+
+ALL
+获取所有元组。
+
+NEXT
+获取指定位置开始的下一个元组。
+
+PRIOR
+获取指定位置开始的前一个元组。
+
+IN
+指示在哪个游标中获取数据。同 FROM 。
+
+FROM
+指示从哪个游标中获取数据。同 IN 。
+
+cursor_name
+曾经用DECLARE定义的游标名。
+
+
+	REMARK = 
+    FETCH 是系统扩展。不仅可以用于嵌入式 SQL（E-SQL）中，也可以用于交互式 SQL 中。
+
+    当不指定相对位置、数量等信息时，默认是从游标当前位置开始，前向获取一个元组。
+
+    如果想使游标能够反向获取数据，在定义游标时要指定 SCROLL 属性。
+	EXAMPLE = 
+从游标中获取数据
+如果希望能够从游标中反向获取数据，必须在定义游标时申明SCROLL或者INSENSITIVE SCROLL关键字。
+-- 假设表tab1定义如下：
+
+-- CREATE TABLE tab1(S CHAR(10));
+
+-- 其中有数据：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- | 12         |
+
+-- | 123        |
+
+-- | 1234       |
+
+-- | 12345      |
+
+-- | 123456     |
+
+-- +------------+
+
+DECLARE c1 SCROLL CURSOR FOR SELECT * FROM tab1;
+
+OPEN c1;
+
+FETCH FORWARD 5 FROM c1;
+
+-- 此时返回如下：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- | 12         |
+
+-- | 123        |
+
+-- | 1234       |
+
+-- | 12345      |
+
+-- +------------+
+
+FETCH BACKWARD 1 FROM c1;
+
+-- 此时返回值如下：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 12345      |
+
+-- +------------+
+
+FETCH c1;
+
+-- 此时返回值如下：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 123456     |
+
+-- +------------+
+
+CLOSE c1;
+
+DEALLOCATE c1;
+
+
+
+
+	REF = 
+DECLARE
+MOVE
+OPEN
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = MOVE
+	ID = ID_HELP_MOVE
+	CONTENT = MOVE [ dir ] [ cnt ] cursor_name ;
+
+dir ::= BACKWARD | FORWARD | RELATIVE | ABSOLUTE
+
+cnt ::= [ count | ALL | NEXT | PRIOR ] IN | FROM
+	PARAM = 
+BACKWARD
+向后移动游标。
+
+FORWARD
+向前移动游标。
+
+RELATIVE
+移动游标时相对于游标当前位置。这是默认情况。
+
+ABSOLUTE
+移动游标时相对于游标的起始位置。
+
+count
+移动时跨越元组的数量。0 的意义与 ALL 相同。为负数时，相当于取数据方向反向（如 BACKWARD -2 相当于 FORWARD 2 ）。如果 count 大于游标中该方向的所有元组数，则相当于 ALL 。
+
+ALL
+按指定方向和起始位置移动到游标的最后。
+
+NEXT
+移动到下一个位置。
+
+PRIOR
+移动到前一个位置。
+
+IN
+在游标中移动位置。与 FROM 没有区别。
+
+FROM
+从游标中移动位置。与 IN 没有区别。
+
+cursor_name
+曾经用 DECLARE 定义的游标名。
+
+
+	REMARK = 
+    MOVE 是系统扩展。不仅可以用于嵌入式 SQL（E-SQL）中，也可以用于交互式 SQL 中。
+
+    当不指定相对位置、方向、移动数量时，默认是相对于当前位置向前移动一个元组。
+
+    要是游标可以反向移动，定义游标时必须指定 SCROLL 。
+	EXAMPLE = 
+移动游标位置示例
+如果希望能够反向移动游标，必须申明 SCROLL 或 INSENSITIVE SCROLL 关键字。
+-- 假设表tab1定义如下：
+
+-- CREATE TABLE tab1(S CHAR(10));
+
+-- 其中有数据：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- | 12         |
+
+-- | 123        |
+
+-- | 1234       |
+
+-- | 12345      |
+
+-- | 123456     |
+
+-- +------------+
+
+DECLARE c1 SCROLL CURSOR FOR SELECT * FROM tab1;
+
+OPEN c1;
+
+MOVE FORWARD 5 FROM c1;
+
+FETCH c1;
+
+-- 此时返回如下：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 123456     |
+
+-- +------------+
+
+MOVE BACKWARD 2 FROM c1;
+
+FETCH c1;
+
+-- 此时返回值如下：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 12345      |
+
+-- +------------+
+
+CLOSE c1;
+
+DEALLOCATE c1;
+
+
+
+
+	REF = 
+DECLARE
+FETCH
+OPEN
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = PREPARE
+	ID = ID_HELP_PREPARE
+	CONTENT = PREPARE plan_name [ p_types ] { AS | FROM } content ;
+
+p_types   ::= ( param_type [, ...] )
+
+content   ::= select | insert | update | delete | exec_proc
+
+exec_proc ::= EXEC [ OUT ] proc_name ( { [ OUT | INOUT ] parameter } [, ...] )
+	PARAM = 
+plan_name
+要定义的查询计划名。
+
+param_type
+查询计划中参数的类型。当查询计划中需要参数时，可以事先指定各参数的类型。参数的类型可以不全部指定，但指定的那些参数类型必须是查询计划中按顺序出现的前面几个参数。
+
+AS
+后跟要定义的查询计划的内容。同 FROM 。
+
+FROM
+后跟要定义的查询计划的内容。同 AS 。
+
+select
+SELECT 语句。要定义的查询计划的内容。
+
+insert
+INSERT 语句。要定义的查询计划的内容。
+
+update
+UPDATE 语句。要定义的查询计划的内容。
+
+delete
+DELETE 语句。要定义的查询计划的内容。
+
+proc_name
+当用 EXEC 作为查询计划的内容时，要执行的存储过程名。
+
+OUT
+出现在 proc_name 前面的 OUT 指函数返回值是否输出，不指定时表示不输出返回值。出现在 parameter 前面的 OUT 指参数是输出参数。
+
+INOUT
+指示 parameter 参数是输入输出参数。当既不指定 OUT 也不指定 INOUT 时，表示 parameter 只是输入参数。
+
+parameter
+查询计划所需的参数，也即 proc_name 对应的函数所需的参数。
+
+
+	REMARK = 
+    PREPARE 是系统扩展。
+
+    PREPARE 定义一个查询计划。可以用来定义的查询计划的语句只有五种：SELECT 语句、INSERT 语句、UPDATE 语句、DELETE 语句、EXEC 一个存储过程。
+
+    当查询计划中需要参数时，可以用 "?" 标示，也可以用 "$#" 标示。其中 "#" 是参数的编号。
+
+    当查询计划中需要参数而 PREPARE 没有指定参数类型，则系统将视图根据上下文信息自动获取参数类型信息并保存起来。如果无法根据上下文获取参数类型信息，则出错。
+
+    另外，PREPARE 时使用返回结果集的存储过程没有意义，因为 EXECUTE 不支持。
+	EXAMPLE = 
+定义一个查询计划
+当定义一个同名的查询计划时，老的查询计划将自动被覆盖。
+-- DROP TABLE tab1;
+
+CREATE TABLE tab1 (s CHAR(10));
+
+PREPARE p1 AS INSERT INTO tab1 VALUES(?);
+
+EXECUTE p1('1');
+
+EXECUTE p1('12');
+
+EXECUTE p1('123');
+
+PREPARE p1 AS SELECT * FROM tab1 WHERE s LIKE ?;
+
+EXECUTE p1('123       ');
+
+-- 返回结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 123        |
+
+-- +------------+
+
+DEALLOCATE PREPARE p1;
+
+DROP TABLE tab1;
+
+
+
+使用存储过程定义一个查询计划
+CREATE PROCEDURE 中使用的参数只能用 "$#" 表示，而 PREPARE 中的参数可以用 "$#" 表示也可以用 "?" 表示。
+
+
+-- DROP TABLE tab1;
+
+-- DROP PROCEDURE myproc(CHAR(10));
+
+CREATE TABLE tab1 (s CHAR(10));
+
+CREATE PROCEDURE myproc (CHAR(10)) RETURN CHAR(10) AS 
+
+BEGIN
+
+  INSERT INTO tab1 VALUES($1); 
+
+  RETURN $1;
+
+END; 
+
+LANGUAGE PLOSCAR;
+
+PREPARE p1 AS EXEC OUT myproc(?);
+
+EXECUTE p1('1234');
+
+-- 此时，输出为
+
+-- +--------+
+
+-- | MYPROC |
+
+-- +--------+
+
+-- | 1234   |
+
+-- +--------+
+
+DEALLOCATE PREPARE p1;
+
+DROP PROCEDURE myproc(CHAR(10));
+
+DROP TABLE tab1;
+
+
+
+
+	REF = 
+DEALLOCATE PREPARE
+DECLARE
+DELETE
+EXECUTE
+GET PARAMINFO FOR
+GET ROWDESCRIPTION FOR
+INSERT
+SELECT
+UPDATE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = EXECUTE
+	ID = ID_HELP_EXECUTE
+	CONTENT = EXECUTE plan_name [ params ] [ into ] ;
+
+params ::= ( parameter [, ...] ) | USING parameter [, ...]
+
+into   ::= INTO [ [ LOCAL | GLOBAL ] TEMPORARY | TEMP ] [ TABLE ] table_name
+	PARAM = 
+plan_name
+曾经用PREPARE定义的查询计划名。
+
+parameter
+执行查询计划所需的参数。
+
+LOCAL
+指示执行结果放入本地临时表。
+
+GLOBAL
+指示执行结果放入全局临时表。
+
+TEMPORARY | TEMP
+指示是否是临时表。当不指定时表示非临时表。
+
+table_name
+执行查询计划的结果所要放入的表名。
+
+
+	REMARK = 
+    EXECUTE 是系统扩展。
+
+    EXECUTE 执行一个查询计划。关于查询计划的更多信息，请参考 PREPARE 语法。
+
+    执行查询计划时，可以指定参数（如果查询计划需要的话），各参数出现的顺序、类型等信息应该与 PREPARE 时一致。想获取参数信息，请参考 GET PARAMINFO OF 语法。指定参数可以有两种方式，如上所示。
+
+    查询计划的执行结果可以放入一个表或临时表中。关于临时表请参考 CREATE TABLE 和 SELECT INTO 语法。
+
+    由于 EXECUTE 不能执行返回结果集的存储过程，因此 PREPARE 时不要使用返回结果集的存储过程。
+	EXAMPLE = 
+执行查询计划
+注意，当定义一个同名的查询计划时，老的查询计划将自动被覆盖。
+-- DROP TABLE tab1;
+
+CREATE TABLE tab1 (s CHAR(10));
+
+PREPARE p1 AS INSERT INTO tab1 VALUES(?);
+
+EXECUTE p1('1');
+
+EXECUTE p1('12');
+
+PREPARE p1 AS SELECT * FROM tab1 WHERE s LIKE ?;
+
+EXECUTE p1('12        ');
+
+-- 返回结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 12         |
+
+-- +------------+
+
+DEALLOCATE PREPARE p1;
+
+DROP TABLE tab1;
+
+
+
+
+	REF = 
+GET PARAMINFO FOR
+GET ROWDESCRIPTION FOR
+PREPARE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DEALLOCATE PREPARE
+	ID = ID_HELP_DEALLOCATE_PREPARE
+	CONTENT = DEALLOCATE PREPARE plan_name ;
+	PARAM = 
+plan_name
+曾经通过PREPARE语句定义过的查询计划的名字。
+
+
+	REMARK = 
+    DEALLOCATE PREPARE 是系统扩展。
+
+    DEALLOCATE PREPARE 删除并释放一个查询计划及其所占用的资源。注意不要与释放游标的 DEALLOCATE 语句混淆。
+	EXAMPLE = 
+释放查询计划
+
+-- CREATE TABLE tab1 (col1 int);
+
+PREPARE p1 AS SELECT * FROM tab1 where col1 > ?;
+
+EXECUTE p1(param_value); -- 可以多次执行查询计划
+
+DEALLOCATE PREPARE p1;
+
+
+	REF = 
+PREPARE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = GET PARAMINFO FOR
+	ID = ID_HELP_GET_PARAMINFO_FOR
+	CONTENT = GET PARAMINFO FOR plan_name ;
+	PARAM = 
+plan_name
+曾经用PREPARE定义过的查询计划名。
+
+
+	REMARK = 
+    GET PARAMINFO FOR 是系统扩展。提供给 ODBC/JDBC 使用，用户无需直接使用。
+	EXAMPLE = 
+
+	REF = 
+EXECUTE
+PREPARE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = GET ROWDESCRIPTION FOR
+	ID = ID_HELP_GET_ROWDESCRIPTION_FOR
+	CONTENT = GET ROWDESCRIPTION FOR plan_name ;
+	PARAM = 
+plan_name
+曾经使用PREPARE定义过的查询计划名。
+
+
+	REMARK = 
+    GET ROWDESCRIPTION FOR 是系统扩展。供 ODBC/JDBC 使用，用户无需直接使用。请不要与获取游标行描述信息的 GET DESCRIPTION OF 语句混淆。
+	EXAMPLE = 
+
+	REF = 
+EXECUTE
+GET DESCRIPTION OF
+PREPARE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = GET DESCRIPTION OF
+	ID = ID_HELP_GET_DESCRIPTION_OF
+	CONTENT = GET DESCRIPTION OF cursor_name ;
+	PARAM = 
+cursor_name
+曾经用DECLARE定义过的游标名。
+
+
+	REMARK = 
+    GET DESCRIPTION OF 是系统扩展。供 ODBC/JDBC 使用，用户无需直接使用。请不要与获取查询计划的行描述信息的 GET ROWDESCRIPTION FOR 语句混淆。
+	EXAMPLE = 
+
+	REF = 
+DECLARE
+GET ROWDESCRIPTION FOR
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = BEGIN
+	ID = ID_HELP_BEGIN
+	CONTENT = BEGIN [ WORK | TRANSACTION ] [ READ ONLY | READ WRITE ] ;
+	PARAM = 
+WORK
+表示开始一个事务。此参数没有意义。
+
+TRANSACTION
+表示开始一个事务。此参数没有意义。
+
+READ ONLY
+表示开始的事务只读。
+
+READ WRITE
+表示开始的事务可读写。
+
+
+	REMARK = 
+    如果当前已经在一个事务中了，语句 BEGIN; 将导致出错。
+
+    当没有申明 READ ONLY 和 READ WRITE 时，在不同的情况下采取不同的默认值：当数据库只读、或当前 session 只读、或当前 session 的隔离级别为 READ UNCOMMITTED 时，开始的事务将是只读的。否则开始的时候就是可读写的。如果数据库只读、或当前 session 只读、或当前 session 的隔离级别为 READ UNCOMMITTED 时，申明 READ WRITE 则导致出错，开始事务失败。
+
+    当开始一个事务之后，执行其他语句之前，可以使用 SET TRANSACTION 语句设置事务的读写属性和隔离级别。一旦执行过其他 DML 或 DDL 语句，表示事务被激活，再次使用 SET TRANSACTION 设置事务属性将失败。
+
+    当 AUTOCOMMIT 配置参数为 FALSE 时，执行一条 DML 或 DDL 或 SET TRANSACTION 语句之后，将自动进入一个事务。这相当于在这条语句之前输入了一条 BEGIN; 语句。参见 SET AUTOCOMMIT 。
+	EXAMPLE = 
+开始一个事务
+回滚之后tab1将不存在。
+BEGIN;
+
+CREATE TABLE tab1(s CHAR(10));
+
+-- ...
+
+ROLLBACK;
+
+开始一个只读事务
+当开始一个只读事务时，事务中的动作不能对数据库产生写操作，否则就出错。
+BEGIN READ ONLY;
+
+CREATE TABLE tab1(s CHAR(10)); -- 出错
+
+-- ...
+
+ROLLBACK;
+
+当前session只读时开始一个事务
+
+SET SESSION_READONLY = TRUE;
+
+BEGIN;                         -- 此时开始的事务默认是只读的
+
+CREATE TABLE tab1(s CHAR(10)); -- 出错
+
+ROLLBACK;
+
+BEGIN READ WRITE;              -- 出错，与当前session的属性冲突
+
+
+
+开始事务之后设置其属性
+
+BEGIN;
+
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED; -- 事务只读
+
+CREATE TABLE tab1 (s CHAR(10));                   -- 出错
+
+-- ...
+
+ROLLBACK;
+
+
+	REF = 
+ABORT
+COMMIT
+END
+ROLLBACK
+SAVEPOINT
+SET AUTOCOMMIT
+SET TRANSACTION
+START TRANSACTION
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = COMMIT
+	ID = ID_HELP_COMMIT
+	CONTENT = COMMIT [ WORK | TRANSACTION ] ;
+	PARAM = 
+WORK
+表示提交一个事务。此参数没有意义。
+
+TRANSACTION
+表示提交一个事务。此参数没有意义。
+
+
+	REMARK = 
+    如果当前不在一个事务中，此语句将导致出错。
+
+    提交一个事务时，事务中所做的各种操作将真正对数据库产生影响。如果此后系统崩溃或断电，系统将可以根据记录的日志恢复这个事务中的各种操作对数据库产生的影响。
+	EXAMPLE = 
+提交事务
+
+BEGIN;
+
+CREATE TABLE tab1(s CHAR(10));
+
+INSERT INTO tab1 VALUES('1');
+
+INSERT INTO tab1 VALUES('12');
+
+COMMIT;
+
+SELECT * FROM tab1;
+
+-- 返回结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- | 12         |
+
+-- +------------+
+
+
+	REF = 
+ABORT
+BEGIN
+END
+ROLLBACK
+START TRANSACTION
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = START TRANSACTION
+	ID = ID_HELP_START_TRANSACTION
+	CONTENT = START TRANSACTION [ iso ] [ access_mode ] ;
+
+iso         ::= ISOLATION LEVEL { READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SERIALIZABLE }
+
+access_mode ::= READ ONLY | READ WRITE
+	PARAM = 
+READ UNCOMMITTED
+执行脏读或 0 级隔离锁定，这表示不发出共享锁，也不接受排它锁。当设置该选项时，可以对数据执行未提交读或脏读；在事务结束前可以更改数据内的数值，元组也可以出现在数据集中或从数据集消失。这是四个隔离级别中限制最小的级别。
+
+READ COMMITTED
+指定在读取数据时控制共享锁以避免脏读，但数据可在事务结束前更改，从而产生不可重复读取或幻像数据。该选项是系统的默认值。
+
+REPEATABLE READ
+锁定查询中使用的所有数据以防止其他用户更新数据，但是其他用户可以将新的幻像行插入数据集，且幻像行包括在当前事务的后续读取中。因为并发低于默认隔离级别，所以应只在必要时才使用该选项。
+
+SERIALIZABLE
+在数据集上放置一个范围锁，以防止其他用户在事务完成之前更新数据集或将行插入数据集内。这是四个隔离级别中限制最大的级别。因为并发级别较低，所以应只在必要时才使用该选项。
+
+READ ONLY
+表示开始一个只读事务。
+
+READ WRITE
+表示开始一个可读写事务。
+
+
+	REMARK = 
+    如果当前已经在一个事务中了，语句 START TRANSACTION; 将导致出错。
+
+    当没有申明 READ ONLY 和 READ WRITE 时，在不同的情况下采取不同的默认值：当数据库只读、或当前 session 只读、或当前 session 的隔离级别为 READ UNCOMMITTED 时，开始的事务将是只读的。否则开始的时候就是可读写的。如果数据库只读、或当前 session 只读、或当前 session 的隔离级别为 READ UNCOMMITTED 时，申明 READ WRITE 将导致出错，开始事务失败。
+
+    当开始一个事务之后，执行其他语句之前，可以使用 SET TRANSACTION 语句再次设置事务的读写属性和隔离级别。一旦执行过其他 DML 或 DDL 语句，表示事务被激活，再次使用 SET TRANSACTION 设置事务属性将失败。
+
+
+	EXAMPLE = 
+开始一个事务
+
+START TRANSACTION;
+
+CREATE TABLE tab1(s CHAR(10));
+
+-- ...
+
+ROLLBACK;
+
+开始一个只读事务
+
+START TRANSACTION READ ONLY;
+
+CREATE TABLE tab1(s CHAR(10)); -- 出错
+
+-- ...
+
+ROLLBACK;
+
+指定隔离级别开始一个事务
+
+START TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+
+-- ...
+
+ROLLBACK;
+
+开始事务之后修改其属性
+设置事务的隔离级别时，一般不会修改事务的读写属性。除非隔离级别为 READ UNCOMMITTED ，此时事务的读写属性被改为只读。
+START TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED; -- 此时事务隔离级别改变，但读写属性仍然是只读
+
+SET TRANSACTION READ WRITE;
+
+-- ...
+
+ROLLBACK;
+
+
+	REF = 
+ABORT
+BEGIN
+COMMIT
+END
+ROLLBACK
+SAVEPOINT
+SET AUTOCOMMIT
+SET TRANSACTION
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = END
+	ID = ID_HELP_END
+	CONTENT = END [ WORK | TRANSACTION ] ;
+	PARAM = 
+WORK
+表示结束一个事务。此参数没有意义。
+
+TRANSACTION
+表示结束一个事务。此参数没有意义。
+
+
+	REMARK = 
+    如果此时不在一个事务中，将导致出错。
+
+    语句 END; 的效果与 COMMIT; 的效果是一样的，结束一个事务时，事务中所做的各种操作将真正对数据库产生影响。如果此后系统崩溃或断电，系统将可以根据记录的日志恢复这个事务中的各种操作对数据库产生的影响。
+	EXAMPLE = 
+结束一个事务
+
+BEGIN;
+
+CREATE TABLE tab1(s CHAR(10));
+
+INSERT INTO tab1 VALUES('1');
+
+INSERT INTO tab1 VALUES('12');
+
+COMMIT;
+
+SELECT * FROM tab1;
+
+-- 返回结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- | 12         |
+
+-- +------------+
+
+
+	REF = 
+ABORT
+BEGIN
+COMMIT
+ROLLBACK
+START TRANSACTION
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ABORT
+	ID = ID_HELP_ABORT
+	CONTENT = ABORT [ WORK | TRANSACTION ] ;
+	PARAM = 
+WORK
+表示取消事务。此参数没有意义。
+
+TRANSACTION
+表示取消事务。此参数没有意义。
+
+
+	REMARK = 
+    在我们的系统中， ABORT; 和 ROLLBACK; 的意义相同，都是取消一个事务中的动作对数据库产生的影响。如果此时不在一个事务中，将导致出错。
+	EXAMPLE = 
+取消事务所做的动作
+
+BEGIN;
+
+CREATE TABLE tab1 (s CHAR(10));
+
+SELECT * FROM tab1; -- 此时查询成功
+
+ABORT;
+
+SELECT * FROM tab1; -- 此时查询失败，指示表 tab1 不存在
+
+
+	REF = 
+BEGIN
+COMMIT
+END
+ROLLBACK
+START TRANSACTION
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ROLLBACK
+	ID = ID_HELP_ROLLBACK
+	CONTENT = ROLLBACK [ WORK | TRANSACTION ] [ TO [ SAVEPOINT ] spnt ] ;
+	PARAM = 
+WORK
+表示回滚一个事务。此参数没有意义。
+
+TRANSACTION
+表示回滚一个事务。此参数没有意义。
+
+spnt
+要回滚到某个保存点时该保存点的名字。
+
+
+	REMARK = 
+    如果此时不在一个事务中，或者保存点不存在，将导致出错。
+
+    当回滚整个事务时，与语句 ABORT; 的效果相同，都可以消除事务中的动作对数据库产生的影响。当回滚到某个保存点时，将消除这个保存点之后的动作对数据库产生的影响。
+	EXAMPLE = 
+回滚一个事务
+
+BEGIN;
+
+CREATE TABLE tab1 (s CHAR(10));
+
+SELECT * FROM tab1; -- 此时查询成功
+
+ROLLBACK;
+
+SELECT * FROM tab1; -- 此时查询失败，指示表tab1不存在
+
+回滚到某个保存点
+
+BEGIN;
+
+CREATE TABLE tab1(s CHAR(10));
+
+INSERT INTO tab1 VALUES('1');
+
+SELECT * FROM tab1;
+
+-- 此时结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- +------------+
+
+SAVEPOINT sp1;
+
+INSERT INTO tab1 VALUES('12');
+
+SELECT * FROM tab1;
+
+-- 此时结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- | 12         |
+
+-- +------------+
+
+ROLLBACK TO sp1;
+
+SELECT * FROM tab1;
+
+-- 此时结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- +------------+
+
+ROLLBACK;
+
+
+	REF = 
+ABORT
+BEGIN
+COMMIT
+END
+SAVEPOINT
+START TRANSACTION
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SAVEPOINT
+	ID = ID_HELP_SAVEPOINT
+	CONTENT = SAVEPOINT spnt ;
+	PARAM = 
+spnt
+要设置的保存点的名字。
+
+
+	REMARK = 
+    如果此时不在一个事务中，或者名为 spnt 的保存点已经存在，将导致出错。
+	EXAMPLE = 
+设置保存点并回滚到该保存点
+
+BEGIN;
+
+CREATE TABLE tab1(s CHAR(10));
+
+INSERT INTO tab1 VALUES('1');
+
+SELECT * FROM tab1;
+
+-- 此时结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- +------------+
+
+SAVEPOINT sp1;
+
+INSERT INTO tab1 VALUES('12');
+
+SELECT * FROM tab1;
+
+-- 此时结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- | 12         |
+
+-- +------------+
+
+ROLLBACK TO sp1;
+
+SELECT * FROM tab1;
+
+-- 此时结果为：
+
+-- +------------+
+
+-- |     S      |
+
+-- +------------+
+
+-- | 1          |
+
+-- +------------+
+
+ROLLBACK;
+
+
+	REF = 
+BEGIN
+DROP SAVEPOINT
+ROLLBACK
+START TRANSACTION
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP SAVEPOINT
+	ID = ID_HELP_DROP_SAVEPOINT
+	CONTENT = DROP SAVEPOINT spnt ;
+	PARAM = 
+spnt
+保存点的名字。
+
+
+	REMARK = 
+    如果此时不在一个事务中，或者名为 spnt 的保存点不存在，将出错。
+
+    当删除一个保存点时，该保存点之后的保存点将同时被删除。
+	EXAMPLE = 
+删除保存点
+
+BEGIN;
+
+CREATE TABLE tab1(s CHAR(10));
+
+SAVEPOINT sp1;
+
+INSERT INTO tab1 VALUES('1');
+
+SAVEPOINT sp2;
+
+DROP SAVEPOINT sp1;
+
+ROLLBACK TO sp2; -- 出错
+
+ROLLBACK TO sp1; -- 出错
+
+ROLLBACK;
+
+
+
+
+	REF = 
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SET TRANSACTION
+	ID = ID_HELP_SET_TRANSACTION
+	CONTENT = SET TRANSACTION trans_opt ;
+
+trans_opt>   ::= { access_mode [ iso ] } | { iso [ access_mode ] }
+
+access_mode> ::= READ ONLY | READ WRITE
+
+iso          ::= ISOLATION LEVEL { READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SERIALIZABLE }
+	PARAM = 
+READ ONLY
+设置当前事务只读。
+
+READ WRITE
+设置当前事务可读写。
+
+READ UNCOMMITTED
+执行脏读或 0 级隔离锁定，这表示不发出共享锁，也不接受排它锁。当设置该选项时，可以对数据执行未提交读或脏读；在事务结束前可以更改数据内的数值，元组也可以出现在数据集中或从数据集消失。这是四个隔离级别中限制最小的级别。
+
+READ COMMITTED
+指定在读取数据时控制共享锁以避免脏读，但数据可在事务结束前更改，从而产生不可重复读取或幻像数据。该选项是系统的默认值。
+
+REPEATABLE READ
+锁定查询中使用的所有数据以防止其他用户更新数据，但是其他用户可以将新的幻像行插入数据集，且幻像行包括在当前事务的后续读取中。因为并发低于默认隔离级别，所以应只在必要时才使用该选项。
+
+SERIALIZABLE
+在数据集上放置一个范围锁，以防止其他用户在事务完成之前更新数据集或将行插入数据集内。这是四个隔离级别中限制最大的级别。因为并发级别较低，所以应只在必要时才使用该选项。
+
+
+	REMARK = 
+    如果当前不在一个事务中，或者系统自动提交属性为假，或者事务已经被激活，SET TRANSACTION 语句将导致出错。
+
+    当 BEGIN; 或者由于自动提交为假时开始一个事务之后，以下情况不会导致事务被激活：1). 语法分析错；2). SET 语句、RESET 语句、SHOW 语句；3). 事务相关的语句（BEGIN、START、COMMIT、END、ROLLBACK、ABORT）。之后一旦执行过其他语句，事务就被激活，此时 SET TRANSACTION 将导致出错。
+
+
+	EXAMPLE = 
+设置事务的隔离级别和读写属性
+
+BEGIN;
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+SET TRANSACTION READ ONLY;     -- 此时事务只读
+
+CREATE TABLE tab1(s CHAR(10)); -- 出错
+
+ROLLBACK;
+
+事务激活之后设置事务属性
+
+BEGIN;
+
+BEGIN;                          -- 出错，但不会激活事务
+
+CREATE TABLE tab1 (s CHAR(10)); -- 事务被激活
+
+SET TRANSACTION READ WRITE;     -- 出错，因为事务已经被激活
+
+ROLLBACK;
+
+设置冲突的读写属性
+
+BEGIN;
+
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED; -- 事务只读
+
+SET TRANSACTION READ WRITE;                       -- 出错
+
+-- ...
+
+ROLLBACK;
+
+
+	REF = 
+BEGIN
+SET AUTOCOMMIT
+START TRANSACTION
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = KILL
+	ID = ID_HELP_KILL
+	CONTENT = KILL SESSION sid [ IMMEDIATE | ABORT | TRANSACTIONAL | NORMAL ] ;
+	PARAM = 
+sid
+将要被强制结束的 session 号，必须 0 <= sid < 65535。可以从系统视图 V_SYS_SESSIONS 中查询。
+
+IMMEDIATE
+立即终止这个 session ，同 ABORT 。
+
+ABORT
+立即终止这个 session ，同 IMMEDIATE 。
+
+TRANSACTIONAL
+如果该 session 在事务中，等待事务结束再强制终止这个 session ，同 NORMAL 。
+
+NORMAL
+如果该 session 在事务中，等待事务结束再强制终止这个 session ，同 TRANSACTIONAL 。这是默认的情况。
+
+
+	REMARK = 
+    只有超级用户才有强制终止其他 session 的权限。另外，不允许强制终止自己所在的 session 。
+
+    如果使用 NORMAL 或 TRANSACTIONAL 终止一个 session ，同时该 session 正处于一个事务中，则强制终止该 session 的操作直到该 session 结束其当前事务时才返回，这可能引起等待。
+	EXAMPLE = 
+强制终止 idle 的 session
+
+-- 当前用户为超级用户
+
+SELECT "SESSION ID", "CURRENT SQL" FROM V_SYS_SESSIONS;
+
+-- 返回结果为：
+
+-- +------------+---------------------------------------------------------+
+
+-- | SESSION ID |                       CURRENT SQL                       |
+
+-- +------------+---------------------------------------------------------+
+
+-- |          0 | SELECT "SESSION ID", "CURRENT SQL" FROM V_SYS_SESSIONS; |
+
+-- |          1 | idle                                                    |
+
+-- +------------+---------------------------------------------------------+
+
+-- 可见 1 号 session 在 idle
+
+KILL SESSION 1 IMMEDIATE;
+
+SELECT "SESSION ID", "CURRENT SQL" FROM V_SYS_SESSIONS;
+
+-- 此时返回结果为：
+
+-- +------------+---------------------------------------------------------+
+
+-- | SESSION ID |                       CURRENT SQL                       |
+
+-- +------------+---------------------------------------------------------+
+
+-- |          0 | SELECT "SESSION ID", "CURRENT SQL" FROM V_SYS_SESSIONS; |
+
+-- +------------+---------------------------------------------------------+
+
+
+	REF = 
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE USER
+	ID = ID_HELP_CREATE_USER
+	CONTENT = CREATE USER username 
+
+[ [WITH]
+
+ {
+
+     PASSWORD 'password'
+
+   | ROLE rolename [, ...]
+
+   | DEFAULT SCHEMA schema
+
+   | VALID UNTIL 'abstime'
+
+  }
+
+]
+	PARAM = 
+username
+用户名
+
+password
+用户口令。
+
+如果不使用口令认证， 那么可以省略这个选项，否则该用户将不能联接到一个口令认证的服务器上。
+
+口令长度必须大于或等于配置文件oscar.conf中的参数MinPasswordLen设置的长度，否则该用户将无法创建。
+
+rolename
+用户角色。
+
+用户可以同时具有多个角色。
+
+schema
+用户缺省schema名。
+
+缺省值为PUBLIC。
+
+所有对象在没有指定schema时将使用该参数值。
+
+abstime
+用户口令有效期。省略该参数时，用户口令永远有效。
+
+可以使用date 类型或者 timestamp 类型的写法。
+
+
+	REMARK = 
+CREATE USER在当前连接数据库中增加一个新用户。
+
+对于创建非审计用户，创建者必须是具有创建用户权限的DBA用户。
+
+对于创建审计用户，创建者必须是安全管理员SYSSECURE。
+	EXAMPLE = 
+创建一个无口令用户
+下面的示例将创建一个没有口令的用户
+CREATE USER app_user1;
+
+创建一个有口令用户
+下面的示例将创建口令为'password'的用户：
+CREATE USER app_user2 WITH PASSWORD 'password'
+
+创建有期限限制的用户
+下面的示例将创建一个有口令的用户，其帐号在2011年12月31日23点59分59秒后过期：
+CREATE USER app_user3 WITH PASSWORD 'password' VALID UNTIL '2011-12-31 23:59:59';
+
+创建有缺省SCHEMA用户
+下面的示例将创建缺省SCHEMA为user4_schema的用户
+CREATE USER app_user4 WITH DEFAULT SCHEMA user4_schema;
+
+创建有建库权限的用户
+下面的示例将创建一个具有创建数据库权限的用户
+CREATE USER manager WITH PASSWORD 'password' ROLE SYSMAINTAIN;
+
+创建一DBA用户
+下面的示例将创建一个DBA用户。
+
+
+CREATE USER manager2 WITH PASSWORD 'manager' ROLE SYSDBA;
+
+
+	REF = 
+ALTER USER
+DROP USER
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ALTER USER
+	ID = ID_HELP_ALTER_USER
+	CONTENT = ALTER USER username 
+
+[ [ [WITH]
+
+  {  PASSWORD 'password'
+
+   | DEFAULT SCHEMA schema
+
+   | VALID UNTIL 'abstime'
+
+  }
+
+|
+
+  [ LOCK | UNLOCK]
+
+]
+	PARAM = 
+username
+要修改信息的用户名
+
+password
+用户要修改的新口令。
+
+新口令长度必须大于或等于配置文件oscar.conf中的参数MinPasswordLen设置的长度，否则修改将不能成功。
+
+schema
+用户缺省schema名。
+
+所有对象在没有指定schema时将使用该参数值。
+
+abstime
+用户口令有效期。
+
+可以使用date 类型(例：'2003-12-31')或者 timestamp 类型(例：'2003-12-31 23:59:59')的写法。
+
+LOCK
+锁住用户不能注册。
+
+UNLOCK
+解除用户锁定。
+
+用户登陆密码输入错误超过设定次数时该用户将被锁定，此时需要DBA使用该参数显式解除锁定。
+
+
+
+
+	REMARK = 
+ALTER USER 无法改变用户所属角色。必须使用 GRANT/REVOKE ROLE 改变用户角色信息。
+
+只有DBA才能改变其他用户信息．普通用户只能修改它们自己的口令．
+	EXAMPLE = 
+修改用户口令
+下面的示例将修改用户口令：
+ALTER USER app_user1 WITH PASSWORD 'ak4sim1';
+
+修改用户有效期
+下面的示例将修改用户有效期至2012年12月31日零点：
+ALTER USER app_user1 VALID UNTIL '2012-12-31 00:00:00';
+
+改变用户缺省SCHEMA
+下面的示例将改变用户缺省SCHEMA为app_schema1：
+ALTER USER app_user1 WITH DEFAULT SCHEMA user1_schema;
+
+
+	REF = 
+CREATE USER
+DROP USER
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE ROLE
+	ID = ID_HELP_CREATE_ROLE
+	CONTENT = CREATE ROLE rolename [ WITH ] [ USER  username [, ...] ]
+	PARAM = 
+rolename
+角色名
+
+username
+属于该角色的用户列表。用户必须已经存在。
+
+包含在列表中的用户将具有该角色的权限。
+
+
+	REMARK = 
+  CREATE ROLE在当前连接数据库中增加一个新角色，创建者必须是DBA。
+
+ 
+
+  角色是一组权限的集合。DBA利用角色进行权限管理可以简化权限分配的复杂性。
+
+ 
+
+  例如，DBA可以创建一个对表具有查看、插入权限的角色。在创建用户时，对用户赋予此角色，用户将自动具有此角色拥有的查看、插入权限而不用对每个用户单独赋权限。当DBA决定收回用户的插入权限时，只需收回角色的插入权限而不用单独改变每个用户的权限。
+
+
+	EXAMPLE = 
+创建一个不包含任何用户的角色
+下面的示例将创建一个不包含任何用户的角色
+CREATE ROLE app_role1;
+
+创建一个包含用户的角色
+下面的示例将创建一个包含用户 app_user1, app_user2 的角色
+CREATE ROLE app_role2 WITH USER app_user1, app_user2;
+
+创建一个对表app_table1有SELECT权限的角色
+下面的示例将创建一个对表app_table1有SELECT权限的角色：
+CREATE ROLE app_role1;
+
+GRANT SELECT ON app_table1 TO ROLE app_role1;
+
+
+	REF = 
+ALTER ROLE
+DROP ROLE
+GRANT ROLE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = REVOKE ROLE
+	ID = ID_HELP_REVOKE_ROLE
+	CONTENT = REVOKE ROLE rolename FROM USER username [,...]
+	PARAM = 
+rolename
+角色名
+
+username
+用户名。用户必须已经存在。
+
+
+	REMARK = 
+被回收角色的用户将不再具有角色权限
+	EXAMPLE = 
+回收用户具有角色
+下面的示例将收回用户具有角色：
+--创建对表app_table1插入权限的角色app_role1
+
+CREATE ROLE app_role1;
+
+GRANT INSERT ON app_table1 TO ROLE app_role1;
+
+  
+
+--用户app_user1也将自动具有对表app_table1插入权限
+
+GRANT ROLE app_role1 TO USER app_user1;
+
+ 
+
+--用户app_user1被收回表app_table1插入权限
+
+REVOKE ROLE app_role1 FROM USER app_user1;
+
+
+	REF = 
+CREATE ROLE
+DROP ROLE
+GRANT ROLE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP DOMAIN
+	ID = ID_HELP_DROP_DOMAIN
+	CONTENT = DROP DOMAIN domainname [, ...]  [ CASCADE | RESTRICT ]
+	PARAM = 
+domainname
+域名
+
+CASCADE
+自动删除倚赖域的对象
+
+RESTRICT
+当存在依赖对象不删除此域。
+
+缺省时使用该参数。
+
+
+	REMARK = 
+必须是域的所有者才能删除该域
+	EXAMPLE = 
+删除一个域
+下面的示例将删除zip_code域：
+--创建一个新的域类型
+
+CREATE DOMAIN zip_code char(6) NOT NULL;
+
+  
+
+--使用新定义的域类型
+
+CREATE TABLE city(cityname VARCHAR(255), zipcode zip_code);
+
+ 
+
+--由于存在依赖，删除zip_code域将失败
+
+DROP DOMAIN zip_code RESTRICT;
+
+ 
+
+--使用自动删除，将删除表city中的zipcode列
+
+DROP DOMAIN zip_code CASCADE;
+
+
+	REF = 
+CREATE DOMAIN
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP SEQUENCE
+	ID = ID_HELP_DROP_SEQUENCE
+	CONTENT = DROP SEQUENCE seqname [, ...]
+	PARAM = 
+seqname
+要删除的序列名
+
+
+	REMARK = 
+DROP SEQUENCE 命令显式从数据库中删除一个序列生成器
+	EXAMPLE = 
+删除序列发生器
+下面的示例将删除app_serial1序列发生器：
+DROP SEQUENCE app_serial1;
+
+
+	REF = 
+CREATE SEQUENCE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP TRIGGER
+	ID = ID_HELP_DROP_TRIGGER
+	CONTENT = DROP TRIGGER triggername ON table
+	PARAM = 
+triggername 
+要删除的的触发器名
+
+table
+触发器作用的表名
+
+
+	REMARK = 
+删除触发器的用户必须是触发器的所有者
+	EXAMPLE = 
+删除表上触发器
+下面的示例将删除表app_table1上的触发器app_trigger1：
+DROP TRIGGER app_trigger1 ON app_table1;
+
+
+	REF = 
+CREATE TRIGGER
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP TABLESAPCE
+	ID = ID_HELP_DROP_TABLESAPCE
+	CONTENT = DROP TABLESPACE tablespace_name;
+	PARAM = 
+tablespace_name
+要删除的表空间名
+
+
+	REMARK = 
+删除表空间将删除表空间所属的所有数据文件，删除表空间是不可恢复的，如果表空间有数据，将不允许删除。
+	EXAMPLE = 
+删除一个表空间
+删除创建的表空间tpcc。
+CREATE TABLESPACE tpcc DATAFILE 'tpcc.data' SIZE 26m AUTOEXTEND ON NEXT 26m;
+
+ 
+
+DROP TABLESPACE tpcc;
+
+
+	REF = 
+ALTER TABLESPACE
+CREATE TABLESPACE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP PROCEDURE
+	ID = ID_HELP_DROP_PROCEDURE
+	CONTENT = DROP PROCEDUE proc_name;
+	PARAM = 
+proc_name
+存储过程名，跟过程创建时相同。
+
+
+	REMARK = 
+
+	EXAMPLE = 
+删除一个存储过程
+
+DROP PROCEDURE def_val;
+
+--DROP PROCEDURE
+
+
+
+
+	REF = 
+CREATE PROCEDURE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT
+	ID = ID_HELP_SELECT
+	CONTENT = select_stmt ::= SELECT [ ALL | DISTINCT [ ON ( expr [, ...] ) ] ]
+
+    * | expr [ AS c_alias ] [, ...]
+
+    [ INTO [ TEMPORARY | TEMP ] [ TABLE ] new_table ]
+
+    [ FROM table_reference [, ...] ]
+
+    [ WHERE condition ]
+
+    [ GROUP BY expr [, ...] ]
+
+    [ HAVING condition ]
+
+    [ { UNION | INTERSECT | EXCEPT } [ ALL ] {select_stmt | (select_stmt)} ]
+
+    [ ORDER BY expr [ ASC | DESC | USING operator ] [, ...] ]
+
+    [ FOR UPDATE [ OF {table_name [, ...]|column_name [,...]} ] ]
+
+    [ LIMIT { count | ALL } [ OFFSET start ] ]
+
+
+
+table_reference ::=
+
+    table_name [ [ AS ] t_alias [ ( c_alias_list ) ] ]
+
+   |( select_stmt ) [ AS ] t_alias [ ( c_alias_list ) ]
+
+   |table_reference [ NATURAL ] joinop table_reference [ ON join_condition | USING ( 
+
+
+join_column_list )]
+
+
+
+joinop ::= CROSS JOIN | JOIN | [NATURAL] (LEFT [OUTER] | RIGHT [OUTER] | FULL [OUTER] 
+
+
+| INNER) JOIN;
+	PARAM = 
+c_alias
+输出列的别名。若指定了别名，则在查询结果中对应列的名称就为指定的别名，且该别名可以在GROUP BY子句和ORDER BY子句中被引用，但不能在WHERE子句和HAVING子句中被引用。
+
+expr
+列名或表达式
+
+
+	REMARK = 
+SELECT语句用于数据检索。对于SELECT语句中的各个子句，从逻辑上可以认为系统将按如下的顺序进行处理：
+
+1、处理FROM子句，得到FROM子句中指定的所有数据源联接的结果；
+
+2、处理WHERE子句。对输入根据条件condition进行筛选，返回那些满足条件的行；
+
+3、处理GROUP BY子句。将输入按分组属性进行分组；
+
+4、处理HAVING子句，过滤掉那些不满足条件的组；
+
+5、处理ORDER BY子句，按输入进行排序；
+
+6、处理SETOP子句，将输入与另一个查询的结果进行集合操作；
+
+6、处理LIMIT子句，过滤掉那些不在指定范围内的元组；
+
+7、处理SELECT子句，对输入进行投影操作，即只保留在SELECT子句指定要返回的列，而舍弃其余的列；
+
+8、若语句中包含INTO子句，则将查询结果插入到新创建的表中，否则，将查询结果返回给用户。
+
+
+
+注意FOR UPDATE子句并没有处理在上述的处理流程中，这是由于FOR UPDATE子句并不影响查询结果，而只是告诉执行器要对查询结果所涉及的行加排它锁（在通常情况下加的是共享锁）。
+
+
+
+SELECT语句是SQL中最复杂的语句之一，本节只说明SELECT语句中SELECT子句的用法。对于其它子句，请参见“SELECT: INTO”，“SELECT: FROM”，“SELECT: WHERE”，“SELECT: SETOP”，“SELECT: GROUP BY”，“SELECT: HAVING”，“SELECT: ORDER BY”，“SELECT: LIMIT”，“SELECT: FOR UPDATE”等主题获得详细描述。在说明各子句时使用一个由STUDENT, COURSE, ELECT等三个表构成的通用示例，请参见“SELECT: EXAMPLE”获得对通用示例的详细描述。
+
+
+
+SELECT子句用于指定输出列，一个SELECT语句最多可以输出65535个列。
+	EXAMPLE = 
+选择所有列
+在SELECT子句中使用*可以指定返回所有列，如获取所有学生信息的功能可用如下的SQL语句实现：
+
+SELECT * FROM STUDENT;
+
+查询结果如下：
+
++----------+-------+--------+------+---------+---------+
+
+|   SNO    | SNAME | SDEPT  | SAGE | SGENDER | SCREDIT |
+
++----------+-------+--------+------+---------+---------+
+
+| S0000001 | 王某  | 计算机 |   23 | M       |    14.0 |
+
+| S0000002 | 李某  | 数学   |   21 | F       |    28.5 |
+
+| S0000003 | 刘某  | 计算机 |   24 | M       |     6.0 |
+
+| S0000004 | 孙某  | 信电   |   20 | F       |     0.0 |
+
++----------+-------+--------+------+---------+---------+
+ 　
+
+指定要返回的列
+通过使用列名，可以对要返回的列进行筛选，如若只需获取所有学生的学号和姓名，则可使用如下的查询：
+
+SELECT SNO, SNAME FROM STUDENT;
+
+查询结果如下：
+
+
+　
+
+有重名的列时怎么办
+在使用了联接操作后，可以会在查询结果中产生的重名的列，这时可以用形如table_name.column_name的表达式来选择重名列中的某一列，如查询：
+
+SELECT STUDENT.SNO, COURSE.CNO FROM STUDENT INNER JOIN ELECT ON SNO INNER JOIN COURSE ON CNO;
+
+在上述查询中，STUDENT INNER JOIN ELECT ON SNO INNER JOIN COURSE ON CNO的结果中将包含两个名为SNO的列，两个名为CNO的列。通过使用STUDENT.SNO可以指定返回来自于STUDENT表中的SNO列，通过使用COURSE.CNO可以指定返回来自于COURSE表中的CNO列。
+　
+
+消除结果中的重复行
+通过使用DISTINCT关键字，可以消除结果中的重复行，如使用如下查询可以获取所有至少选了一门课的学生的学号：
+
+SELECT DISTINCT SNO FROM ELECT;
+
+查询结果如下：
+
++----------+
+
+|   SNO    |
+
++----------+
+
+| S0000001 |
+
+| S0000002 |
+
+| S0000003 |
+
++----------+
+　
+
+
+	REF = 
+DELETE
+GRANT
+INSERT
+SELECT: EXAMPLE
+SELECT: FOR UPDATE
+SELECT: FROM
+SELECT: GROUP BY
+SELECT: HAVING
+SELECT: INTO
+SELECT: LIMIT
+SELECT: ORDER BY
+SELECT: SETOP
+SELECT: WHERE
+UPDATE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: FROM
+	ID = ID_HELP_SELECT:_FROM
+	CONTENT = FROM table_reference [, ...] 
+
+table_reference ::=
+
+    table_name [ [ AS ] t_alias [ ( c_alias_list ) ] ]
+
+   |( select_stmt ) [ AS ] t_alias [ ( c_alias_list ) ]
+
+   |table_reference [ NATURAL ] joinop table_reference [ ON join_condition | USING ( join_column_list )]
+
+
+
+joinop ::= CROSS JOIN | JOIN | [NATURAL] (LEFT [OUTER] | RIGHT [OUTER] | FULL [OUTER] | INNER) JOIN;
+	PARAM = 
+table_reference
+查询的一个数据源，可以为表、视图、函数调用、子查询或表联接的结果。
+
+table_name
+基本表或视图的名称。
+
+joinop
+联接操作类型。OSCAR中支持的联接操作类型有CROSS JOIN, JOIN, [NATURAL] LEFT [OUTER] JOIN, [NATURAL] RIGHT [OUTER] JOIN, [NARUAL] FULL [OUTER] JOIN, [NATURAL] INNER JOIN等多种类型，不指定类型的JOIN相当于INNER JOIN。
+
+join_condition
+联接条件。类似于WHERE子句中的查询条件，但只能使用参与联接的两个表中的字段。
+
+join_column_list
+联接字段列表。列表中的字段必须是参与联接的两个表中的共同字段，指定联接字段列表的作用相当于进行在这些字段上的等值联接条件，即TABLE1 joinop TABLE2 USING(A, B)相当于TABLE1 joinop TABLE2 ON TABLE1.A = TABLE2.A AND TABLE1.B = TABLE2.B。
+
+
+	REMARK = 
+FROM子句为SELECT语句声明了一个到多个数据源，其输出是各个数据源的输出进行笛卡尔积并加以联接条件进行筛选之后的结果。每个数据源可以是以下三种类型之一：
+
+１、一个基本表或视图；
+
+２、一个用圆括号括起的子查询；
+
+３、一个联接表，即多个数据源进行联接之后的结果。
+
+
+
+一个查询中最多可以使用32张表，是这针对于视图展开之后的结果而言的，即若FROM子句中的某个数据源为视图，而视图的定义中又涉及到多张基本表，则认为该查询也使用了多张表。
+
+
+
+OSCAR中支持的联接类型包括笛卡尔积联接(CROSS JOIN)，内联接(INNER JOIN或JOIN)，外联接(包括左外联接LEFT OUTER JOIN, 右外联接RIGHT OUTER JOIN, 全外联接FULL OUTER JOIN)等多种类型。除CROSS JOIN这外的所有联接类型又可以通过在前面加上NATURAL关键字成为自然联接。
+
+
+
+CROSS JOIN和不带联接条件的INNER JOIN/JOIN的作用相同，都是输出两个数据源进行笛卡尔积的结果。
+
+
+
+LEFT OUTER JOIN除了返回所有联接行，还返回那些在右手边数据源中没有匹配行的左手边数据源行与空值右手边行联接的结果(即这部分联接结果中那些只来自于右手边数据源的属性都为NULL)；相反，RIGHT OUTER JOIN除了返回所有联接行，还返回那些在左手边数据源中没有匹配行的右手边数据源行与空值左手边行联接的结果(即这部分联接结果中那些只来自于左手边数据源的属性都为NULL)。FULL OUTER JOIN返回所有联接行，加上所有未匹配的左手边行(只来自于右手边数据源的属性用NULL值填充)，再加上所有未匹配的右手边行(只来自于左手边数据源的属性用NULL值填充)。
+
+
+
+除了CROSS JOIN，其它的联接类型都需要指定联接条件，可以使用以下三种方式之一来指定：
+
+１、使用ON join_condition，这是最灵活的方式，用户不但可以指定进行等值联接（如ON A = B)，还可以指定使用其它的比较操作（如ON A < B, ON A LIKE B）进行联接，甚至是表达式（如ON A + 1 = B）。
+
+2、使用USING join_column_list，这相当于指定了join_column_list中的所有字段上的等值条件，如USING A, B相当于指定了ON LEFT_TABLE.A = RIGHT_TABLE.A AND LEFT_TABLE.B = RIGHT_TABLE.B，因此要求join_column_list中的字段为两个数据源中的共同字段。
+
+3、使用NATURAL关键字，这相当于为两个数据源中的所有共同字段指定了等值联接条件，如STUDENT NATURAL JOIN ELECT相当于STUDENT JOIN EELCT ON STUDENT.SNO = ELECT.SNO。使用NATURAL关键字的联接又称为自然联接。
+	EXAMPLE = 
+自然联接
+可以使用适当的联接操作从多张表中选择数据，如以下的查询获得所有学生的选课信息：
+
+SELECT SNAME, CNAME, SCORE 
+
+FROM STUDENT NATURAL JOIN ELECT NATURAL JOIN COURSE;
+
++-------+----------------+-------+
+
+| SNAME |     CNAME      | SCORE |
+
++-------+----------------+-------+
+
+| 李某  | C程序设计      |  86.0 |
+
+| 王某  | C程序设计      |  84.0 |
+
+| 刘某  | C程序设计      |  84.0 |
+
+| 李某  | 数学分析       |  69.0 |
+
+| 李某  | 新编大学英语   |  75.0 |
+
+| 王某  | 新编大学英语   |  75.0 |
+
+| 王某  | 计算机网络     |  95.0 |
+
+| 李某  | 计算机网络     |  81.0 |
+
+| 刘某  | 计算机网络     |  79.0 |
+
+| 李某  | 数据库管理系统 |  83.0 |
+
+| 王某  | 数据库管理系统 |  88.0 |
+
+| 李某  | 线性代数       |  92.0 |
+
++-------+----------------+-------+
+
+上述查询中使用了自然联接，自然联接实际上是参与联接的表共同字段上的等值联接，如上述查询等价于：
+
+SELECT SNAME, CNAME, SCORE
+
+FROM STUDENT JOIN ELECT ON STUDENT.SNO = ELECT.SNO JOIN COURSE USING (CNO);
+ 
+
+使用外联接
+学校需要统计每个学生选修的课程数，首先数据库管理员尝试用如下的查询实现：
+
+SELECT SNAME, COUNT(CNO) FROM 
+
+STUDENT NATURAL JOIN ELECT 
+
+GROUP BY SNAME;
+
+得出查询结果如下：
+
++-------+-------+
+
+| SNAME | COUNT |
+
++-------+-------+
+
+| 李某  |     6 |
+
+| 刘某  |     2 |
+
+| 王某  |     4 |
+
++-------+-------+
+
+可以发现，未选修过任何一门课的“孙某”的信息从上述查询结果中消失了。为了正确实现要求的功能，需要进行外联接，如下所示：
+
+SELECT SNAME, COUNT(CNO) FROM 
+
+STUDENT NATURAL OUTER JOIN ELECT 
+
+GROUP BY SNAME;
+
+得出正确的结果如下：
+
++-------+-------+
+
+| SNAME | COUNT |
+
++-------+-------+
+
+| 李某  |     6 |
+
+| 刘某  |     2 |
+
+| 孙某  |     0 |
+
+| 王某  |     4 |
+
++-------+-------+
+　
+
+左外联接与右外联接互换
+左外联接与右外联接是可以互换的，左外联接A LEFT OUTER JOIN B相当于B RIGHT OUTER JOIN A。如上述查询也可以用以下的语句实现：
+
+
+SELECT SNAME, COUNT(CNO) 
+
+FROM ELECT NATURAL RIGHT OUTER JOIN STUDENT
+
+GROUP BY SNAME;
+
+
+	REF = 
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: GROUP BY
+	ID = ID_HELP_SELECT:_GROUP_BY
+	CONTENT = GROUP BY expr [, ...]
+	PARAM = 
+expr
+列名或表达式。
+
+
+	REMARK = 
+GROUP BY子句对输入按指定的表达式序列进行分组。对于形如GROUP BY expr1, expr2, ..., exprn的分组子句，对于其输出中任意组中的每个元组，expr1, expr2, ..., exprn的值都是相同的，但对于不同组中的元组，expr1, expr2, ..., exprn的值一完全相同。
+
+
+
+GROUP BY子句中的表达式可以是简单的字段名，如:
+
+SELECT SDEPT, COUNT(*) FROM STUDENT GROUP BY SDEPT;
+
+将所有学生按其所在系进行分组；还可以是复杂表达式，如：
+
+SELECT COUNT(*) FROM STUDENT GROUP BY SCORE >= 60;
+
+将所有选课记录按及格与否进行组，一组为及格的(SCORE >= 60为TRUE)，另一组为不及格的(SCORE >= 60为FALSE)。
+
+
+
+若使用了GROUP BY子句，则在SELECT子句中选择列表中就不能直接引用那些不在GROUP BY子句中的列，如：
+
+SELECT SNO, SCORE FROM ELECT GROUP BY SNO;
+
+是错的，因为SCORE没有出现在GROUP BY子句中。
+
+
+
+但通过使用聚集函数，则可以使用那些不在GROUP BY子句中的列，如：
+
+SELECT SNO, AVG(SCORE) FROM ELECT GROUP BY SNO;
+
+是正确的。
+
+
+
+在GROUP BY子句中出现的表达式个数不能超过32。
+	EXAMPLE = 
+使用分组和聚集函数
+学生的平均分是很重要的，学校里经常要根据学生的平均分进行排名，这一功能可以用如下的语句实现：
+
+SELECT SNAME, AVG(SCORE) AS AVG_SCORE 
+
+FROM STUDENT NATURAL JOIN ELECT
+
+GROUP BY SNAME
+
+ORDER BY AVG_SCORE DESC;
+
+查询结果如下：
+
++-------+--------------------+
+
+| SNAME |     AVG_SCORE      |
+
++-------+--------------------+
+
+| 王某  | 85.500000000000000 |
+
+| 刘某  | 81.500000000000000 |
+
+| 李某  | 81.000000000000000 |
+
++-------+--------------------+
+ 
+
+
+	REF = 
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SELECT: ORDER BY
+	ID = ID_HELP_SELECT:_ORDER_BY
+	CONTENT = ORDER BY expr [ ASC | DESC | USING operator ] [, ...]
+	PARAM = 
+expr
+用于排序的表达式，通常是一个字段名，但也可以是一个复杂的表达式。
+
+ASC
+指定进行升序排序。
+
+DESC
+指定进行降序排序。
+
+operator
+指定用于进行排序的操作符，指定"<"相当于进行升序排序，指定">"相当于进行降序排序。
+
+
+	REMARK = 
+ORDER BY子句
+
+
+
+ORDER BY子句将输入进行排序。对于形如ORDER BY expr1, expr2, ...,expr n的ORDER BY子句，可以认为系统将按如下步骤进行排序：
+
+１、对所有输入按expr1进行排序；
+
+２、对步骤1的输出中expr1相等的行，按expr2进行排序；
+
+...
+
+n、对步骤n-1的输出中expr1, expr2, ..., expr n-1都相等的行，按expr n进行排序。
+
+
+
+ORDER BY子句中的每个表达式通常为字段名，如：
+
+SELECT SNO, SNAME FROM STUDENT ORDER BY SNO;
+
+将所有学生按学号进行排序；若该字段也在SELECT子句中，也可以使用字段在SELECT子句中位置来代替，如上述的查询等价于：
+
+SELECT SNO, SNAME FROM STUDENT ORDER BY 1;
+
+
+
+在缺省情况下，ORDER BY子句将按每个排序字段进行升序排序(使用ASC关键字也是进行升序排序，这与缺省情况是等价的)，通过使用DESC关键字，可以指定对某字段进行降序排序。用户还可以使用USING关键字指定用于排序的操作，指定USING <相当于进行升序排序，指定USING >相当于进行降序排序。
+
+
+
+需要注意一个对空值的处理。在OSCAR中，认为空值是最大的，换句话说，在进行升序排序时，空值排在最后，在进行降序排序时，空值排在最前。
+
+
+
+与GROUP BY子句相同，在ORDER BY子句中出现的表达式个数也不能超过32。
+
+
+	EXAMPLE = 
+对查询结果进行排序
+学校想查看学生的所有成功，并且希望一个学生所选的课的成绩显示在一起，这可以通过对结果按学生姓名排序实现，如下：
+
+SELECT SNAME, CNAME, SCORE 
+
+FROM STUDENT NATURAL JOIN ELECT NATURAL JOIN COURSE
+
+ORDER BY SNAME;
+
+查询结果如下：
+
++-------+----------------+-------+
+
+| SNAME |     CNAME      | SCORE |
+
++-------+----------------+-------+
+
+| 李某  | C程序设计      |  86.0 |
+
+| 李某  | 数学分析       |  69.0 |
+
+| 李某  | 新编大学英语   |  75.0 |
+
+| 李某  | 计算机网络     |  81.0 |
+
+| 李某  | 数据库管理系统 |  83.0 |
+
+| 李某  | 线性代数       |  92.0 |
+
+| 刘某  | C程序设计      |  84.0 |
+
+| 刘某  | 计算机网络     |  79.0 |
+
+| 王某  | 计算机网络     |  95.0 |
+
+| 王某  | C程序设计      |  84.0 |
+
+| 王某  | 数据库管理系统 |  88.0 |
+
+| 王某  | 新编大学英语   |  75.0 |
+
++-------+----------------+-------+
+ 
+
+按复杂表达式的结果进行排序
+也可以按一个复杂表达式对查询结果进行排序，如要对学生按选课多少来排序，可以用如下的查询实现：
+
+SELECT SNO, COUNT(CNO)
+
+FROM STUDENT NATURAL LEFT OUTER JOIN ELECT
+
+GROUP BY SNO
+
+ORDER BY COUNT(CNO);
+
+查询结果如下:
+
++----------+-------+
+
+|   SNO    | COUNT |
+
++----------+-------+
+
+| S0000004 |     0 |
+
+| S0000003 |     2 |
+
+| S0000001 |     4 |
+
+| S0000002 |     6 |
+
++----------+-------+
+ 
+
+
+	REF = 
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE TABLESPACE
+	ID = ID_HELP_CREATE_TABLESPACE
+	CONTENT = CREATE TABLESPACE tablespace_name [<data_file_clause>];
+
+ 
+
+<data_file_clause>::={DATAFILE {<data_file_spec> [<autoextend_clause>]}[, ...n]}[ ...n]
+
+ 
+
+<data_file_spec>::= 'datafile_path' [SIZE  size [K |M |G ]]
+
+ 
+
+<autoextend_clause> ::= AUTOEXTEND {OFF | ON [NEXT size [K | M | G]] [MAXSIZE {UNLIMITED | size [K | M | G]}]}
+	PARAM = 
+tablespace_name
+要创建的表空间名
+
+DATAFILE
+指定创建数据文件
+
+datafile_name
+要增加的数据文件路径
+
+SIZE  size [K | M | G]
+指定数据文件大小，K,M,G分别是可选的字节单位,默认是M(兆字节)
+
+AUTOEXTEND
+指定数据文件自动增长属性
+
+OFF | ON
+指定数据文件是否自动增长， OFF不自动增长，ON自动增长
+
+NEXT  size [K | M | G]
+分区大小的增长步长, K,M,G分别是可选的字节单位,默认是M(兆字节),增长步长为64k的倍数
+
+MAXSIZE {UNLIMITED | size [K | M | G]}
+指定数据文件的最大长度，UNLIMITED为长度不受限制。
+
+
+	REMARK = 
+创建表空间将为数据库分配新的空间。表空间可以包含多个数据文件。
+	EXAMPLE = 
+新建一个表空间
+下例创建一个新的表空间，表空间有一个数据文件tpcc.data。
+CREATE TABLESPACE system2 DATAFILE 'tpcc2.data' SIZE 26m AUTOEXTEND ON NEXT 26m;
+
+
+	REF = 
+ALTER TABLESPACE
+DROP TABLESPACE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ALTER TABLESPACE
+	ID = ID_HELP_ALTER_TABLESPACE
+	CONTENT = ALTER  TABLESPACE tablespace_name <alter_table_space>;
+
+ 
+
+<alter_table_space>::= ADD  DATAFILE {<data_file_spec>[<autoextend_clause>]}[,...n];
+
+     | RENAME  DATAFILE <file_name_spec> TO <file_name_spec>;
+
+ 
+
+<data_file_spec>::= 'datafile_path' [SIZE  size [K |M |G ]]
+
+ 
+
+<autoextend_clause> ::= AUTOEXTEND {OFF | ON [NEXT size [K | M | G]] [MAXSIZE {UNLIMITED | size [K | M | G]}]}
+
+ 
+
+<file_name_spec>::={'datafile_path'}[, ...n];
+	PARAM = 
+tablespace_name
+要创建的表空间名
+
+ADD DATAFILE
+指定增加数据文件
+
+RENAME DATAFILE ... TO ...
+指定重命名数据文件
+
+datafile_path
+数据文件路径名
+
+SIZE  size [K | M | G]
+指定数据文件大小，K,M,G分别是可选的字节单位,默认是M(兆字节)
+
+AUTOEXTEND
+指定数据文件自动增长属性
+
+OFF | ON
+指定数据文件是否自动增长， OFF不自动增长，ON自动增长
+
+NEXT  size [K | M | G]
+分区大小的增长步长, K,M,G分别是可选的字节单位,默认是M(兆字节),增长步长为64k的倍数
+
+MAXSIZE {UNLIMITED | size [K | M | G]}
+指定数据文件的最大长度，UNLIMITED为长度不受限制，K,M,G分别是可选的字节单位,默认是M(兆字节)。
+
+
+	REMARK = 
+通过增加数据文件，表空间可以有更多的数据文件。
+
+重命名表空间数据文件可以用于恢复，当数据文件因各种原因破坏掉时，可以使表空间数据文件指向备份的数据文件,注意:备份数据文件与使用的数据文件数据一致。
+	EXAMPLE = 
+增加数据文件
+下例增加一个数据文件tpcc2.data。
+CREATE TABLESPACE system2 DATAFILE 'tpcc2.data' SIZE 26m AUTOEXTEND ON NEXT 26m;
+
+
+	REF = 
+CREATE TABLESPACE
+DROP TABLESPACE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ALTER INDEX
+	ID = ID_HELP_ALTER_INDEX
+	CONTENT = ALTER INDEX index_name { <alter_index_storage_option> | REBUILD [<index_storage_option>]}
+
+
+
+<alter_index_storage_option>::=PRIORITY level{
+
+                        |[LOGGING | NOLOGGING]
+
+			|NEXT integer [K|M|G]
+
+			|MAX  integer [K|M|G]	}[ ...n]
+
+
+
+<index_storage_option> ::=PRIORITY level{      TABLESAPCE tablespacename
+
+				|[LOGGING | NOLOGGING]
+
+				|INIT size [K|M|G]
+
+				|NEXT size [K|M|G]
+
+				|MAX  size [k|m|g]	
+
+				|FILL fillsize
+
+				|SPLIT splitsize}[ ...n]
+	PARAM = 
+index_name
+是索引名。索引名在数据库中的模式中必须唯一。索引名必须遵循标识符规则。
+
+PRIORITY level
+为该索引指定一个优先级参数，该参数表明了在生成执行计划时，该索引被考虑使用的优先级别，数值越大，表示其优先级越低,优先级为0的索引的优先级最高.当用户创建或修改索引时如果不指定其优化级，优化器就按常规的代价估算来进行路径选择，选择代价最小的索引来生成执行计划。用户一般不需要为索引指定优化级，
+
+TABLESAPCE tablespacename
+索引所属的表空间名
+
+LOGGING | NOLOGGING
+对分区进行的操作记日志和不对分区进行的操作记日志（后者暂未实现）
+
+INIT size [k|m|g]
+索引大小的初始值, k,m,g分别是可选的字节单位,默认是m(兆字节)
+
+NEXT size [k|m|g]
+索引大小的增长步长, k,m,g分别是可选的字节单位,默认是m(兆字节),增长步长为64k的倍数
+
+MAX  size [k|m|g]
+索引大小的最大值,k,m,g分别是可选的字节单位,默认是m(兆字节)
+
+FILL fillsize
+索引填充系数。在创建索引的时候，对每一个索引页面不一定是全部填满，而是填充FILL的比例。其值在(0 , 100]之间，100表示填满。建议值是70。
+
+n
+是表示前面的项可重复 n 次的占位符
+
+
+	REMARK = 
+ALTER INDEX语句可以根据索引依赖的表的数据量变化，更改索引的物理存储参数。
+
+ALTER INDEX语句可以用于重建损坏了的系统索引． 尽管理论上这种情况决不应该发生，但实际上索引可能因为硬件失效而损坏．ALTER INDEX提供了一种恢复手段。
+
+
+	EXAMPLE = 
+更改索引的物理存储参数
+下例更改了原来索引的物理存储参数
+CREATE TABLE project_a(column_a INT, column_b INT);
+
+CREATE INDEX project_a_i on project_a(column_a);
+
+ALTER  INDEX project_a_i LOGGING NEXT 4M MAXSIZE UNLIMITED;
+
+DROP   TABLE project_a;
+
+重建索引
+下例重建了创建的索引
+CREATE TABLE project_b(column_a INT, column_b INT);
+
+CREATE INDEX project_b_i on project_b(column_b);
+
+ALTER  INDEX project_b_i REBUILD LOGGING INIT 2m NEXT 4m MAXSIZE UNLIMITED FILL 70 SPLIT 50;
+
+DROP 　TABLE project_b;
+
+
+	REF = 
+CREATE INDEX
+DROP INDEX
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ALTER TABLE
+	ID = ID_HELP_ALTER_TABLE
+	CONTENT = ALTER TABLE table
+
+{ ADD [ COLUMN ] column type [ DEFAULT constant_expression ] [ <column_constraint> ]
+
+  | ADD [COLUMN] ( {column type [ DEFAULT constant_expression ] [ <column_constraint> ]}[, ...n ]) 
+
+  | DROP [ COLUMN ] column [ RESTRICT | CASCADE ]
+
+  | ALTER [ COLUMN ] column { SET DEFAULT constant_expression | DROP DEFAULT }   
+
+  | ALTER [ COLUMN ] column { SET | DROP } NOT NULL 
+
+  | RENAME [ COLUMN ] column TO new_column	  
+
+  | RENAME TO new_table
+
+  | ADD <table_constraint_definition>
+
+  | DROP CONSTRAINT constraint_name [ RESTRICT | CASCADE ]
+
+  | OWNER TO new_owner
+
+  | LOCK { DEFAULT | TABLE | TUPLE | NO}
+
+  | {BLOCK pagesize | TUPLE tuplesize}[ ...n]
+
+  | REBUILD [<table_storage_option>]
+
+  | { [LOGGING | NOLOGGING] | NEXT integer [K|M|G] | MAX  integer [K|M|G]}}[ ...n]
+
+ 
+
+< column_constraint > ::= [ CONSTRAINT constraint_name ]
+
+{  NULL | NOT NULL
+
+ | UNIQUE [USING INDEX index_name [<index_storage_option>]]
+
+ | PRIMARY KEY [USING INDEX index_name [<index_storage_option>]]
+
+ | CHECK (expression) |
+
+  REFERENCES reftable [ ( refcolumn ) ] [ MATCH FULL | MATCH SIMPLE ] [ ON DELETE action ] [ ON UPDATE action ] }
+
+[ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
+
+  
+
+< table_constraint > ::= [ CONSTRAINT constraint_name ]
+
+{ UNIQUE ( column_name [, ...n ] ) [USING INDEX index_name [<index_storage_option>]]
+
+ | PRIMARY KEY ( column_name [, ...n] ) [USING INDEX index_name [<index_storage_option>]]
+
+ | CHECK ( expression ) |
+
+  FOREIGN KEY ( column_name [, ...n] ) REFERENCES reftable [ ( refcolumn [, ...n ] ) ]
+
+    [ MATCH FULL | MATCH SIMPLE ] [ ON DELETE action ] [ ON UPDATE <action> ] }
+
+[ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
+
+   
+
+<action>::= {             NO ACTION					
+
+			| RESTRICT					
+
+			| CASCADE					
+
+			| SET NULL				
+
+			| SET DEFAULT }
+
+   
+
+<table_storage_option>::= { TABLESAPCE tablespacename 
+
+		       | [LOGGING | NOLOGGING]
+
+		       |INIT size [K|M|G]
+
+		|NEXT size [K|M|G]
+
+		|MAX  size [K|M|G]
+
+		|PCTFREE freesize 
+
+		|PCTUSED usedsize}[ ...n]
+
+    
+
+<index_storage_option> ::={      TABLESAPCE tablespacename
+
+				|[LOGGING|NOLOGGING]
+
+				|INIT size [K|M|G]
+
+				|NEXT size [K|M|G]
+
+				|MAX  size [K|M|G]	
+
+				|FILL fillsize
+
+				|SPLIT splitsize}[ ...n]
+	PARAM = 
+ADD [ COLUMN ]
+指定要添加一个或多个列定义
+
+table
+是要更改的表的名称。如果表不在当前数据库中或者不属于当前用户所拥有，可以显式指定数据库和模式名
+
+column 
+是要更改、添加或除去的列的名称。
+
+type
+可以是任何数据库定义的数据类型
+
+DEFAULT default_expr
+DEFAULT 子句给它所出现的字段一个缺省数值． 该数值可以是任何不含变量的表达式(不允许使用子查询和对本 表中的其它字段的交叉引用)．缺省表达式的数据类型必须和字段类型匹配． 
+
+n
+是表示前面的项可重复 n 次的占位符。
+
+
+
+
+
+RESTRICT
+默认选项，确保只有不存在相关视图或完整性约束的表才可以被删除． 
+
+CASCADE
+任何引用的视图或完整性约束都将被删除． 
+
+ALTER [ COLUMN ]
+指定要更改给定列。
+
+SET DEFAULT constant_expression 
+设置列的默认值属性, DEFAULT 子句给它所出现的字段一个缺省数值． 该数值可以是任何不含变量的表达式(不允许使用子查询和对本 表中的其它字段的交叉引用)．缺省表达式的数据类型必须和字段类型匹配．
+
+DROP DEFAULT
+删除列的默认值属性
+
+{ SET | DROP } NOT NULL
+设置或者删除列的非空属性
+
+RENAME [ COLUMN ] column TO
+改变表中一个独立字段的名字． 它对存储的数据没有任何影响
+
+
+
+
+
+new_column
+现存列的新名称
+
+RENAME TO
+改变一个表的名字(或者是一个 索引，一个序列，或者一个视图),对存储的数据没有任何影响． 
+
+
+
+new_table
+表的新名称
+
+ADD <table_constraint_definition>
+这个形式给表增加一个新的约束
+
+DROP CONSTRAINT constraint_name
+指定从表中删除constraint_name,注意:修改NULL,NOTNULL约束请使用ALTER TABLE ALTER [ COLUMN ] column { SET | DROP } NOT NULL子句.
+
+ 
+
+OWNER TO
+这个形式改变表，索引，序列或者视图的所有者为指定所有者
+
+new_owner 
+该表的新所有者的用户名． 
+
+LOCK { DEFAULT | TABLE | TUPLE | NO}
+建议执行过程加锁模式。
+
+DEFAULT建议由执行过程自动决定
+
+TABLE建议执行过程对表级锁, 不加行锁.
+
+TUPLE建议执行过程对表加意向锁,对具体操作的元组加行级锁
+
+NO建议执行过程对表不加锁.
+
+一般情况下应该使用LOCK DEFAULT选项, LOCK TABLE可以减少加锁数量,降低加锁开销,但可能降低并发度.LOCK TUPLE有利于提高并发度,但会增加加锁数量,增加加锁开销..
+
+BLOCK pagesize
+估计一个表占用的页数目.
+
+TUPLE tuplesize
+估计一个表的元组数目
+
+REBUILD [<table_storage_option>]
+设置表的新的存储参数, 整理表的数据到一个连续的块中.
+
+LOGGING | NOLOGGING
+设置主分区进行的操作记日志和不对分区进行的操作记日志（后者暂未实现）
+
+NEXT size [k|m|g]
+设置主分区大小的增长步长, k,m,g分别是可选的字节单位,默认是m(兆字节),增长步长为64k的倍数
+
+MAX  size [k|m|g]
+设置主分区大小的最大值,k,m,g分别是可选的字节单位,默认是m(兆字节)
+
+NULL | NOT NULL
+是确定列中是否允许空值的关键字。不允许空值的列只有在指定了默认值的情况下，才能用 ALTER TABLE 语句向表中添加。添加到表中的新列要么允许空值，要么必须指定默认值。
+
+
+
+如果新列允许空值，而且没有指定默认值，那么新列在表中每一行都包含空值。如果新列允许空值并且指定了新列的默认值,那么每一行都包含默认值
+
+
+
+如果新列不允许空值，那么新列必须具有 DEFAULT 定义，而且新列的所有现有行中将自动装载该默认值。
+
+
+
+可在 ALTER COLUMN 语句中DROP NOT NULL 以使 NOT NULL 列允许空值，但 PRIMARY KEY 约束中的列除外。只有列中不包含空值时，ALTER COLUMN 中才可指定 NOT NULL。必须将空值更新为非空值后，才允许执行 ALTER COLUMN SET NOT NULL 语句
+
+
+
+
+
+UNIQUE
+是通过唯一索引为给定的一列或多列提供实体完整性的约束。一个表可以有多个 UNIQUE 约束。
+
+PRIMARY KEY
+是通过唯一索引对给定的一列或多列强制实体完整性的约束。对于每个表只能创建一个 PRIMARY KEY 约束。
+
+USING INDEX index_name
+建表时, 当表具有UNIQUE或PRIMAY KEY约束时, 可以指定创建的唯一性索引的名字
+
+CHECK (expression)
+是通过限制可输入到一列或多列中的可能值强制域完整性的约束。
+
+REFERENCES | FOREIGN KEY...REFERENCES
+是为列中的数据提供引用完整性的约束。FOREIGN KEY 约束要求列中的每个值在被引用表中对应的被引用列中都存在。FOREIGN KEY 约束只能引用被引用表中为 PRIMARY KEY 或 UNIQUE 约束的列或被引用表中在 UNIQUE INDEX 内引用的列
+
+reftable
+是 FOREIGN KEY 约束所引用的表名。
+
+(refcolumn) | (refcolumn[,...n])
+是 FOREIGN KEY 约束所引用的表中的一列或多列。
+
+MATCH FULL
+向这些列增加的数值将使用给出的匹配类型与参考表的参考列中的数值进行匹配，不允许一个多字段外键的字段为NULL
+
+ON DELETE action
+指定当要创建的表中的行具有引用关系，并且从父表中删除该行所引用的行时，要对该行采取的操作。默认设置为 NO ACTION。 
+
+
+
+ON UPDATE action
+指定当要创建的表中的行具有引用关系，并且在父表中更新该行所引用的行时，要对该行采取的操作。默认设置为 NO ACTION。 
+
+DEFERRABLE | NOT DEFERRABLE
+这两个关键字设置该约束是否可推迟．一个不可推迟的约束将在每条命令之后 马上检查．可以推迟的约束检查可以推迟到事务结尾． 缺省是 NOT DEFERRABLE．目前只有外键约束 接受这个子句．所有其它约束类型都是不可推迟的．
+
+INITIALLY IMMEDIATE | INITIALLY DEFERRED
+如果约束是可推迟的，那么这个子句声明检查约束的缺省时间． 如果约束是 INITIALLY IMMEDIATE， 那么每条语句之后就检查它．这个是缺省．如果约束是 INITIALLY DEFERRED，那么只有在事务结尾才检查它．
+
+NO ACTION
+表示删除或者更新将产生一个违反外键约束的动作，生成错误,它是缺省动作
+
+RESTRICT
+对应<atction>的一个选项，与NO ACTION 相同
+
+CASCADE
+对应<action>的一个选项，删除任何引用了被删除行的行，或者分别把引用行的字段值更新为 被参考字段的新数值
+
+SET NULL
+把引用行数值设置为 NULL
+
+SET DEFAULT
+把引用列的数值设置为它们的缺省值
+
+TABLESAPCE tablespacename
+分区所属的表空间名
+
+INIT size [k|m|g]
+主分区大小的初始值, k,m,g分别是可选的字节单位,默认是m(兆字节)
+
+PCTFREE freesize
+该分区的页面为将来可能发生的增长更新操作保留的空闲空间百分比，当某页面剩余的空闲空间不足PCTFREE%时，该页面将不再允许进行插入操作，此时发生页面溢出
+
+PCTUSED usedsize
+该分区的溢出页面的最小使用空间百分比，当页面溢出后，在此页面上的删除操作或者缩减更新操作使得页面的已使用空间少于PCTUSED%时，该页面重新允许进行插入操作，此时页面取消溢出
+
+
+
+FILL fillsize
+索引填充系数。在创建索引的时候，对每一个索引页面不一定是全部填满，而是填充wFillCoef的比例。其值在(0 , 100]之间，100表示填满。建议值是70。
+
+SPLIT splitsize
+索引分裂系数。在决定索引插入的时候如果引起页面分裂，该参数决定原页面上的索引元组在分裂后两个页面的分布情况，如果是50表示在两个页面之间均分，其值在(0 , 100)之间，建议值是50。
+
+
+	REMARK = 
+若要添加新数据行，请使用 INSERT 语句。若要删除数据行，请使用 DELETE 或 TRUNCATE TABLE 语句。若要更改现有行中的值，请使用 UPDATE 语句。
+
+ 
+
+ALTER TABLE 语句指定的更改将立即实现。如果这些更改需要修改表中的行，ALTER TABLE 将更新这些行。ALTER TABLE 将获取表上的修改锁，以确保在更改期间其它连接不能引用该表（甚至不能引用其元数据）。对表进行的更改将记录于日志中，并且可以完全恢复。影响非常大的表中所有行的更改，比如除去一列或者用默认值添加 NOT NULL 列，可能需要较长时间才能完成，并会生成大量日志记录。如同影响大量行的 INSERT、UPDATE 或者 DELETE 语句一样，这一类 ALTER TABLE 语句也应小心使用
+
+ 
+
+当除去约束时，作为约束的一部分而创建的索引也将除去。而通过 CREATE INDEX 创建的索引必须使用 DROP INDEX 语句来除去
+
+ 
+
+当在现有列上添加新 PRIMARY KEY 或 UNIQUE 约束时，该列中的数据必须唯一。如果存在重复值，ALTER TABLE 语句将失败.每个 PRIMARY KEY 和 UNIQUE 约束都将生成一个索引。
+	EXAMPLE = 
+更改表以添加新列
+下例添加一个允许空值的列，而且没有通过 DEFAULT 定义提供值。各行的新列中的值将为 NULL
+CREATE TABLE project_a ( column_a INT);
+
+ALTER TABLE project_a ADD column_b VARCHAR(20) NULL;
+
+
+
+ 
+
+更改表以除去列
+下例修改表以删除一列。
+CREATE TABLE project_b ( column_a INT, column_b VARCHAR(20) NULL); 
+
+ALTER TABLE project_b DROP COLUMN column_b;
+
+
+
+
+
+更改表以添加具有约束的列
+下例向表中添加具有 UNIQUE 约束的新列。 
+CREATE TABLE project_c ( column_a INT);
+
+ALTER TABLE project_c ADD column_b VARCHAR(20) NULL 
+
+   CONSTRAINT project_unique UNIQUE;
+
+
+
+
+
+更改表以添加check约束
+下例向表中的现有列上添加约束。该列中存在一个违反约束的值；因此不允许该约束的添加。
+CREATE TABLE project_d ( column_a INT); 
+
+INSERT INTO project_d VALUES (-1);
+
+ALTER TABLE project_d ADD CONSTRAINT exd_check CHECK (column_a > 1);
+
+
+
+
+
+更改表以添加多个带有约束的列
+下例向表中添加多个带有约束的新列。
+CREATE TABLE project_e ( column_a INT CONSTRAINT column_a_un UNIQUE); 
+
+
+
+ALTER TABLE project_e ADD 
+
+(
+
+/* Add a PRIMARY KEYcolumn. */ 
+
+column_b INT
+
+CONSTRAINT column_b_pk PRIMARY KEY, 
+
+
+
+/* Add a column referencing another column in the same table. */ 
+
+column_c INT NULL  
+
+CONSTRAINT column_c_fk 
+
+REFERENCES project_e(column_a),
+
+
+
+/* Add a column with a constraint to enforce that   */ 
+
+/* nonnull data is in a valid phone number format.  */
+
+column_d INT NULL 
+
+CONSTRAINT column_d_chk
+
+CHECK 
+
+(column_d > 4),
+
+
+
+/* Add a nonnull column with a default.  */ 
+
+column_e DECIMAL(3,3)
+
+CONSTRAINT column_e_default
+
+DEFAULT 0.312
+
+);
+
+
+
+
+
+
+
+
+
+添加具有默认值的可为空的列
+下例添加可为空的、具有 DEFAULT 定义的列，为表中的各现有行提供值。
+CREATE TABLE project_f ( column_a INT CONSTRAINT column_a_un UNIQUE);
+
+INSERT INTO project_f VALUES (-1);
+
+
+
+ALTER TABLE project_f 
+
+ADD AddDate timestamp NULL
+
+CONSTRAINT AddDateDflt
+
+DEFAULT now();
+
+
+
+SELECT * FROM project_f;
+
+
+
+重建表，如果表有索引的话，同时重建表对应的索引
+下例向表中的现有列上添加约束。该列中存在一个违反约束的值；因此，利用 WITH NOCHECK 来防止对现有行验证约束，从而允许该约束的添加。
+
+
+
+
+CREATE TABLE project_g(column_a INT PRIMARY KEY, column_b VARCHAR(20) NOT NULL);
+
+INSERT INTO project_g VALUES(2, 'HELLO OSCAR');
+
+INSERT INTO project_g VALUES(3, 'WELCOME');
+
+
+
+ALTER TABLE project_g REBUILD LOGGING INIT 2m NEXT 10m MAXSIZE UNLIMITED PCTFREE 10 PCTUSED 80;
+
+
+
+
+
+
+	REF = 
+CREATE TABLE
+DROP TABLE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = START AUDIT
+	ID = ID_HELP_START_AUDIT
+	CONTENT = START AUDIT;
+	PARAM = 
+
+	REMARK = 
+只有系统安全员才可以开启审计功能。
+	EXAMPLE = 
+START AUDIT
+START AUDIT和DROP AUDIT命令是审计功能的总开关。START AUDIT用于把审计功能打开，DROP AUDIT命令用于把审计功能关闭。
+
+默认情况下，审计功能是关闭的。
+
+
+
+只有审计功能打开的情况下，审计配置表中所有状态为开启的审计配置记录才会生效，Oscar才会根据它们进行审计并生成相应的审计踪迹。对于审计配置表中状态为关闭为关闭的审计配置记录，不论审计功能是打开还是关闭，都不会生效，Oscar不会根据它们进行审计，也就无相应的审计踪迹。
+
+
+
+在审计功能关闭的情况下，审计配置表中所有的审计配置记录，不论它们自身的状态为开启还是关闭，都是无效的，Oscar不会进行任何审计。
+START AUDIT;
+
+
+	REF = 
+AUDIT
+CLEAN AUDIT CONFIGURATION
+CLEAN AUDIT TRAIL
+DROP AUDIT
+NOAUDIT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP AUDIT
+	ID = ID_HELP_DROP_AUDIT
+	CONTENT = DROP AUDIT;
+	PARAM = 
+
+	REMARK = 
+只有系统安全员才可以关闭审计功能。
+	EXAMPLE = 
+DROP AUDIT
+START AUDIT和DROP AUDIT命令是审计功能的总开关。START AUDIT用于把审计功能打开，DROP AUDIT命令用于把审计功能关闭。
+
+默认情况下，审计功能是关闭的。
+
+
+
+只有审计功能打开的情况下，审计配置表中所有状态为开启的审计配置记录才会生效，Oscar才会根据它们进行审计并生成相应的审计踪迹。对于审计配置表中状态为关闭为关闭的审计配置记录，不论审计功能是打开还是关闭，都不会生效，Oscar不会根据它们进行审计，也就无相应的审计踪迹。
+
+
+
+在审计功能关闭的情况下，审计配置表中所有的审计配置记录，不论它们自身的状态为开启还是关闭，都是无效的，Oscar不会进行任何审计。
+DROP AUDIT;
+
+
+	REF = 
+AUDIT
+CLEAN AUDIT CONFIGURATION
+CLEAN AUDIT TRAIL
+NOAUDIT
+START AUDIT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = AUDIT
+	ID = ID_HELP_AUDIT
+	CONTENT = AUDIT { PRIVILEGES {system_priv [,…] | DBA | ALL}
+
+        |{statement_opt [,…] | ALL } [BY user [,…] ]
+
+        |{object_opt[,…] | ALL }ON {[schema.]object | DEFAULT}
+
+      }[WHENEVER [NOT] SUCCESSFUL];
+	PARAM = 
+system_priv
+某一系统特权,如下：
+
+
+
+CREATE ROLE：             创建角色
+
+GRANT ROLE：              把角色授予某一用户
+
+REVOKE ROLE：             把角色从某一用户处收回
+
+
+DROP ROLE：               删除角色
+
+CREATE USER：             创建用户
+
+ALTER USER：              修改用户
+
+DROP USER：               删除用户
+
+CREATE SCHEMA：           创建模式
+
+ALTER SCHEMA：            修改模式
+
+DROP SCHEMA：             删除模式
+
+
+
+DBA
+对DBA角色包含的所有特权进行审计。在Oscar中，DBA角色包含除了开启/关闭审计、进行审计配置、查看/清除审计配置，查看/清除审计踪迹外的所有权限，所以当指定此关键字时，会对除这些特权以外的所有权限进行审计，这些权限参见statement_opt中的说明。
+
+ALL
+在特权审计中表示所有系统特权，表示对system_priv中所有的特权进行审计；
+
+在语句审计中，表示所有的可审计SQL语句。
+
+在对象审计中表示本类对象上所有的可审计操作。
+
+
+
+
+
+WHENEVER [NOT] SUCCESSFUL
+表示审计模式，是可选项。
+
+
+
+当指定WHENEVER SUCCESSFUL时，表示只审计执行成功的特权语句；
+
+当指定WHENEVER NOT SUCCESSFUL时，表示只审计执行失败的特权语句。
+
+
+
+当不指定引参数时，表示对执行成功和执行失败的特权语句都要审计。
+
+PRIVILEGES
+指定PRIVILEGES关键字时，表示本审计配置为特权审计配置。本审计配置记录将出现在特权审计配置视图V_SYS_PRIVAUDCONF中，根据本审计配置记录生成的审计踪迹将出现在特权审计踪迹视图V_SYS_PRIVAUDTRAIL中。
+
+statement_opt
+表示要审计的某一SQL语句,包括如下：
+
+ALTER TRIGGER、ALTER TABLE、ALTER USER、
+
+COMMENT、CREATE CONSTRAINT TRIGGER、
+
+CREATE DOMAIN、CREATE PROCEDURE、CREATE ROLE、
+
+CREATE INDEX、CREATE SCHEMA、CREATE SEQUENCE、
+
+CREATE TABLE、CREATE TABLE AS、 CREATE TRIGGER、
+
+CREATE USER、CREATE VIEW、DELETE、DROP DOMAIN 、
+
+DROP PROCEDURE、DROP ROLE、DROP INDEX、DROP SCHEMA、DROP SEQUENCE、DROP TABLE、DROP TRIGGER、
+
+DROP USER、DROP VIEW、GRANT、INSERT、RESET、REVOKE、
+
+GRANT ROLE、REVOKE ROLE、SELECT、SELECT INTO、SET、TRUNCATE、UPDATE、等等。
+
+
+
+BY user[,...]
+指定该可选项时，表示要审计用户user(可以是多个用户的列表，每个用户间以逗号分隔)执行的由statement_opt(或ALL)指定的操作。
+
+当不指定该可选项时，表示要审计所有用户执行的由statement_opt(或ALL)指定的操作。
+
+object_opt
+表示要审计指定对象上的操作。它是表2表示的statement_opt的一个子集，不同对象上的操作也有所不同，在Oscar中，提供审计支持的各类对象及它们上面的可审计操作见下表：
+
+表(TABLE)上的可审计操作如下：
+
+    SELECT
+
+    INSERT
+
+    UPDATE
+
+    DELETE
+
+    ALTER TABLE
+
+    COMMENT
+
+    GRANT
+
+    REVOKE
+
+    TRUNCATE
+
+视图(VIEW)上的可审计操作如下：
+
+   SELECT
+
+   INSERT
+
+   UPDATE
+
+   DELETE
+
+   COMMENT
+
+   GRANT
+
+   REVOKE
+
+序列(SEQUENCE)上的可审计操作如下：
+
+   SELECT
+
+   COMMENT
+
+   GRANT
+
+   REVOKE
+
+
+
+DEFAULT
+默认审计规则，表示为系统以后创建的所有对象建立和本条审计配置记录同样的审计配置，一旦审计功能开启，该关键字生效，系统会为以后创建的所有对象执行本条审计配置指定的审计。如执行AUDIT INSERT ON DEFAULT，那么当系统每创建一张表、视图后，就会为之生成一条相应的审计配置记录，新记录中的操作object_opt和审计模式和本条审计配置记录相同，当执行START AUDIT后，当执行对表表的插入后，就会为本次插入生成审计踪迹。需要注意的是当执行NOAUDIT xxx DEFAULT时，只会使系统停止为新建的对象执行原默认审计规则指定的审计，而原来因默认审计规则建立的新的审计配置记录不会失效。
+
+ON [schema.]object
+表示要对在ON指定的对象进行的object_opt指定操作进行审计。
+
+schema：表示要审计的对象所有的模式名；不指定该项时其值为进行审计配置时的当前默认模式名。
+
+object：表示要审计的对象的名称，这里的对象包括表、视图和序列。
+
+
+
+
+	REMARK = 
+只有系统安全员才可以进行审计配置。
+
+审计配置表SYS_AUDCONF中有一列 BISON，表示本审计配置记录是否为开启。当其值为't'时，表示本审计配置记录是开启的，为'f'表示本审计配置记录是关闭的。
+
+刚执行完AUDIT命令进行审计配置后，新生成的审计配置记录的状态为't'，当通过NOAUDIT取消一条审计配置记录后，其BISON状态由't'变为'f'。
+	EXAMPLE = 
+审计用户的成功修改
+AUDIT PRIVILEGES ALTER USER WHENEVER SUCCESSFUL;
+查看特权审计配置视图：
+
+SELECT *FROM V_SYS_PRIVAUDCONF;
+
+结果如下：
+
++------------+------+
+
+| PRIV_NAME  | MODE |
+
++------------+------+
+
+| ALTER USER | s    |
+
++------------+------+
+
+(一行)
+
+审计所有的系统特权
+AUDIT PRIVILEGES ALL;
+查看特权审计配置视图：
+
+SELECT *FROM V_SYS_PRIVAUDCONF;
+
+
+
+结果如下：
+
++-------------------------+------+
+
+|        PRIV_NAME        | MODE |
+
++-------------------------+------+
+
+| GRANT ROLE              | a    |
+
+| REVOKE ROLE             | a    |
+
+| CREATE ROLE             | a    |
+
+| DROP ROLE               | a    |
+
+| ALTER USER              | a    |
+
+| CREATE USER             | a    |
+
+| DROP USER               | a    |
+
+| CREATE SCHEMA           | a    |
+
+| ALTER SCHEMA            | a    |
+
+| DROP SCHEMA             | a    |
+
++-------------------------+------+
+
+(11 行)
+
+审计所有成功的授权语句
+AUDIT GRANT WHENEVER SUCCESSFUL;
+
+
+查看语句审计配置视图：
+
+SELECT *FROM V_SYS_STMTAUDCONF;
+
+结果如下：
+
++--------------+------+
+
+|  STMT_NAME   | MODE |
+
++--------------+------+
+
+| GRANT        | s    |
+
++--------------+------+
+
+(2 行)
+
+审计所有可审计的语句
+AUDIT ALL;
+同样可以运行SELECT * FROM V_SYS_STMTAUDCONF;查看语句审计配置视图查看审计配置结果。
+
+
+
+审计用户HU执行的删除索引操作
+AUDIT DROP INDEX BY HU;
+查看用户审计配置视图：
+
+SELECT * FROM V_SYS_USRAUDCONF;
+
+结果如下：
+
++-----------+------------+------+
+
+| USER_NAME | STMT_NAME  | MODE |
+
++-----------+------------+------+
+
+| HU        | DROP INDEX | a    |
+
++-----------+------------+------+
+
+(一行)
+
+审计所有用户对表TAB1的不成功删除操作
+AUDIT DELETE ON TAB1 WHENEVER NOT SUCCESSFUL;
+查看对象审计配置视图：
+
+SELECT * FROM V_SYS_OBJAUDCONF;
+
+结果如下：
+
++----------+------------+--------------+----------+--------+------+
+
+| OBJ_NAME | OBJ_SCHEMA | OBJ_DATABASE | OBJ_TYPE | ACTION | MODE |
+
++----------+------------+--------------+----------+--------+------+
+
+| TAB1     | PUBLIC     | FENIX       | r        | DELETE | a    |
+
++----------+------------+--------------+----------+--------+------+
+
+(一行)
+
+为系统以后创建的对象建立默认SELECT审计规则
+AUDIT SELECT ON DEFAULT;
+当执行完该语句后，由于目前还没有新建的对象，所以此审计配置记录不出现在对象审计配置视图中，而是出现在审计配置表SYS_AUDCONF中。查看审计配置表：SELECT * FROM SYS_AUDCONF;结果如下：
+
++--------+---------+-------+-------+-------+
+
+| HTGTID | STRNAME | CTYPE | CMODE | BISON |
+
++--------+---------+-------+-------+-------+
+
+|      0 | SELECT  | 8     | a     | t     |
+
++--------+---------+-------+-------+-------+
+
+(一行)
+
+其HTGTID为0且CTYPE为8，表示对所有后续新建对象都执行此审计配置指定的SELECT审计。
+
+配置完默认审计规则后，当系统每创建一个新的对象(表、视图或序列)时，审计配置表中就会为该新建对象在审计配置表中生成一条审计配置，这些针对新建对象的审计配置会出现在对象审计配置视图中。如假设配置后上述默认SELECT审计规则后，系统中有用户FLATER创建了表FTAB，则查看对象审计配置视图：SELECT * FROM V_SYS_OBJAUDCONF;
+
+结果如下：
+
++----------+------------+--------------+----------+--------+------+
+
+| OBJ_NAME | OBJ_SCHEMA | OBJ_DATABASE | OBJ_TYPE | ACTION | MODE |
+
++----------+------------+--------------+----------+--------+------+
+
+| FTAB     | PUBLIC     | FENIX       | r        | SELECT  a     |
+
++----------+------------+--------------+----------+--------+------+
+
+(一行)
+
+再查看审计配置表：SELECT * FROM SYS_AUDCONF;
+
+结果如下：
+
++--------+---------+-------+-------+-------+
+
+| HTGTID | STRNAME | CTYPE | CMODE | BISON |
+
++--------+---------+-------+-------+-------+
+
+|      0 | SELECT  | 8     | a     | t     |
+
+|  33090 | SELECT  | 8     | a     | t     |
+
++--------+---------+-------+-------+-------+
+
+(2 行)
+
+可以看出，除了默认的SELECT审计配置外，还有一条对唯一标识为33090的对象的SELECT审计配置，这里33090就是新建的表FTAB的唯一标识。
+
+
+
+
+	REF = 
+CLEAN AUDIT CONFIGURATION
+CLEAN AUDIT TRAIL
+DROP AUDIT
+NOAUDIT
+START AUDIT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = NOAUDIT
+	ID = ID_HELP_NOAUDIT
+	CONTENT = NOAUDIT { PRIVILEGES {system_priv [,…] | DBA | ALL}
+
+        |{statement_opt [,…] | ALL } [BY user [,…] ]
+
+        |{object_opt[,…] | ALL }ON {[schema.]object | DEFAULT}
+
+      }[WHENEVER [NOT] SUCCESSFUL];
+	PARAM = 
+ 
+所有参数请参见AUDIT中的说明。
+
+
+	REMARK = 
+只有系统安全员才可以取消审计配置。
+	EXAMPLE = 
+NOAUDIT DELETE
+
+系统安全员使用isql联接到物理数据库system配置审计和取消审计配置操作：
+
+E:\isql>isql -h localhost -p 5432 -U SYSSECURE system
+
+欢迎来到 isql 5.0.0019 OSCAR的交互终端. 现在是 星期二 十二月 23 2003
+
+
+
+键入:  COPYRIGHT获取发布信息
+
+       HELP 获取 SQL 命令的帮助
+
+       ? 获取内部命令的帮助
+
+       EXIT 退出
+
+
+
+SYSSECURE@SYSTEM> audit delete by hu;
+
+AUDIT
+
+SYSSECURE@SYSTEM> select *from v_sys_usraudconf;
+
++-----------+-----------+------+
+
+| USER_NAME | STMT_NAME | MODE |
+
++-----------+-----------+------+
+
+| HU        | DELETE    | a    |
+
++-----------+-----------+------+
+
+(一行)
+
+
+
+
+
+SYSSECURE@SYSTEM> noaudit delete by hu;
+
+NOAUDIT
+
+SYSSECURE@SYSTEM> select *from v_sys_usraudconf;
+
+2003-12-23 19:44:07, NOTICE, Traffic Cop, 处理了0个元组, SQL: select *from v_sys_usraudconf
+
++-----------+-----------+------+
+
+| USER_NAME | STMT_NAME | MODE |
+
++-----------+-----------+------+
+
++-----------+-----------+------+
+
+(0 行)
+
+SYSSECURE@SYSTEM> select *from sys_audconf;
+
++--------+---------+-------+-------+-------+
+
+| HTGTID | STRNAME | CTYPE | CMODE | BISON |
+
++--------+---------+-------+-------+-------+
+
+|  33173 | DELETE  | 4     | a     | f     |
+
++--------+---------+-------+-------+-------+
+
+(一行)
+
+可以看出执行NOAUDIT后，用户审计配置视图中不再有记录，但在审计配置表中该审计配置记录还存在，但其状态BISON为'f'，表示该审计配置记录无效。
+
+
+	REF = 
+AUDIT
+CLEAN AUDIT CONFIGURATION
+CLEAN AUDIT TRAIL
+DROP AUDIT
+START AUDIT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CLEAN AUDIT CONFIGURATION
+	ID = ID_HELP_CLEAN_AUDIT_CONFIGURATION
+	CONTENT = CLEAN AUDIT CONFIGURATION;
+	PARAM = 
+
+	REMARK = 
+Oscar提供此命令用于清除审计配置，运行此命令会把系统表SYS_AUDCONF中的所有审计配置记录删除，如果只想把部分审计配置清除，请运行相应的NOAUDIT命令使之无效即可。
+
+只有系统安全员syssecure可以清除审计配置。
+	EXAMPLE = 
+CLEAN AUDIT CONFIGURATION
+
+系统安全员使用isql连接到物理数据库fenix运行此命令：
+
+isql -h localhost -U syssecure fenix
+
+欢迎来到 isql 5.0.0019 OSCAR的交互终端. 现在是 星期二 十二月 23 2003
+
+
+
+键入:  COPYRIGHT获取发布信息
+
+       HELP 获取 SQL 命令的帮助
+
+       ? 获取内部命令的帮助
+
+       EXIT 退出
+
+
+
+SYSSECURE@FENIX> SELECT *FROM SYS_AUDCONF;
+
++--------+--------------+-------+-------+-------+
+
+| HTGTID |   STRNAME    | CTYPE | CMODE | BISON |
+
++--------+--------------+-------+-------+-------+
+
+|      0 | CREATE TABLE | 2     | a     | t     |
+
++--------+--------------+-------+-------+-------+
+
+(一行)
+
+SYSSECURE@FENIX> CLEAN AUDIT CONFIGURATION;
+
+CLEAN
+
+SYSSECURE@FENIX> SELECT *FROM SYS_AUDCONF;
+
+2003-12-23 14:53:14, NOTICE, Traffic Cop, 处理了0个元组, SQL: SELECT *FROM SYS_AUDCONF
+
++--------+---------+-------+-------+-------+
+
+| HTGTID | STRNAME | CTYPE | CMODE | BISON |
+
++--------+---------+-------+-------+-------+
+
++--------+---------+-------+-------+-------+
+
+(0 行)
+
+会发现审计配置表SYS_AUDCONF中的记录全部被删除。
+
+
+	REF = 
+AUDIT
+CLEAN AUDIT TRAIL
+DROP AUDIT
+NOAUDIT
+START AUDIT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CLEAN AUDIT TRAIL
+	ID = ID_HELP_CLEAN_AUDIT_TRAIL
+	CONTENT = CLEAN AUDIT TRAIL;
+	PARAM = 
+
+	REMARK = 
+Oscar提供此命令用于清除所有的审计踪迹。运行此命令会把与审计踪迹有关的三张系统表SYS_AUDTRAIL、SYS_AUDCOMN和SYS_OBJECT中的所有记录都删除。
+
+只有系统安全员syssecure才可以清除审计踪迹。
+	EXAMPLE = 
+CLEAN AUDIT TRAIL
+
+系统安全员syssecure使用isql连接物理数据库fenix清除审计踪迹：
+
+E:\isql>isql -h localhost -p 5432 -U syssecure fenxi
+
+欢迎来到 isql 5.0.0019 OSCAR的交互终端. 现在是 星期二 十二月 23 2003
+
+
+
+键入:  COPYRIGHT获取发布信息
+
+       HELP 获取 SQL 命令的帮助
+
+       ? 获取内部命令的帮助
+
+       EXIT 退出
+
+
+
+SYSSECURE@FENIX> SELECT * FROM SYS_AUDTRAIL;
+
++---------+------------+---------------------+------------+------------+-------------------------+
+
+| TRAILID | STRUSRNAME |       AUDTIME       | BISSUCCESS | STRERRTEXT |       STRSQLTEXT        |
+
++---------+------------+---------------------+------------+------------+-------------------------+
+
+|   33170 | SYSDBA     | 2003-12-23 15:00:31 | t          |            | CREATE TABLE T( A INT); |
+
++---------+------------+---------------------+------------+------------+-------------------------+
+
+(一行)
+
+SYSSECURE@FENIX> CLEAN AUDIT TRAIL;
+
+SYSSECURE@SYSTEM> SELECT * FROM SYS_AUDTRAIL;
+
+2003-12-23 15:01:12, NOTICE, Traffic Cop, 处理了0个元组, SQL: SELECT * FROM SYS_AUDTRAIL
+
++---------+------------+---------+------------+------------+------------+
+
+| TRAILID | STRUSRNAME | AUDTIME | BISSUCCESS | STRERRTEXT | STRSQLTEXT |
+
++---------+------------+---------+------------+------------+------------+
+
++---------+------------+---------+------------+------------+------------+
+
+(0 行)
+
+可以看出审计踪迹表SYS_AUDTRAIL中的记录被删除。同样，查看其它两张系统表，也会发现其中的记录全被删除。
+
+
+
+注意：
+
+    只有系统安全员才有权运行此命令来清除审计踪迹。
+
+
+	REF = 
+AUDIT
+CLEAN AUDIT CONFIGURATION
+DROP AUDIT
+NOAUDIT
+START AUDIT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE VIEW
+	ID = ID_HELP_CREATE_VIEW
+	CONTENT = CREATE [OBJECT] VIEW [schema.]viewname [ (colname [, ...] )]
+
+    AS subquery
+
+    [ WITH [ CASCADE | LOCAL ] CHECK OPTION ]
+	PARAM = 
+viewname
+视图名字，必须是合法的OSCAR标识符。
+
+如果给出模式名称SchemaName.ViewName，那么该视图使用指定模式。否则使用该用户的默认模式。并且在某一模式中，视图名称必须唯一。
+
+colname
+视图的列名。不必与表(父视图)上的列名相同。
+
+subquery
+为视图提供数据的SELECT 查询语句。
+
+参见SELECT。
+
+CHECK OPTION
+这个选项用于可更新视图，可以防止用户更改视图中不可见的数据。
+
+如果使用了该选项，所有对视图的 INSERT 和 UPDATE 都要经过视图“CHECK OPTION 条件”的校验。如果没有通过校验，更新将被拒绝。
+
+CHECK OPTION 可以保证所有INSERT 和 UPDATE 到视图的行， 必定是该视图能 SELECT 出来的行。
+
+
+
+CHECK OPTION 一共有两个可选参数 CASCADE 和 LOCAL，默认是 CASCADE。
+
+只有在 一个视图定义在另外一个视图上的时候CASCADE 和 LOCAL 才不同。
+
+
+
+假定当前定义的视图为 V， 当 V 的定义使用了
+
+CASCADE
+
+    则 V 的“CHECK OPTION 条件” = V 的“视图定义条件” AND V 的所有祖先视图的“视图定义条件”。
+
+    
+
+LOCAL
+
+   V 的“CHECK OPTION 条件” = V 的“视图定义条件” AND V 的父视图的“CHECK OPTION 条件”。
+
+
+
+
+
+i.e
+
+
+
+  V1 defined on table T0
+
+  V2 defined on V1 WITH x CHECK OPTION
+
+  V3 defined on V2
+
+  V4 defined on V3 WITH y CHECK OPTION
+
+  V5 defined on V4
+
+
+
+
+
+下表描述了x,y取不同值得时候，V1, V2, V3, V4, V5 的“CHECK OPTION 条件”，是由哪些视图的“视图定义条件” AND 而成的。
+
+
+
++----+---------------------------------------------------------------+  
+
+|    |x = LOCAL    x = CASCADED    x = LOCAL       x = CASCADED      |
+
+|    |y = LOCAL    y = CASCADED    y = CASCADED    y = LOCAL         |
+
++----+---------------------------------------------------------------|
+
+|V1  |  None       None            None            None              |
+
+|V2  |  V2         V2, V1          V2              V2, V1            |
+
+|V3  |  V2         V2, V1          V2              V2, V1            |
+
+|V4  |  V4, V2     V4, V3, V2, V1  V4, V3, V2, V1  V4, V2, V1        |
+
+|V5  |  V4, V2     V4, V3, V2, V1  V4, V3, V2, V1  V4, V2, V1        |
+
++--------------------------------------------------------------------+
+
+
+
+
+
+
+
+注：
+
+   CHECK OPTION 条件：有INSERT 和 UPDATE 到视图的行，必须满足此条件的约束。
+
+   父视图：如果视图 S 定义在视图 P 上， 则P为父视图。
+
+   子视图：如果视图 S 定义在视图 P 上， 则P为子视图。
+
+   祖先视图：
+
+      1.所有视图 S 的父视图 P 是 S 的祖先视图。
+
+      2.P 的祖先视图是 S 的祖先视图。
+
+   
+
+
+
+schemaname
+视图所在的模式名字。
+
+
+	REMARK = 
+创建的视图并不是物理上存在于磁盘的，它只是在数据字典中生成一个关于查询的定义。
+
+除了DROP VIEW, CREATE VIEW之外的其他操作，最终被重写为对视图相关表的操作。
+
+
+
+视图的作用。
+
+  视图提供了数据的另一种访问方式，为数据库提供了灵活性。例如表的名字发生更改，在没有视图的情况下，所有依赖于原表的应用必须作相应的变更。此时可以在新表之上创建一张与原表同名的视图，则依赖于原表的应用都可以通过该视图操作原表，就好像原表没有改变过一样。
+
+  视图提供了一种权限控制机制。视图可以同时控制用户对行和列的访问权限。通过对不同类型的用户定义不同的视图，可以保证“敏感数据”的安全性。
+
+  当然视图也可以用来纪录复杂的查询语句。通过创建视图，用户可以避免记忆和键入大量复杂的查询语句。
+
+
+
+
+
+
+
+OSCAR可更新视图的条件。
+
+可更新视图是指那些可以执行UPDATE或者DELETE, 或者INSERT语句的视图。
+
+
+
+可更新视图的必须满足：
+
+1.视图定义在一张表上。
+
+2.视图定义不含GROUP BY，HANVING子句。
+
+3.视图定义不含重复的列。
+
+4.视图定义不含相关子查询。
+
+在以上两个条件满足的情况下：
+
+
+
+可UPDATE视图的条件：
+
+   如果视图至少含有一个"可UPDATE列"，可该视图被称为"可UPDATE视图"。
+
+
+
+可INSERT视图的条件：
+
+   视图的每一列都是"可UPDATE列"。
+
+可DELETE视图的条件：
+
+   无附加条件。   
+
+
+
+注：
+
+   满足以下两个条件的视图列是"可UPDATE列"，否则被称为"不可UPDATE列"。
+
+   1.列定义不含有聚集函数，函数，表达式。
+
+   2.列对应的父视图的列可UPDATE。
+	EXAMPLE = 
+使用简单的 CREATE VIEW
+建立视图HANGZHOU_PROJ，来显示所有在城市HANGZHOU的项目。该视图隐藏了所有不在杭州的工程，保证了数据的安全性。
+
+但是由于本视图没有执行WITH CHECK OPTION选项，用户可以  INSERT该视图不可见的行：
+
+  例如：执行INSERT  INTO HANGZHOU_PROJ VALUES('1','CODE OSCAR', 'CODE', 100000,'BEIJING');将会插入一行城市在北京的行，该行在视图HANGZHOU_PROJ不可见。
+
+或者UPDATE该视图可见的行，使该行成为不可见。
+
+ 例如：执行UPDATE HANGZHOU_PROJ SET CITY = 'BEIJING';
+
+  
+CREATE VIEW HANGZHOU_PROJ AS SELECT * FROM PROJ WHERE CITY = 'HANGZHOU';
+
+使用WITH CHECK OPTION的视图
+视图DESIGN_PROJ显示所有 PTYPE为'DESIGN'的工程。而且用户不能插入一个该视图不可见的行。
+
+如执行
+
+INSERT  INTO DESIGN_PROJ VALUES('2','CODE OSCAR', 'CODE', 100000,'BEIJING');
+
+将会失败。
+CREATE VIEW DESIGN_PROJ AS SELECT * FROM PROJ WHERE PTYPE = 'DESIGN' WITH CHECK OPTION;
+
+
+
+
+
+不可更新视图
+视图CITY_PROJ_BUDGET显示城市，以及在该城市的所有工程的预算的总和。由于视图的定义中使用了 GROUP BY ,该视图不可更新。
+CREATE VIEW CITY_PROJ_BUDGET AS SELECT CITY, SUM(BUDGET) AS BUDGET FROM PROJ GROUP BY CITY;
+
+特殊的不可更新视图
+视图DUP_PNUM_PRO的列PNUM, PNUM1实际上是基本表上的同一列PNUM，该视图不能更新。
+CREATE VIEW DUP_PNUM_PROJ AS SELECT PNUM,PNUM AS PNUM1 FROM PROJ;
+
+
+	REF = 
+DROP VIEW
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = GRANT
+	ID = ID_HELP_GRANT
+	CONTENT = GrantStmt        ::= {GrantObjStmt|GrantRoleStmt};
+
+
+
+GrantRoleStmt    ::= GRANT ROLE rolename TO username[,...n];
+
+
+
+GrantObjStmt     ::= GRANT privileges ON privilege_target TO {username|ROLE rolename}[,...n] [WITH GRANT OPTION];
+
+privileges       ::= {privilege[,...n]} |ALL [PRIVILEGES];
+
+privilege        ::= { 
+
+                       {SELECT|UPDATE|REFERENCES}[(colname[,...n])]|
+
+                       INSERT|DELETE|TRIGGER|EXECUTE|USAGE|CREATE;
+
+                     }
+
+privilege_target ::= [TABLE]tablename|FUNCTION funcname|DATABASE dbname | LANGUAGE langname |SCHEMA schemaname|SEQUENCE seqname;
+	PARAM = 
+colname
+列的名称。OSCAR系统支持用户对表或者视图的中的某列或者几列进行授权。目前，用户可以对列的SELECT，UPDATE 和REFERENCES 权限进行授权。
+
+
+
+
+
+tablename
+表的名称。
+
+viewname
+视图名字。
+
+username
+用户名字。
+
+rolename
+角色名字。
+
+dbname
+数据库名字。
+
+funcname
+函数的名称以及其参数的类型名称。
+
+langname
+语言名字。
+
+schemaname
+模式名。
+
+PUBLIC
+PUBLIC是一个数据库中的特殊“角色”，所有数据库用户都属于这个角色，授权给PUBLIC 相当于授权给所有用户,授权给PUBLIC就等于授权给数据库的全部用户。
+
+WITH GRANT OPTION
+级联授权选项。若设置了级联授权，则在此次授权命令中得到对象权限的用户或者用户组成员，除得到所授的权限外，还将可以再把该对象上自己已获得的权限授权给其他用户。获得级联授权权限的用户再次授权时仍然可以使用WITH GRANT OPTION 将级联授权权限授给其他用户。若不使用级联授权，则获得授权的用户不能将已获得的权限再次授予其他用户。
+
+SELECT
+表示对表或视图，或者列上的查询权限，
+
+
+
+
+
+INSERT
+表示对表或视图的插入权限
+
+UPDATE
+表示对表、视图或者列的更新权限。
+
+DELETE
+表示对表或视图的删除权限。
+
+
+
+
+
+REFERENCES
+表示在表,列上创建外键约束的权限。
+
+TRIGGER
+表示在表上创建触发器的权限；
+
+
+
+
+
+CREATE
+在逻辑数据库上创建SCHEMA，或者在SCHEMA上创建数据库对象的权限。
+
+TEMPORARY, TEMP
+表示使用数据库时创建临时表的权限。
+
+每一个用户默认都有此权限。
+
+EXECUTE
+表示可以执行指定函数或存储过程的权限。
+
+USAGE
+使用语言，或者使用SCHEMA的权限。
+
+ALL [PRIVILEGES]
+表示所声明对象上的所有权限。
+
+
+
+
+
+RULE
+在表上创建视图的权限。
+
+seqname
+序列名字
+
+
+	REMARK = 
+若用户创建了某个对象，则用户作为该对象的创建者自动拥有对象的所有权限。而其它用户则没有任何访问该对象的权限。非创建者若需要访问对象或者执行某些操作，就需要由创建者进行授权。
+
+可以使用REVOKE 语句收回已经授予的权限，参见REVOKE。
+
+
+
+只有超级用户，数据库对象所有者，或者在该对象上具有授权权限的用户才能执行GRANT语句。
+
+数据库对象权限明细表如下
+
+对象                       权限
+
+----------+--------------------------------------------------
+
+表           INSERT SELECT UPDATE DELETE  REFERENCES TRIGGER
+
+视图          INSERT SELECT UPDATE DELETE
+
+列           SELECT UPDATE REFERENCES
+
+模式        CREATE
+
+序列         UPDATE, SELECT
+
+数据库　　   CREATE 
+
+函数　　　　　EXECUTE
+
+语言　　　　　USAGE
+
+
+
+
+	EXAMPLE = 
+授予用户表和列权限
+授予用户HU 查询PROJ表，更新PROJ表的CITY列的权限。
+GRANT SELECT , UPDATE(CITY) ON PROJ TO HU;
+
+指定级联授权选项的授权语句
+执行该语句后, 用户HU能够把PROJ上的DELETE权限, 列PNAME, PNUM上的UPDATE权限授权给其他用户。
+
+
+GRANT DELETE , UPDATE(PNAME, PNUM) ON PROJ TO HU WITH GRANT OPTION;
+
+授权给角色
+授权给R1后，所有具有角色R1的用户都具有了PROJ上的SELECT权限。
+GRANT SELECT ON PROJ TO ROLE R1;
+
+授权给所有用户
+授予所有用户在模式myschema上创建表的权限。
+GRANT CREATE ON SCHEMA myschema  TO PUBLIC;
+
+授予用户表上的所有权限
+将表PROJ上的所有权限，都授权给用户FLATER。
+GRANT ALL ON PROJ TO FLATER;
+
+授权给多个用户和角色
+
+GRANT SELECT ON PROJ TO HU,FLATER,ROLE R1;
+
+授权角色给一个用户
+把角色SYSDBA授权给用户HU.
+GRANT ROLE SYSDBA TO USER HU;
+
+
+	REF = 
+REVOKE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = REVOKE
+	ID = ID_HELP_REVOKE
+	CONTENT = RevokeStmt        ::= {RevokeObjStmt|RevokeRoleStmt};
+
+
+
+RevokeRoleStmt    ::= REVOKE ROLE rolename FROM USER username[,...n];
+
+
+
+RevokeObjStmt     ::= REVOKE [GRANT OPTION FOR] privileges ON privilege_target FROM {username|ROLE rolename}[,...n];
+
+privileges        ::= {privilege[,...n]} |ALL [PRIVILEGES];
+
+privilege         ::= { 
+
+                       {SELECT|UPDATE|REFERENCES}[(colname[,...n])]|
+
+                       INSERT|DELETE|TRIGGER|EXECUTE|USAGE|CREATE;
+
+                      }
+
+privilege_target  ::= [TABLE]tablename|FUNCTION funcname| DATABASE dbname | LANGUAGE langname |SCHEMA schemaname|SEQUENCE seqname;
+	PARAM = 
+GRANT OPTION FOR 
+若使用GRANT OPTION FOR 子句，则只撤销用户的授权权限，不收回用户在对象上获得的权限；若不使用GRANT OPTION FOR 子句，则撤销授予用户的指定权限，同时也撤销用户的授权权限。
+
+CASCADE
+若使用关键字CASCADE 则表示级联收回所有用户直接或者级联获得的权限。如果不指定CASCADE或者RESTRICT，则默认为CASCADE
+
+
+
+RESTRICT
+则只收回所FROM 子句中用户的权限，此用户已经授予其他用户的权限不予撤销。
+
+
+
+SELECT
+表示对表、视图或者列的查询权限。
+
+
+
+
+
+INSERT
+表示对表或视图的插入权限。
+
+
+
+UPDATE
+表示对表、视图或者列的更新权限。
+
+
+
+
+
+DELETE
+表示对表或视图的删除权限。
+
+REFERENCES
+表示在表、列上创建外键约束的权限。
+
+RULE
+允许在表/视图上创建规则。
+
+TRIGGER
+表示在表上创建触发器的权限。
+
+CREATE
+在逻辑数据库上创建SCHEMA，或者在SCHEMA上创建数据库对象的权限。
+
+TEMPORARY,TEMP
+表示使用数据库时创建临时表的权限。
+
+EXECUTE
+表示可以执行指定函数的权限。
+
+USAGE
+使用SCHEMA或者使用语言的权限。
+
+ALL [PRIVILEGES]
+对象上的所有权限。
+
+username
+用户的名称。
+
+rolename
+角色名字。
+
+PUBLIC
+PUBLIC是一个数据库中的特殊“角色”，所有数据库用户都属于这个角色，授权给PUBLIC 相当于授权给所有用户。
+
+tablename
+表名字。
+
+viewname
+视图名字。
+
+colname
+列的名称。OSCAR系统支持用户对表中的某列或者几列的授权进行撤销。目前，用户可以对列的SELECT，UPDATE 和REFERENCES 授权进行撤销。
+
+dbname
+数据库名字。
+
+funcname
+函数的名称声明，其中funcname 是函数名称，argtype 是函数的参数类型。
+
+
+
+
+
+langname
+语言名。
+
+schemaname
+模式名。
+
+seqname
+序列名字。
+
+
+	REMARK = 
+本语句用于回收GRANT语句授出的权限。执行REVOKE语句的用户必须是被REVOKE用户的授权者，超级用户，或者数据库对象的所有者。
+
+数据库对象权限明细表如下
+
+对象                       权限
+
+----------+--------------------------------------------------
+
+表           INSERT SELECT UPDATE DELETE  REFERENCES TRIGGER
+
+视图          INSERT SELECT UPDATE DELETE
+
+列           SELECT UPDATE REFERENCES
+
+模式         CREATE 
+
+序列         UPDATE, SELECT
+
+数据库　　   CREATE 
+
+函数　　　　　EXECUTE
+
+语言　　　　　USAGE
+
+
+
+
+	EXAMPLE = 
+废除授予多个用户帐户的多个权限
+回收用户HU和FLATER在表PROJ上的查询权限和更新列CITY的权限。
+REVOKE SELECT , UPDATE(CITY) ON PROJ FROM HU,FLATER;
+
+回收角色的权限
+回收角色R1在表PROJ上的SELECT权限。
+REVOKE SELECT ON PROJ FROM ROLE R1;
+
+回收级联授权选项
+执行下述语句后， 用户HU不再能把PROJ上的查询权限授权给其他用户，但是用户HU还有PROJ上的查询权限。。
+REVOKE GRANT OPTION FOR SELECT ON PROJ FROM HU;
+
+回收所有权限
+回收PUBLIC角色在PROJ上的所有权限。
+REVOKE ALL ON PROJ FROM PUBLIC;
+
+级联回收权限
+假定用户HU把PROJ上的查询权限授予了用户FLATER
+
+回收用户HU在PROJ上的查询权限，同时回收HU和FLATER的权限。
+
+
+REVOKE SELECT ON PROJ FROM HU CASCADE;
+
+
+	REF = 
+GRANT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP VIEW
+	ID = ID_HELP_DROP_VIEW
+	CONTENT = DROP VIEW [schema.]viewname [ RESTRICT | CASCADE ]
+	PARAM = 
+schema
+视图所在的模式，缺省为当前模式。
+
+viewname
+要删除的视图名。
+
+RESTRICT
+确保只有不存在依赖关系或完整性约束的视图可以被删除。
+
+
+
+
+
+CASCADE
+强制删除视图，并删除任何与本视图有依赖性的数据库对象。
+
+
+
+
+	REMARK = 
+执行DROP VIEW语句的用户必须是该视图的创建者，或者是DBA。
+
+
+	EXAMPLE = 
+使用RESTRICT选项
+删除没有依赖关系和完整性约束的视图 HANGZHOU_PROJ。
+
+如果HANGZHOU_PROJ上有依赖关系和完整性约束则执行该语句就会失败。
+DROP VIEW HANGZHOU_PROJ RESRICT;
+
+使用CASCADE选项
+删除HANGZHOU_PROJ,并删除所有和HANGZHOU_PROJ上有依赖关系的数据库对象。
+DROP VIEW HANGZHOU_PROJ CASCADE;
+
+
+	REF = 
+CREATE VIEW
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = EXEC PROCEDURE
+	ID = ID_HELP_EXEC_PROCEDURE
+	CONTENT = EXEC [IN|OUT] proc_name([[IN|OUT|INOUT|] {expr|arg_name=expr}] [,...n]);
+	PARAM = 
+IN
+指定IN表示结果或者参数不需要返回值。
+
+OUT
+指定OUT表示结果或者参数需要返回值，如果结果或者参数没有返回值，那么报错。
+
+INOUT
+指定INOUT表示参数需要返回值，如果参数在过程创建时被声明为IN/OUT，则报错。
+
+ 
+
+默认情况有返回值则返回。
+
+proc_name
+被调用的过程名
+
+expr
+表达式，参数的值。按照参数的顺序进行赋值
+
+arg_name = expr
+按参数名对参数进行赋值
+
+n
+参数的个数，如果过程在创建的时候声明了默认值，那么n可以少于参数的个数。否则必须相等
+
+
+	REMARK = 
+参数名和默认值的使用
+
+  可以为存储过程的参数声明参数名和默认值。在调用的时候对一个存储过程的参数赋值有两种方法：按序赋值和按参数名赋值。
+
+  按序赋值是指在调用存储过程的时候，实参按照顺序对形参逐一赋值。
+
+  用参数名赋值则是用 argname = value_expr的方式来对形参进行赋值。
+
+  如果不使用参数名，那么将会使用按序赋值，在实参的数量不够的时候，未被赋值的会自动使用默认值（如果有默认值），或者报错（没有默认值）。
+
+  使用参数名可以不按照顺序来对存储过程的参数进行赋值。没有被赋值的参数都会使用默认值（如果有的话），或者报错（没有默认值）。
+
+  按序赋值可以跟按参数名赋值混合使用，但在混合使用的时候，按参数名赋值必须出现在按序赋值之后。
+
+
+	EXAMPLE = 
+IN|OUT|INOUT的使用
+
+CREATE PROCEDURE favorgame(newgame char(20), oldgame OUT char(20)) return void as 
+
+begin
+
+  if newgame='' then oldgame := 'StartCraft';
+
+  else oldgame:= newgame;
+
+end if;
+
+
+
+  return; 
+
+end;
+
+language ploscar;
+
+
+
+EXEC favorgame('WAR3', NULL);
+
+--Success
+
+EXEC favorgame(OUT 'WAR3', NULL);
+
+--Error becase parameter 1 can't be out
+
+默认值的使用
+
+CREATE PROCEDURE def_val(arg1 int default 1, arg2 int default 2, arg3 int default 3)RETURN int AS
+
+begin
+
+  return arg1+arg2+arg3;
+
+end;
+
+LANGUAGE ploscar;
+
+
+
+EXEC def_val();
+
+--Result is 6
+
+EXEC def_val(5);
+
+--Result is 10;
+
+EXEC def_val(arg2 = 10);
+
+--Result is 14;
+
+EXEC def_val(2,arg2 = 10);
+
+--Result is 15;
+
+
+	REF = 
+CREATE PROCEDURE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE PROCEDURE
+	ID = ID_HELP_CREATE_PROCEDURE
+	CONTENT = CREATE [OR REPLACE] PROCEDURE procname ( [[argname] [IN|OUT|INOUT] datatype [NULL|NOT NULL] [DEFAULT value | := value]] [,...n])
+
+{RETURNS|RETURN} rettype {IS|AS} proc_body LANGUAGE lanname;
+	PARAM = 
+ OR REPLACE
+OR REPLACE PROCEDURE将要么创建一个新函数， 要么替换现有的定义
+
+procname
+新存储过程的名称的名字，可以有大纲修饰，并且必须符合标识符规则。有关更多信息，请参见使用标识符。
+
+argname
+参数的名字，必须符合标识符规则。
+
+在同一个存储过程里，各个参数名不能重复。
+
+在调用存储过程的时候，可以使用参数名来对参数赋值，不过如果使用参数名来对参数赋值必须在按序赋值的参数之后。参见示例。
+
+IN|OUT|INOUT
+IN表示该参数是输入参数
+
+OUT表示该参数是输出参数
+
+INOUT表示该参数是输入输出参数
+
+默认为IN
+
+datatype
+参数类型，输入类型可以是基本类型，也可以是 复合类型，域类型，或者和一个现有字段相同的类型． 一个字段的类型是用 tablename.columnname%TYPE 表示的；该用法可以使得函数独立于表定义的修改。
+
+NULL|NOT NULL
+NULL表示该参数可以为NULL
+
+NOT NULL表示该参数不能为NULL
+
+DEFAULT value | := value
+为该参数申明一个默认值。
+
+默认值必须是一个常量，不能是一个含有运算符的表达式('-'当作取负使用除外);
+
+n
+一个存储过程的参数的个数，现在最多为32。
+
+rettype
+返回的类型
+
+输出类型可以声明为一个基本类型，复合类型， 域类型，或者和现有字段同类型。
+
+proc_body
+存储过程体。有关说明请参见oscar数据库过程语言手册
+
+lanname
+过程语言名，现有的过程语言为ploscar,SQL
+
+
+	REMARK = 
+LANGUAGE SQL
+
+  对于语言为SQL的过程，由SQL语句组成，绝大部分SQL语句都可以出现在过程里面，但是事务处理语句不能。
+
+
+
+执行存储过程。
+
+  存储过程在oscar里面用EXEC procedure([args][,...n])的方式来执行。请参见EXEC PROCEDURE以获得更多信息。
+
+
+
+存储过程的prepare
+
+  可以对一个存储过程进行PREPARE，请参见PREPARE以获得更多信息。
+	EXAMPLE = 
+sum
+一个求两数之和的过程。
+create or replace procedure sum(i int,j int) return int as
+
+declare
+
+       sum int;
+
+begin
+
+	sum = i+j;
+
+	return sum;
+
+end;
+
+language 'ploscar';
+
+
+
+exec sum(1,2);
+
+--the result is 3
+
+
+	REF = 
+CREATE PROCEDURE
+EXEC PROCEDURE
+oscar数据类型说明
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE DOMAIN
+	ID = ID_HELP_CREATE_DOMAIN
+	CONTENT = CREATE DOMAIN domainname [AS] data_type
+
+    [ DEFAULT default_expr ]
+
+    [ constraint_spec [, ... ] ]
+
+
+
+constraint_spec ::=  NOT NULL | NULL
+	PARAM = 
+domainname 
+要定义的域名
+
+data_type
+域所依赖的基本数据类型
+
+DEFAULT default_expr
+域类型缺省值。
+
+该值可以是任何不含变量的表达式(但不允许子查询)。
+
+缺省表达式的数据类型必须与域的数据类型匹配。
+
+NOT NULL
+域值不能为NULL
+
+NULL
+域值可以为NULL。
+
+缺省时使用该参数。
+
+
+	REMARK = 
+定义域的用户将成为域所有者。
+
+用户可以将不同表之间的共同属性定义为域，这样可以建立域约束而不是分别设置每个表的约束。
+	EXAMPLE = 
+创建一个新的域类型
+下面的示例创建一个新的域类型：
+--创建一个新的域类型
+
+CREATE DOMAIN zip_code char(6) NOT NULL;
+
+  
+
+--使用新定义的域类型
+
+CREATE TABLE city(cityname VARCHAR(255), zipcode zip_code);
+
+
+	REF = 
+DROP CAST
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = COMMENT ON
+	ID = ID_HELP_COMMENT_ON
+	CONTENT = COMMENT ON
+
+{
+
+    TABLE object_name
+
+  | COLUMN table_name.column_name
+
+  | CONSTRAINT constraint_name ON table_name
+
+  | DATABASE object_name
+
+  | DOMAIN object_name
+
+  | FUNCTION func_name (arg1_type, arg2_type, ...)
+
+  | PROCEDURE proc_name
+
+  | INDEX object_name
+
+  | PARAMETER argument_name ON proc_name
+
+  | SCHEMA object_name
+
+  | SEQUENCE object_name
+
+  | TRIGGER trigger_name ON table_name
+
+  | VIEW object_name
+
+} IS 'text'
+	PARAM = 
+object_name, table_name.column_name, constraint_name, func_name, proc_name, argument_name, trigger_name
+要加入注释的对象名称
+
+text
+要加入的注释
+
+
+	REMARK = 
+  利用注释可以对对象作简要说明。
+
+  
+
+  每个对象只能存储一条注释。新的 COMMENT 命令将覆盖原注释。
+
+  
+
+  在文本字串的位置写上 NULL将删除注释。
+
+  
+
+  删除对象时注释自动被删除。
+
+  
+
+  注释依赖于sys_description系统表，所有的注释内容都会存放在这张系统表中。
+	EXAMPLE = 
+给表加上注释
+下面的示例将给表app_table1加上注释：
+COMMENT ON app_table1 IS 'It is app_table1 ';
+
+删除表上注释
+下面的示例将删除表app_table1上的注释：
+COMMENT ON TABLE app_table1 IS NULL;
+
+
+	REF = 
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SET
+	ID = ID_HELP_SET
+	CONTENT = SET variable { TO | = } { value | 'value' | DEFAULT };
+	PARAM = 
+variable
+必须是运行时可以设置的运行时配置参数。用户可设置的参数列表，请参见《配置参数文档》。
+
+value
+参数值。
+
+DEFAULT
+代表一个参数的默认值。
+
+配置参数的默认值有两个来源，分别是OSCAR.CONF配置文件和系统默认值。其中，其中OSCAR.CONF的优先级高于系统默认值。也就是说，在OSCAR.CONF中设置某一个参数，就会改变该参数的默认值。
+
+
+
+
+	REMARK = 
+SET 允许用户设置运行时参数。
+	EXAMPLE = 
+设置AUTOCOMMIT参数
+设置AUTOCOMMIT值为“手动提交事务”。
+SET AUTOCOMMIT TO FALSE;
+
+设置参数为默认值
+AUTOCOMMIT的“系统默认值”是TRUE,假设配置参数中没有设定AUTOCOMMIT。那么该语句相当于 SET AUTOCOMMIT TO TRUE;
+SET AUTOCOMMIT TO DEFAULT;
+
+
+	REF = 
+RESET
+SHOW
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = RESET
+	ID = ID_HELP_RESET
+	CONTENT = RESET {variable|ALL};
+	PARAM = 
+variable
+参数名。
+
+ALL
+代表所有运行时参数。
+
+
+	REMARK = 
+RESET 将运行时参数恢复为缺省值．
+
+
+	EXAMPLE = 
+重置AUTOCOMMIT
+设置AUTOCOMMIT参数为默认值。
+
+该语句等同于SET AUTOCOMMIT TO DEFAULT;
+RESET AUTOCOMMIT;
+
+
+	REF = 
+SET
+SHOW
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SHOW
+	ID = ID_HELP_SHOW
+	CONTENT = SHOW {variable|ALL};
+	PARAM = 
+variable
+运行时参数名。
+
+ALL
+显示所有参数。
+
+
+	REMARK = 
+SHOW 将显示当前运行时参数的数值．
+	EXAMPLE = 
+显示AUTOCOMMIT的当前值
+
+SHOW AUTOCOMMIT;
+
+
+	REF = 
+RESET
+SET
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE INDEX
+	ID = ID_HELP_CREATE_INDEX
+	CONTENT = CREATE [ UNIQUE ] INDEX index_name ON table
+
+    [ USING acc_method ] {( column [ ops_name | ASC | DESC] [, ...n] ) 
+
+                           | FROM mergeindexname[,...n] }
+
+[PRIORITY level] 
+
+[<index_storage_option>]
+
+
+
+<index_storage_option> ::={      TABLESAPCE tablespacename
+
+				|[LOGGING | NOLOGGING]
+
+				|INIT size [K|M|G]
+
+				|NEXT size [K|M|G]
+
+				|MAX  size [K|M|G]	
+
+				|FILL fillsize
+
+				|SPLIT splitsize}[ ...n]
+	PARAM = 
+UNIQUE
+为表创建唯一索引（不允许存在索引值相同的两行）。
+
+在创建索引时，如果数据已存在，数据库会检查是否有重复值，并在每次使用 INSERT 或 UPDATE 语句添加数据时进行这种检查。如果存在重复的键值，将取消 CREATE INDEX 语句，并返回错误信息， 
+
+当创建 UNIQUE 索引时，允许有多个NULL值。
+
+
+
+index_name
+是索引名。索引名在数据库中的模式中必须唯一。索引名必须遵循标识符规则。
+
+table
+包含要创建索引的列的表。
+
+USING acc_method
+用于索引的访问模式．目前数据库支持BTREE,BITMAP． 
+
+column
+应用索引的列。
+
+ops_name
+为索引的每个列声明的操作符表，操作符表标识将要被该索引用于该列/字段的操作符，实际上，该域的数据类型的缺省操作符表一般就足够了． 某些数据类型有操作符表的原因是，它们可能有多于一个的有意义的顺序。
+
+n
+是表示前面的项可重复 n 次的占位符
+
+mergeindexname
+要在该表上合并的索引的名字
+
+PRIORITY level
+为该索引指定一个优先级参数，该参数表明了在生成执行计划时，该索引被考虑使用的优先级别，数值越大，表示其优先级越低,优先级为0的索引的优先级最高.当用户创建或修改索引时如果不指定其优化级，优化器就按常规的代价估算来进行路径选择，选择代价最小的索引来生成执行计划。用户一般不需要为索引指定优化级，
+
+TABLESAPCE tablespacename
+索引所属的表空间名
+
+LOGGING | NOLOGGING
+对分区进行的操作记日志和不对分区进行的操作记日志（后者暂未实现）
+
+INIT size [k|m|g]
+索引大小的初始值, k,m,g分别是可选的字节单位,默认是m(兆字节)
+
+NEXT size [k|m|g]
+索引大小的增长步长, k,m,g分别是可选的字节单位,默认是m(兆字节),增长步长为64k的倍数
+
+MAX  size [k|m|g]
+索引大小的最大值,k,m,g分别是可选的字节单位,默认是m(兆字节)
+
+FILL fillsize
+索引填充系数。在创建索引的时候，对每一个索引页面不一定是全部填满，而是填充FILL的比例。其值在(0 , 100]之间，100表示填满。建议值是70。
+
+SPLIT splitsize
+索引分裂系数。在决定索引插入的时候如果引起页面分裂，该参数决定原页面上的索引元组在分裂后两个页面的分布情况，如果是50表示在两个页面之间均分，其值在(0 , 100)之间，建议值是50。
+
+ASC| DESC
+确定具体某个索引列的升序或降序排序方向。默认设置为 ASC。
+
+
+	REMARK = 
+索引主要用来提高数据库性能．但是如果不恰当的使用将导致性能的下降．
+
+CREATE INDEX 语句同其它查询一样优化。查询处理器可以选择扫描另一个索引，而不是执行表扫描，以节省 I/O 操作。 
+	EXAMPLE = 
+使用简单索引
+下面的示例为 project 表的 column_a 列创建索引。
+CREATE TABLE project_a(column_a INT, column_b CHAR(20));
+
+CREATE INDEX project_a_i  ON project_a(column_a);
+
+
+
+使用简单组合索引
+下面的示例为 employ表的 orderID 列和 employeeID 列创建索引。
+CREATE TABLE employ
+
+(
+
+ orderID int,
+
+ employeeID int NOT NULL,
+
+ orderdate date NOT NULL,
+
+ orderamount numeric(10,2) NOT NULL
+
+);
+
+
+
+CREATE INDEX employ_ind
+
+   ON employ(orderID, employeeID);
+
+
+
+使用合并索引
+下面的示例为 project_c表创建两个索引project_c_i1和project_c_i2，然后把创建的两个索引合并为索引project_c_merge_i。
+CREATE TABLE project_c(column_a INT, 
+
+column_b CHAR(20), 
+
+column_c INT,
+
+column_d TIME,
+
+column_e DECIMAL(5,2));
+
+
+
+CREATE INDEX project_c_i1 ON project_c(column_a, column_b);
+
+
+
+CREATE INDEX project_c_i2 ON project_c(column_b, column_c);
+
+
+
+CREATE INDEX project_c_merge_i ON project_c FROM project_c_i1, project_c_i2;
+
+使用物理存储参数
+下面的示例为 project_d表创建索引project_d_i，指定索引的物理存储参数。
+CREATE TABLE project_d(column_a INT,column_b CHAR(20));
+
+INSERT INTO project_d VALUES(2, 'hello');
+
+CREATE INDEX project_d_i on project_d(column_a) INIT 2m NEXT 4m FILL 70 SPLIT 50;
+
+
+	REF = 
+ALTER INDEX
+CREATE TABLE
+DROP INDEX
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE DATABASE
+	ID = ID_HELP_CREATE_DATABASE
+	CONTENT = CREATE DATABASE [dbname]
+
+[
+
+    CONTROLFILE ['ctlfile'] 
+
+  | [log_file_clause]+ 
+
+  | [arch_log_clause]
+
+  | [data_file_clause]+
+
+]
+
+ 
+
+log_file_clause ::= LOGFILE [[GROUP] log_file_spec+]+
+
+ 
+
+arch_log_clause ::= ARCHIVELOG 'archpath' | NOARCHIVELOG
+
+ 
+
+data_file_clause ::= DATAFILE data_file_spec [autoextend_clause]
+
+ 
+
+log_file_spec ::= { 'logfile' | ( {'logfile'}+ )} [SIZE size_clause] 
+
+ 
+
+data_file_spec ::= 'datafile' [SIZE size_clause] 
+
+ 
+
+autoextend_clause ::= AUTOEXTEND {OFF | ON [NEXT size_clause] [MAXSIZE {UNLIMITED | size_clause}]}
+
+ 
+
+size_clause ::= size [K | M | G]
+	PARAM = 
+dbname
+要创建的数据库名。
+
+缺省数据库可由SET DEFAULT DATABASE命令给出。
+
+ctlfile
+控制文件名。
+
+控制文件路径由配置参数CONTROL_FILES给出。
+
+LOGFILE
+该子句创建一个日志组。
+
+可以包含多条LOGFILE子句（至少两条），每条子句分别创建一个不同的日志组。
+
+缺省时，系统自动创建两个大小为100M的日志组，每个日志组包含一个日志成员，创建路径由环境变量给出。
+
+logfile
+日志文件名
+
+size
+文件大小。
+
+其中K表示千字节，M表示兆字节，G表示千兆字节。
+
+缺省时以M为单位。
+
+DATAFILE
+数据文件设置子句。
+
+缺省时自动创建一个大小为100M的数据文件，创建路径由环境变量给出。
+
+datafile
+数据文件名
+
+AUTOEXTEND
+数据文件的自动增长属性
+
+NEXT
+每次自动增长大小。
+
+缺省值为10M。
+
+MAXSIZE
+数据文件最大限制
+
+UNLIMITED
+数据文件大小没有限制
+
+ARCHIVELOG
+归档模式
+
+archpath
+归档路径
+
+NOARCHIVELOG
+不归档模式。
+
+缺省时使用该参数。
+
+
+	REMARK = 
+创建数据库必须在启动模式下进行。具体可参见DBA管理员手册。
+	EXAMPLE = 
+A.创建一个缺省值数据库
+下面的示例将创建一个缺省值数据库：
+CREATE DATABASE app_db;
+
+B.创建一个指定参数数据库
+下面的示例将创建一个指定参数数据库：
+CREATE DATABASE app_db2 LOGFILE 'log1.log' SIZE 20m LOGFILE 'log2.log' SIZE 20m DATAFILE app_db2 'app_db2.dbf' SIZE 10m AUTOEXTEND ON;
+
+
+	REF = 
+ALTER DATABASE
+DROP DATABASE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE TABLE
+	ID = ID_HELP_CREATE_TABLE
+	CONTENT = CREATE [[LOCAL | GLOBAL] { TEMPORARY | TEMP }][OBJECT] TABLE table_name(    
+
+{ < column_definition >
+
+    | < table_constraint >  }[, ...n ]
+
+)  
+
+[LOCK { DEFAULT | TABLE | TUPLE  | NO}]
+
+[<table_storage_definition>]
+
+ 
+
+< column_definition > ::= { [PARTITION partitionname [STATIC] :] column_name data_type }
+
+    [ DEFAULT default_expr]
+
+    [ < column_constraint > ]
+
+ 
+
+< column_constraint > ::= [ CONSTRAINT constraint_name ]
+
+{ NOT NULL | NULL 
+
+ | UNIQUE [<user_index_option>]
+
+ | PRIMARY KEY [<user_index_option>]
+
+ | CHECK (expression)
+
+ | [ FOREIGN KEY ] REFERENCES reftable [ ( refcolumn ) ]<key_actions> }
+
+[ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
+
+ 
+
+< table_constraint > ::= [ CONSTRAINT constraint_name ]
+
+{ UNIQUE ( column_name [, ...n ] ) [<user_index_option>]
+
+ | PRIMARY KEY ( column_name [, ...n] ) [<user_index_option>]
+
+ | CHECK ( expression ) 
+
+ | <foreignkey_option> }
+
+[ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
+
+   
+
+<user_index_option>::=USING INDEX index_name [<index_storage_option>]]
+
+ 
+
+<foreignkey_option>::= FOREIGN KEY ( column_name [, ...n] ) REFERENCES reftable [ ( refcolumn [, ...n ] ) ]
+
+    <key_actions>
+
+ 
+
+<key_actions>::=[ MATCH FULL | MATCH SIMPLE ] [ ON DELETE action ] [ ON UPDATE action ]
+
+<action>::= {             NO ACTION					
+
+			| RESTRICT					
+
+			| CASCADE					
+
+			| SET NULL				
+
+			| SET DEFAULT }
+
+ 
+
+<table_storage_definition> ::= {PARTITION partitionname <table_storage_option>}[ ...n ]
+
+ 
+
+<table_storage_option> ::= { TABLESAPCE tablespacename 
+
+		       | [LOGGING | NOLOGGING]
+
+		       |INIT size [K|M|G]
+
+		|NEXT size [K|M|G]
+
+		|MAX  size [K|M|G]
+
+		|PCTFREE freesize 
+
+		|PCTUSED usedsize}[ ...n]  
+
+ 
+
+<index_storage_option> ::={      TABLESAPCE tablespacename
+
+				|[LOGGING|NOLOGGING]
+
+				|INIT size [K|M|G]
+
+				|NEXT size [K|M|G]
+
+				|MAX  size [K|M|G]	
+
+				|FILL fillsize
+
+				|SPLIT splitsize}[ ...n ]
+	PARAM = 
+[LOCAL | GLOBAL] { TEMPORARY | TEMP }
+如果声明了此参数，则该表创建为临时表．
+
+当指定LOCAL或忽略时表示本地临时表
+
+当指定GLOBAL时表示全局临时表
+
+本地临时表仅在当前会话中可见；全局临时表在所有会话中都可见。
+
+
+
+
+
+OBJECT
+如果声明了此参数，则该表自动创建一个数据类型,该数据类型代表对应该表一行的元组类型(结构类型)． 因此，这时表不能和一个现有数据类型同名.创建的表对象类型不能作为表的列类型.创建的表对象类型可以用在存储过程中.
+
+table_name
+要创建的表的名字,表名必须符合标识符规则。
+
+LOCK { DEFAULT | TABLE | TUPLE | NO}
+建议执行过程加锁模式。
+
+DEFAULT建议由执行过程自动决定
+
+TABLE建议执行过程对表级锁, 不加行锁.
+
+TUPLE建议执行过程对表加意向锁,对具体操作的元组加行级锁
+
+NO建议执行过程对表不加锁.
+
+如果不指定LOCK选项, 默认为LOCK DEFAULT.一般情况下应该使用LOCK DEFAULT选项, LOCK TABLE可以减少加锁数量,降低加锁开销,但可能降低并发度.LOCK TUPLE有利于提高并发度,但会增加加锁数量,增加加锁开销..
+
+PARTITION partitionname:
+表中的垂直的分区名,可以为每个列指定垂直分区,也可以多个列共用一个垂直分区.为表中的列指定垂直分区可以加快查询速度.当查询集中在表的固定的几个列时,为固定的几个列单独指定一个垂直分区,将会显著提高查询性能.
+
+STATIC
+分区为静态分区，建立完成以后不允许对该分区的模式信息进行修改
+
+column_name
+是表中的列名。列名必须符合标识符规则，并且在表内唯一。
+
+
+
+data_type
+该字段的数据类型声明
+
+DEFAULT default_expr
+DEFAULT 子句给它所出现的字段一个缺省数值． 该数值可以是任何不含变量的表达式(不允许使用子查询和对本 表中的其它字段的交叉引用)．缺省表达式的数据类型必须和字段类型匹配． 
+
+CONSTRAINT constraint_name
+列或表约束的可选名字．如果没有声明，则由系统生成一个名字． 
+
+NULL | NOT NULL
+是确定列中是否允许空值的关键字。从严格意义上讲，NULL 不是约束，但可以使用与指定 NOT NULL 同样的方法指定。
+
+UNIQUE
+是通过唯一索引为给定的一列或多列提供实体完整性的约束。一个表可以有多个 UNIQUE 约束。
+
+PRIMARY KEY
+是通过唯一索引对给定的一列或多列强制实体完整性的约束。对于每个表只能创建一个 PRIMARY KEY 约束。
+
+USING INDEX index_name
+建表时, 当表具有UNIQUE或PRIMAY KEY约束时, 可以指定创建的唯一性索引的名字
+
+CHECK (expression)
+是通过限制可输入到一列或多列中的可能值强制域完整性的约束。
+
+REFERENCES | FOREIGN KEY...REFERENCES
+是为列中的数据提供引用完整性的约束。FOREIGN KEY 约束要求列中的每个值在被引用表中对应的被引用列中都存在。FOREIGN KEY 约束只能引用被引用表中为 PRIMARY KEY 或 UNIQUE 约束的列或被引用表中在 UNIQUE INDEX 内引用的列。
+
+
+
+
+
+reftable
+是 FOREIGN KEY 约束所引用的表名。
+
+(refcolumn) | (refcolumn[,...n])
+是 FOREIGN KEY 约束所引用的表中的一列或多列。
+
+MATCH FULL
+向这些列增加的数值将使用给出的匹配类型与参考表的参考列中的数值进行匹配，不允许一个多字段外键的字段为NULL
+
+ON DELETE action
+指定当要创建的表中的行具有引用关系，并且从父表中删除该行所引用的行时，要对该行采取的操作。默认设置为 NO ACTION。 
+
+
+
+
+
+ON UPDATE action
+指定当要创建的表中的行具有引用关系，并且在父表中更新该行所引用的行时，要对该行采取的操作。默认设置为 NO ACTION。 
+
+
+
+
+
+DEFERRABLE | NOT DEFERRABLE
+这两个关键字设置该约束是否可推迟．一个不可推迟的约束将在每条命令之后 马上检查．可以推迟的约束检查可以推迟到事务结尾． 缺省是 NOT DEFERRABLE．目前只有外键约束 接受这个子句．所有其它约束类型都是不可推迟的． 
+
+INITIALLY IMMEDIATE | INITIALLY DEFERRED
+如果约束是可推迟的，那么这个子句声明检查约束的缺省时间． 如果约束是 INITIALLY IMMEDIATE， 那么每条语句之后就检查它．这个是缺省．如果约束是 INITIALLY DEFERRED，那么只有在事务结尾才检查它．
+
+NO ACTION
+表示删除或者更新将产生一个违反外键约束的动作，生成错误,它是缺省动作；
+
+RESTRICT
+与NO ACTION 相同
+
+CASCADE
+删除任何引用了被删除行的行，或者分别把引用行的字段值更新为 被参考字段的新数值
+
+SET NULL
+把引用行数值设置为 NULL
+
+SET DEFAULT
+把引用列的数值设置为它们的缺省值
+
+TABLESAPCE tablespacename
+分区所属的表空间名
+
+LOGGING | NOLOGGING
+对分区进行的操作记日志和不对分区进行的操作记日志（后者暂未实现）
+
+INIT size [k|m|g]
+分区大小的初始值, k,m,g分别是可选的字节单位,默认是m(兆字节)
+
+NEXT size [k|m|g]
+分区大小的增长步长, k,m,g分别是可选的字节单位,默认是m(兆字节),增长步长为64k的倍数
+
+MAX  size [k|m|g]
+分区大小的最大值,k,m,g分别是可选的字节单位,默认是m(兆字节)
+
+PCTFREE freesize
+该分区的页面为将来可能发生的增长更新操作保留的空闲空间百分比，当某页面剩余的空闲空间不足PCTFREE%时，该页面将不再允许进行插入操作，此时发生页面溢出
+
+PCTUSED usedsize
+该分区的溢出页面的最小使用空间百分比，当页面溢出后，在此页面上的删除操作或者缩减更新操作使得页面的已使用空间少于PCTUSED%时，该页面重新允许进行插入操作，此时页面取消溢出
+
+
+
+FILL fillsize
+索引填充系数。在创建索引的时候，对每一个索引页面不一定是全部填满，而是填充wFillCoef的比例。其值在(0 , 100]之间，100表示填满。建议值是70。
+
+SPLIT splitsize
+索引分裂系数。在决定索引插入的时候如果引起页面分裂，该参数决定原页面上的索引元组在分裂后两个页面的分布情况，如果是50表示在两个页面之间均分，其值在(0 , 100)之间，建议值是50。
+
+n
+是表示前面的项可重复 n 次的占位符
+
+
+	REMARK = 
+每个表可以有 1000 列。表的行数及总大小仅受可用存储空间的限制。每行最多可以存储 8106 字节。如果创建具有 varchar或 varbinary 列的表，并且列的字节总数超过 8106 字节，虽然仍可以创建此表，但会出现警告信息。如果试图插入超过 8106 字节的行或对行进行更新以至字节总数超过 8106，将出现错误信息并且语句执行失败。
+
+ 
+
+可以创建本地和全局临时表。本地临时表仅在当前会话中可见；全局临时表在所有会话中都可见。除非使用 DROP TABLE 语句显式除去临时表，否则本地临时表将在当前会话结束时由系统自动除去.全局临时表在系统重新启动时自动除去。临时表可以方便用户,用户不需要关注表的删除.全局临时表对所有用户透明,所有用户都可以访问全局临时表.临时表可以不计日志,提高性能.
+
+ 
+
+一个表只能包含一个 PRIMARY KEY 约束。在 PRIMARY KEY 约束中定义的所有列都必须定义为 NOT NULL。每个 UNIQUE 约束都生成一个索引。如果在 FOREIGN KEY 约束的列中输入非 NULL 值，则此值必须在被引用的列中存在，否则将返回违反外键约束的错误信息。FOREIGN KEY 可以引用同一表中的其它列（自引用）。列级 FOREIGN KEY 约束的 REFERENCES 子句仅能列出一个引用列，且该列必须与定义约束的列具有相同的数据类型。表级 FOREIGN KEY 约束的 REFERENCES 子句中引用列的数目必须与约束列列表中的列数相同。每个引用列的数据类型也必须与列表中相应列的数据类型相同。FOREIGN KEY 约束只能引用被引用表的 PRIMARY KEY 或 UNIQUE 约束中的列或被引用表上 UNIQUE INDEX 中的列。 
+
+
+
+每个表系统都会创建两个系统属性：bigint类型ROWID和smallint类型的ROWVERSION。ROWID唯一表示表的一个元组。ROWVERSION表示元组修改的版本号，每次对元组做一次UPDATE操作，ROWVERSION自动加1。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	EXAMPLE = 
+完整的表定义
+下例显示 pubs 数据库中所创建的三个表（PROJ、WORKS 和 STAFF）的完整表定义，其中包含所有的约束定义。
+/* ************************** PROJ TABLE ************************** */
+
+CREATE TABLE PROJ
+
+   (PNUM     CHAR(3) NOT NULL UNIQUE,
+
+    PNAME    CHAR(20),
+
+    PTYPE    CHAR(6),
+
+    BUDGET   DECIMAL(9),
+
+    CITY     CHAR(15));
+
+ 
+
+/* ************************** WORKS TABLE ************************** */
+
+CREATE TABLE WORKS
+
+   (EMPNUM   CHAR(3) NOT NULL,
+
+    PNUM     CHAR(3) NOT NULL REFERENCES PROJ(PNUM),
+
+    HOURS    DECIMAL(5),
+
+    PRIMARY KEY (EMPNUM,PNUM));
+
+ 
+
+/* ************************** STAFF TABLE ************************** */
+
+CREATE TABLE STAFF
+
+   (EMPNUM   CHAR(3) NOT NULL UNIQUE,
+
+    EMPNAME  CHAR(20) DEFAULT 'Bill',
+
+    GRADE    DECIMAL(4) CHECK(GRADE > 3),
+
+    CITY     CHAR(15));
+
+ 
+
+在列中使用分区信息
+下例显示创建含有垂直分区信息的完整表定义。
+CREATE TABLE Partition_Data
+
+	(PARTITION b_par : b int, 
+
+	 PARTITION c_par : c int, 
+
+	 d int, 
+
+	 PARTITION e_par : e int)
+
+PARTITION b_par logging init 10m next 10m MAXSIZE UNLIMITED 
+
+PARTITION c_par init 10m next 10m MAXSIZE 100m;
+
+使用LOCK选项
+建议执行模块对表操作加表级锁
+CREATE TABLE lock_table(column_a INT) LOCK TABLE;
+
+
+
+
+	REF = 
+ALTER TABLE
+CREATE INDEX
+CREATE VIEW
+DROP INDEX
+DROP TABLE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE SCHEMA
+	ID = ID_HELP_CREATE_SCHEMA
+	CONTENT = CREATE SCHEMA { schemaname [AUTHORIZATION owner] | AUTHORIZATION owner}
+
+    [ < schema_element > [ ...n ] ]
+
+
+
+< schema_element > ::=
+
+    { table_definition | view_definition | grant_statement }
+	PARAM = 
+schemaname
+要创建的模式名字．如果省略，则使用用户名作为模式名． 
+
+owner
+将拥有该模式的用户名．如果省略，缺省为执行该命令的用户名． 只有管理员用户才能创建不属于自己的模式． 
+
+table_definition
+指定在模式内创建表的 CREATE TABLE 语句。
+
+
+
+
+
+view_definition
+指定在模式内创建视图的 CREATE VIEW 语句。
+
+grant_statement
+指定授予用户或角色权限的GRANT 语句。 
+
+
+	REMARK = 
+CREATE SCHEMA 提供了在单个语句中创建表、视图以及授予对象权限的方法。如果在创建任何对象或授予任何权限（这些是在 CREATE SCHEMA 语句中指定的）时发生错误，则不会创建任何对象。
+
+ 
+
+创建的对象不必按逻辑顺序出现，但引用其它视图的视图除外。例如，GRANT 语句可以在创建某个对象之前授予该对象的权限，CREATE VIEW 语句也可以出现在创建该视图所引用表的 CREATE TABLE 语句之前。同样，CREATE TABLE 语句中声明的外键可以指向后面指定的表。例外情况是，如果一个视图的选择语句引用另一个视图，则必须在指定引用视图之前指定被引用的视图。
+
+
+
+
+
+
+
+
+	EXAMPLE = 
+创建一个模式并且在里面创建一个表
+创建一个模式hollywood，并且在里面创建一个表films和视图winner。
+CREATE SCHEMA hollywood
+
+    CREATE TABLE films (title TEXT, release DATE, awards CHAR(20))
+
+    CREATE VIEW winners AS
+
+        SELECT title, release FROM films WHERE awards IS NOT NULL;
+
+
+
+创建一个与用户同名的模式
+创建一个和用户rose同名的模式，同时创建这个属于这个模式的表，视图。
+CREATE USER rose;
+
+CREATE SCHEMA AUTHORIZATION rose 
+
+CREATE TABLE t1(c1 int)
+
+CREATE VIEW v1(c1) AS SELECT c1 from t1
+
+GRANT SELECT on v1 TO public;
+
+
+
+
+	REF = 
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP USER
+	ID = ID_HELP_DROP_USER
+	CONTENT = DROP USER username [,...]
+	PARAM = 
+username
+要删除的用户名
+
+
+	REMARK = 
+删除者必须是DBA。
+
+不能删除系统内建的SYSDBA用户和SYSSECURE用户。
+
+用户ID不能重用。用户删除后，新建的同名用户ID与已删除用户ID不同。用户拥有的对象将成为无属主对象，可以使用ALTER命令更改对象属主。
+	EXAMPLE = 
+删除数据库用户
+下面的示例将删除数据库用户app_user1：
+DROP USER app_user1;
+
+
+	REF = 
+ALTER USER
+CREATE USER
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE SEQUENCE
+	ID = ID_HELP_CREATE_SEQUENCE
+	CONTENT = CREATE [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } ] SEQUENCE seqname
+
+  [ INCREMENT increment ]
+
+  [ MINVALUE minvalue ] [ MAXVALUE maxvalue ]
+
+  [ START start ] [ CACHE cache ] [ CYCLE ]
+	PARAM = 
+GLOBAL TEMPORARY
+该参数定义全局级临时序列发生器。
+
+该序列发生器在服务器下次启动时自动删除。
+
+LOCAL TEMPORARY
+该参数定义会话级临时序列发生器。
+
+该序列发生器在用户退出结束本次会话时自动删除。
+
+缺省时使用该参数。
+
+seqname
+新定义的序列名
+
+increment
+序列每次增长数。
+
+使用正数序列递增，使用负数序列递减。
+
+缺省时使用1。不允许使用0。
+
+minvalue
+序列可生成的最小值。
+
+缺省时序列递增为1，序列递减为-2^63-1。
+
+maxvalue
+序列可生成的最大值。
+
+缺省时序列递增为2^63-1，序列递减为-1。
+
+start
+序列初始值。
+
+缺省时递增序列为 minvalue，递减序列为 maxvalue。
+
+cache
+每次序列号预分配值。
+
+此时序列号可以从存放在内存中的已预分配值获取。使用完已预分配值后，系统自动再次获取预分配值。
+
+使用该参数可加快序列号分配速度，但可能会造成序列号不连续。
+
+缺省时是1。即不进行预分配。
+
+CYCLE
+序列号达到最大值（序列递增）或最小值（序列递减）时可复位并继续下去。
+
+序列号达到最大值时，生成的下一个数据将分别是最小值（序列递增）或最大值（序列递减）。
+
+如果无该参数，那么在到达最大值后再获取下一序列号时将返回错误。
+
+
+	REMARK = 
+序列是基于 bigint 运算的，因此其范围不能超过八字节的 整数范围(-9223372036854775808 到 9223372036854775807)。
+
+序列创建后，可以使用函数 nextval, currval 和 setval 对序列进行操作。
+
+用户在需要获得不能重复值，比如需要生成订单号时，可以利用序列来得到一个唯一值。
+
+
+
+用户可以在创建表的时候用serial类型或者bigserial类型.
+
+serial和bigserial类型不是真正的类型， 只是为在表中设置唯一标识做的概念上的便利． 在目前的实现中，下面一句话： 
+
+CREATE TABLE tablename (
+
+	colname SERIAL
+
+);
+
+等价于声明下面几句话： 
+
+CREATE SEQUENCE tablename_colname_seq;
+
+CREATE TABLE tablename(
+
+	colname integer DEFAULT nextval('tablename_colname_seq') UNIQUE NOT NULL
+
+);
+
+因此，我们就创建了一个整数字段并且把它的缺省数值安排为从一个 序列发生器取值．还应用了 UNIQUE 和 NOT NULL 约束以确保明确地插入的 数值也不会重复． 
+
+
+
+类型名serial创建integer字段．类型名bigserial创建一个 bigint 字段．
+	EXAMPLE = 
+创建递增序列
+下面的示例将创建名为 app_serial1的初始值从101开始递增序列：
+--创建初始值从101开始的递增序列
+
+CREATE SEQUENCE app_serial1 START 101;
+
+ 
+
+--获取序列中下一数字
+
+SELECT nextval ('app_serial1');
+
+ 
+
+--获取当前序列号
+
+SELECT currval('app_serial1');
+
+ 
+
+--创建示例表
+
+CREATE TABLE app_table1(id INT);
+
+ 
+
+--使用序列保证插入id列唯一
+
+INSERT INTO app_table1 VALUES (nextval('app_serial1'));
+
+ 
+
+--设置序列号
+
+SELECT setval('app_serial1', max(id)) FROM app_table1;
+
+
+	REF = 
+DROP SEQUENCE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE TRIGGER
+	ID = ID_HELP_CREATE_TRIGGER
+	CONTENT = CREATE TRIGGER triggername { BEFORE | AFTER } { event [OR ...] }
+
+     ON table FOR [ EACH ] { ROW | STATEMENT }
+
+     EXECUTE PROCEDURE proc ()
+	PARAM = 
+triggername
+定义的触发器名。
+
+定义在相同表上的触发器名不能相同。
+
+event
+激活触发器的事件。
+
+INSERT , DELETE 或 UPDATE 其中之一。多个事件可以用 OR 声明。
+
+table
+触发器作用的表名
+
+ROW
+行级触发器
+
+STATEMENT
+语句级触发器
+
+proc
+用户提供的存储过程。
+
+存储过程定义为无参数，返回值为 trigger 类型。
+
+
+	REMARK = 
+  触发器可以声明为在对记录进行操作之前（在检查约束之前和 INSERT，UPDATE 或 DELETE 执行前）或之后（在检查约束之后和完成 INSERT， UPDATE 或 DELETE 操作）触发。
+
+ 
+
+  如果触发器在事件之前，触发器可能略过对当前记录的操作或改变被插入的记录（只对 INSERT 和 UPDATE 操作有效）。
+
+ 
+
+  如果触发器在事件之后，包括最后的插入、更新或删除的所有更改对触发器都是"可见"的。
+
+ 
+
+  如果多个同类型的触发器为同样事件做了定义， 那么它们将按照字母顺序被激活。
+
+ 
+
+  SELECT 并不更改任何行，因此不能创建 SELECT 触发器。这种场合下视图更合适些。
+
+
+	EXAMPLE = 
+定义一个触发器
+下面的示例将在定义一个触发器，在插入或更新表 app_table1 之前检查一下属性col1是否为NULL，为NULL则失败：
+--创建示例表
+
+CREATE TABLE app_table1(col1 INT, col2 CHAR);
+
+ 
+
+--创建触发器函数
+
+CREATE PROCEDURE app_triggerproc1() RETURNS TRIGGER AS 
+
+  BEGIN
+
+     IF NEW.col1 ISNULL THEN
+
+       RAISE EXCEPTION 'col1 cannot be NULL value';
+
+     END IF;
+
+     RETURN NEW;
+
+  END;
+
+LANGUAGE 'PLOSCAR';
+
+ 
+
+--创建触发器
+
+CREATE TRIGGER app_trigger1 BEFORE INSERT OR UPDATE ON app_table1 FOR EACH ROW EXECUTE PROCEDURE app_triggerproc1();
+
+ 
+
+--col1列为NULL，插入不成功
+
+INSERT INTO app_table1 VALUES(NULL);
+
+
+	REF = 
+CREATE FUNCTION
+DROP TRIGGER
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DECLARE
+	ID = ID_HELP_DECLARE
+	CONTENT = DECLARE cursor_name [ TRANSACTIONAL ] [ type ] CURSOR FOR content ;
+
+type    ::= BINARY | SCROLL | INSENSITIVE | INSENSITIVE SCROLL
+
+content ::= plan_name | query
+
+query   ::= select [ FOR { READ ONLY | UPDATE [ OF column [, ...] ] } ]
+	PARAM = 
+cursor_name
+游标名称。
+
+TRANSACTIONAL
+事务级游标(可选)。该关键字为系统扩展。当申明为事务级游标时，在事务结束游标将自动关闭和释放。
+
+BINARY
+SQL92 关键字，表示二进制游标，游标将以二进制而不是文本格式获取数据。
+
+SCROLL
+SQL92 关键字，表明每个 FETCH 操作可以检索出多行数据，同时可以正向、反向获取数据。
+
+INSENSITIVE
+SQL92 关键字， 表明从游标检索出来的数据不应该被其他客户端连接或游标的更新动作影响。
+
+INSENSITIVE SCROLL
+INSENSITIVE与SCROLL的结合。
+
+plan_name
+曾经申明过的查询计划的名字（PREPARE）。系统允许以查询计划名代替 SELECT 语句来申明一个游标。
+
+select
+一个SELECT查询语句，它提供由游标控制的行。请参考 SELECT 语法。
+
+READ ONLY
+SQL92 关键字，表明游标将用于只读模式。
+
+UPDATE
+SQL92 关键字，表明游标将被用于更新表。如果后面不跟列名，则表示所有列都可更新。
+
+column
+可以被更新的列。现在系统仅在语法上提供了支持，对于列级更新上的限制还未实现。因此 FOR UPDATE 与 FOR UPDATE OF ... 的效果是一样的。
+
+
+	REMARK = 
+    DECLARE 是系统扩展，不仅可以用于嵌入式 SQL（E-SQL）中，也可以用于交互式 SQL 中。
+
+    DECLARE 允许用户创建游标，用于在一个大的查询里面检索少数几行数据（使用 FETCH ）。游标可以既可以返回文本也可以返回二进制格式。
+
+    当不在一个事务中时， TRANSACTIONAL 关键字将导致定义游标出错。
+
+    当使用查询计划名来申明一个游标时，如果 DEALLOCATE 这个查询计划，这个相关的游标将同时被 DEALLOCATE 。如果此时游标仍然处于打开状态，将出错，显示无法 DEALLOCATE 这个查询计划。另外，每个查询计划只能与一个游标相关联。如果该查询计划已经关联了一个游标，再次使用它申明一个游标时将出错。
+
+    如果游标所依赖的表结构发生变化，那么在做 OPEN 、FETCH 的时候会导致出错。
+
+    当没有申明 FOR READ ONLY 和 FOR UPDATE 时，默认将是只读的。
+
+    所有在事务中打开的游标当事务提交/回滚时将自动关闭。
+	EXAMPLE = 
+申明游标
+申明一个游标。此时将以 ASCII 返回结果，不可反向 FETCH 数据，各列不可更新。
+-- CREATE TABLE tab1 (s CHAR(10));
+
+DECLARE c1 CURSOR FOR SELECT * FROM tab1;
+
+事务级游标
+这里在一个事务中申明一个事务级游标，事务结束前游标处于打开状态，但事务结束之后，c1 将自动关闭并释放。
+-- CREATE TABLE tab1 (s CHAR(10));
+
+BEGIN;
+
+DECLARE c1 TRANSACTIONAL CURSOR FOR SELECT * FROM tab1;
+
+OPEN c1;
+
+END;
+
+OPEN c1;               -- 注意这里将出错，指示游标c1不存在
+
+通过查询计划申明游标
+如果查询计划有参数，在打开游标时需要使用 USING 关键字指定参数。参见 OPEN 。当 DEALLOCATE 这个查询计划时发生的情况见前面的注释。
+-- CREATE TABLE tab1 (col1 INT);
+
+PREPARE p1 AS SELECT * FROM tab1 WHERE col1 > ?;
+
+DECLARE c1 CURSOR FOR p1;
+
+OPEN c1 USING 1;
+
+-- 此时可以做一些FETCH操作
+
+DEALLOCATE PREPARE p1; -- 此时将报错，指示与之相关的游标还处于打开状态
+
+CLOSE c1;
+
+DEALLOCATE PREPARE p1; -- 成功
+
+OPEN c1;               -- 出错，指示游标c1不存在
+
+申明可更新游标
+FOR UPDATE 不支持对列更新的限制。
+-- DROP TABLE tab1;
+
+CREATE TABLE tab1(name CHAR(10), id INT);
+
+INSERT INTO tab1 VALUES('user1', 1);
+
+INSERT INTO tab1 VALUES('user2', 2);
+
+SELECT * FROM tab1;
+
+-- 此时返回结果如下：
+
+-- +------------+----+
+
+-- |    NAME    | ID |
+
+-- +------------+----+
+
+-- | user1      |  1 |
+
+-- | user2      |  2 |
+
+-- +------------+----+
+
+DECLARE c1 CURSOR FOR SELECT * FROM tab1 FOR UPDATE;
+
+OPEN c1;
+
+FETCH c1;
+
+-- 此时结果为：
+
+-- +------------+----+
+
+-- |    NAME    | ID |
+
+-- +------------+----+
+
+-- | user1      |  1 |
+
+-- +------------+----+
+
+DELETE FROM tab1 WHERE CURRENT OF c1;
+
+FETCH c1;
+
+-- 此时结果为：
+
+-- +------------+----+
+
+-- |    NAME    | ID |
+
+-- +------------+----+
+
+-- | user2      |  2 |
+
+-- +------------+----+
+
+UPDATE tab1 SET name = 'USER2' WHERE CURRENT OF c1;
+
+SELECT * FROM tab1;
+
+-- 此时结果为：
+
+-- +------------+----+
+
+-- |    NAME    | ID |
+
+-- +------------+----+
+
+-- | USER2      |  2 |
+
+-- +------------+----+
+
+DROP TABLE tab1;
+
+
+
+
+	REF = 
+CLOSE
+DEALLOCATE
+FETCH
+MOVE
+PREPARE
+SELECT
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SHUTDOWN
+	ID = ID_HELP_SHUTDOWN
+	CONTENT = SHUTDOWN [ IMMEDIATE | ABORT | TRANSACTIONAL | NORMAL ] ;
+	PARAM = 
+IMMEDIATE
+不做检查点，立即退出系统。
+
+ABORT
+终止所有 session ，包括回滚它们正在做的事务，做检查点并退出系统。
+
+TRANSACTIONAL
+对于正在事务中的 session ，等待其事务结束之后终止该 session ；对于不在事务中的 session ，立刻终止该 session 。当所有 session 都终止之后，做检查点并退出系统。
+
+NORMAL
+等待除当前 session 以外的所有 session 主动退出之后，做检查点并退出系统。
+
+
+	REMARK = 
+    只有数据库管理员才有关闭数据库的权限。
+
+    如果当前 session 正在一个事务中，则不能用 TRANSACTIONAL 和 NORMAL 模式执行 SHUTDOWN 命令。
+
+    做检查点是指强制将当前数据库的所有脏页写到磁盘上。脏页是指在输入到高速缓冲存储器后被修改的数据或日志页，但这些修改还没有写到磁盘上。检查点保证系统数据不丢失并能加快恢复过程。参见 ALTER SYSTEM 。
+	EXAMPLE = 
+
+	REF = 
+ALTER SYSTEM
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ALTER SYSTEM
+	ID = ID_HELP_ALTER_SYSTEM
+	CONTENT = ALTER SYSTEM [CHECKPOINT]
+	PARAM = 
+
+	REMARK = 
+    检查点最大限度地减少数据库完全恢复时所必须执行的日志部分，从而加快恢复的时间。在完全恢复时，必须执行两种操作： 
+
+
+
+    日志可以包含REDO日志，这些修改在系统停止前还没有刷新到磁盘上。必须进行前滚操作，保证这些修改体现到数据文件上。
+
+
+
+    必须回滚与未完成的事务（没有 COMMIT 或 ROLLBACK 日志记录的事务）相关联的所有修改，这些修改记录在UNDO日志中。 
+
+    检查点从当前数据库的缓冲区中回刷脏数据和日志页，以尽量减少在恢复时必须前滚的修改量。
+
+
+
+    OSCAR检查点在当前数据库内执行下列进程： 
+
+
+
+    将标记检查点起点的记录写入日志文件。
+
+
+
+    将为检查点记录的信息存储在检查点日志记录链内。将这条链起点的 LSN 写入数据库根页。
+
+
+
+    记录在检查点记录中的一条信息是第一个日志映像的 LSN，该映像必须存在以保证成功的数据库范围的回滚。这个 LSN 称为最小恢复 LSN (MinLSN)，它是下面这些 LSN 中的最小 LSN： 
+
+    检查点起点的 LSN。
+
+    最旧的活动事务起点的 LSN。
+
+    记录在检查点记录中的另一条信息是所有未完成的活动事务的列表。
+
+
+
+    如果数据库使用的是非归档，则删除新的 MinLSN 之前的所有日志记录，这时日志得到回收。
+
+
+
+    将所有脏日志和数据页写入磁盘。
+
+
+
+    将标记检查点末端的记录写入日志文件。 
+
+
+
+    检查点在下列情况下发生： 
+
+
+
+    当执行 CHECKPOINT 语句时。对连接所使用的当前数据库执行检查点操作。
+
+
+
+    当OSCAR实例启动，完成恢复时。
+
+
+
+    当使用 ALTER DATABASE READ ONLY更改数据库状态时。当数据库选项被更改时，ALTER DATABASE 对数据库执行检查点操作。
+
+
+
+    OSCAR实例自动设置的减少恢复数据库所需的时间而在每个数据库内定期生成自动检查点时。当OSCAR实例在一定的时间间隔内尚未做过检查点，OSCAR将自动开始一个检查点。该时间间隔由oscar.conf配置文件中的配置项TM_CHECKPOINT_INTERVAL控制。
+
+
+
+    当 OSCAR 实例正常方式停止运行时(即非SHUTDOWN IMMEDIATE)。 
+
+
+
+
+
+    由于使用了异步写回机制，OSCAR的检查点本身代价相当的小，OSCAR默认的检查点时间为1000秒，管理员可以根据数据库负载和数据库恢复性能的要求配置这个参数。
+
+
+	EXAMPLE = 
+强制系统做CHECKPOINT
+
+ALTER SYSTEM CHECKPOINT;
+
+
+	REF = 
+SHUTDOWN
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = TRUNCATE  
+	ID = ID_HELP_TRUNCATE
+	CONTENT = TRUNCATE [ TABLE ] table_name
+	PARAM = 
+table_name
+要清空的表。 
+
+
+	REMARK = 
+TRUNCATE TABLE 在功能上与不带 WHERE 子句的 DELETE 语句相同：二者均删除表中的全部行。但 TRUNCATE TABLE 比 DELETE 速度快。
+
+ 
+
+不能在事务块(BEGIN/COMMIT 对) 里执行 TRUNCATE，因为TRUNCATE操作不记录日志，无法回退。
+
+
+	EXAMPLE = 
+清空表的数据
+下例删除project_a表中的所有数据。
+CREATE TABLE project_a(column_a INT);
+
+INSERT INTO project_a VALUES(23);
+
+INSERT INTO project_a VALUES(2);
+
+
+
+TRUNCATE TABLE project_a;
+
+
+	REF = 
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = DROP SCHEMA
+	ID = ID_HELP_DROP_SCHEMA
+	CONTENT = DROP SCHEMA schema_name [, ...n] [ CASCADE | RESTRICT ]
+	PARAM = 
+schema_name
+要删除的模式名
+
+n
+是表示前面的项可重复 n 次的占位符
+
+RESTRICT
+确保只有不存在相关视图或完整性约束的表才可以被删除
+
+CASCADE
+任何引用的视图或完整性约束都将被删除
+
+
+	REMARK = 
+只有模式的所有者和数据库管理员才可以删除模式.如果使用CASCADE删除模式,将删除模式包含的所有对象.
+
+
+	EXAMPLE = 
+删除一个模式
+删除模式schema_test
+CREATE SCHEMA schema_test;
+
+DROP SCHEMA schema_test;
+
+
+	REF = 
+ALTER SCHEMA
+CREATE SCHEMA
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ALTER SCHEMA
+	ID = ID_HELP_ALTER_SCHEMA
+	CONTENT = ALTER SCHEMA schema_name OWNER TO owner_name;
+	PARAM = 
+schema_name
+修改的模式名
+
+owner_name
+指定的模式的所有者
+
+
+	REMARK = 
+只有数据库管理员才能修改模式的属主.
+	EXAMPLE = 
+修改模式的所有者
+把模式myschema的所有者从bill改为willam
+CREATE USER bill;
+
+CREATE USER willam;
+
+CREATE SCHEMA myschema AUTHORIZATION bill;
+
+ALTER SCHEMA myschema owner to willam;
+
+
+
+
+	REF = 
+CREATE SCHEMA
+DROP SCHEMA
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = SET AUTOCOMMIT
+	ID = ID_HELP_SET_AUTOCOMMIT
+	CONTENT = SET AUTOCOMMIT = { TRUE | FALSE } ;
+	PARAM = 
+TRUE
+系统自动提交属性为真。每条语句对应一个事务并在语句结束时自动提交。
+
+FALSE
+系统自动提交属性为假。当执行DML或DDL语句或SET TRANSACTION之后，相当于在该语句之前输入BEGIN开始了一个事务。直到用户输入COMMIT或ROLLBACK时这个事务才算结束。
+
+
+	REMARK = 
+    自动提交是指后台自动提交一个事务，而不是自动开始一个事务。即无论是否指定自动提交，当用户开始发到后台一个语句，并且后台并未发现该用户处于一个活动事务中时，后台都会主动为用户开始一个事务。
+
+    这里所说的"用户"是对于后台而言的，即所有的前台，不分是前台的ODBC/JDBC还是最终用户应用程序或者交互式SQL。
+
+    另外，SET AUTOCOMMIT 命令不影响当前正在执行的语句或事务。
+
+    在默认情况下，系统的自动提交属性为真。
+
+    如果系统的自动提交属性为真，则，1). 当不在一个事务中时，每个 DML 或 DDL 语句对数据库产生的影响将马上生效；2). 当已经在一个事务中时，后台不会自动提交事务，将等待直到用户发出 COMMIT 为止。
+
+    如果系统的自动提交属性为假，则上一个事务之后的所有语句对数据库产生的影响直到输入 END 或 COMMIT 时才生效。而以下情况不会导致自动进入一个事务：1). 上个事务之后的第一条语句出错；2). 上个事务之后的第一条语句是 SET TRANSACTION 以外的 SET 语句、RESET 语句、SHOW 语句；3). 上个事务之后的第一条语句是事务相关的语句（COMMIT，END，ROLLBACK，ABORT）；
+	EXAMPLE = 
+非自动提交示例
+
+SET AUTOCOMMIT = FALSE;
+
+CREATE TABLE tab1(s CHAR(10));
+
+-- 上面这条语句相当于以下的序列：
+
+-- BEGIN;
+
+-- CREATE TABLE tab1(s CHAR(10));
+
+BEGIN; -- 出错，提示已经在一个事务中
+
+ROLLBACK;
+
+BEGIN; -- 开始一个事务
+
+-- ...
+
+COMMIT;
+
+
+	REF = 
+BEGIN
+SET TRANSACTION
+START TRANSACTION
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = ALTER DATABASE
+	ID = ID_HELP_ALTER_DATABASE
+	CONTENT = ALTER DATABASE [dbname]
+
+{
+
+    data_file_clause 
+
+  | log_file_clause 
+
+  | {ARCHIVELOG archpath | NOARCHIVELOG}
+
+  | RENAME GLOBAL_NAME TO newdbname
+
+  | RENAME FILE olddatapath TO newdatapath
+
+}
+
+ 
+
+data_file_clause ::= 
+
+   DATAFILE datafile [RESIZE size_clause | autoextend_clause] 
+
+ 
+
+log_file_clause ::= 
+
+{
+
+    ADD LOGFILE {[GROUP] log_file_spec}+ 
+
+  | DROP LOGFILE {GROUP integer}+ 
+
+  | ADD LOGFILE MEMBER {'logfile'}+ TO GROUP integer
+
+  | DROP LOGFILE MEMBER {'logfile'}+
+
+}
+
+ 
+
+log_file_spec ::= {'logfile' | ( {'logfile'}+ )} [SIZE size_clause]
+
+ 
+
+autoextend_clause ::= AUTOEXTEND {OFF | ON [NEXT size_clause] [MAXSIZE {UNLIMITED | size_clause}]}
+
+ 
+
+size_clause ::= size [{K | M | G}]
+	PARAM = 
+dbname
+要创建的数据库名。
+
+缺省数据库可由SET DEFAULT DATABASE命令给出。
+
+DATAFILE
+该子句更改一个已有的数据文件的长度或自动增长属性
+
+datafile
+要修改的数据文件名
+
+ADD LOGFILE
+该子句创建一个日志组。
+
+日志组是将日志文件进行分组管理的逻辑概念，使用日志组可以对一组日志文件进行处理。
+
+一个日志组中的日志文件将会被循环使用。
+
+DROP LOGFILE GROUP
+该子句删除日志组
+
+ADD LOGFILE MEMBER
+该子句在指定的一个日志组中增加一个或多个日志成员
+
+DROP LOGFILE MEMBER
+该子句删除多个日志成员
+
+logfile
+日志文件名
+
+size
+文件大小。
+
+其中K表示千字节，M表示兆字节，G表示千兆字节。
+
+缺省时以M为单位。
+
+AUTOEXTEND
+数据文件的自动增长属性。
+
+设置此属性为ON时，数据文件空间使用完后会自动增长。
+
+设置此属性为OFF时，数据文件空间使用完后不会自动增长，此时引起数据文件增长的操作（如插入元组）将失败。
+
+NEXT
+每次自动增长大小。
+
+缺省值为10M。
+
+MAXSIZE
+数据文件最大限制
+
+UNLIMITED
+数据文件大小没有限制
+
+ARCHIVELOG
+归档模式。
+
+在进行介质故障恢复需要需要使用此参数产生归档日志。
+
+archfile
+归档路径
+
+NOARCHIVELOG
+不归档模式。
+
+缺省时使用该参数。
+
+RENAME GLOBAL_NAME TO
+改变数据库名。
+
+修改后的数据库名会立即生效。
+
+newdbname
+改变后的数据库名
+
+RENAME FILE
+改变数据库文件存放路径
+
+olddatapath
+更改前数据库文件存放路径
+
+newdatapath
+更改后数据库文件存放路径
+
+
+	REMARK = 
+执行此语句用户必须是DBA。
+
+所有的更改数据库文件路径的语句并不自动移动数据库文件，而只是改动在控制文件中的记录，DBA需要自行在外面移动数据文件本身。
+
+具体可参加DBA管理员手册
+	EXAMPLE = 
+更改数据库名
+下面的示例将数据库名由fenix改为fenix2：
+ALTER DATABASE fenix RENAME GLOBAL_NAME TO fenix2;
+
+增加数据库日志组
+下面的示例将增加两个日志组，每个日志组中包含两个大小为20M日志文件：
+ALTER DATABASE fenix ADD LOGFILE GROUP('FENIXG2LOG1', 'FENIXG2LOG2') SIZE 20M, GROUP('FENIXG3LOG1', 'FENIXG3LOG2') SIZE 20M;
+
+改变数据库的归档属性
+下面的示例将设置数据库为不归档：
+ALTER DATABASE fenix NOARCHIVELOG;
+
+
+	REF = 
+CREATE DATABASE
+DROP DATABASE
+
+SYNTAX_END
+
+SYNTAX_BEGIN
+	NAME = CREATE STATISTICS
+	ID = ID_HELP_CREATE_STATISTICS
+	CONTENT = CREATE STATISTICS statistics_name  ON table
+
+( col_name [,...n] ) 
+
+[ WITH INDEX [index_value]
+
+  | SCAN BY FULL
+
+  | SCAN BY DEFAULT
+
+  | SCAN BY PERCENT value
+
+  | SCAN BY MINVALUE value
+
+]
+
+[WITH NORECOMPUTE];
+	PARAM = 
+staistics_name
+要创建的统计的名称。统计名必须符合标识符规则，并且在同一个表上的统计名称必须唯一。
+
+table
+在其上计算统计信息的表名。
+
+column
+是要在其上创建统计的一列或一组列的名称。
+
+n
+是表示可以指定多列的占位符。
+
+SCAN BY DEFAULT
+指定按缺省的方式读取表中的行以收集统计信息。
+
+SCAN BY FULL
+指定应读取表中的所有行以收集统计信息。
+
+SCAN BY PERCENT value
+按指定比例的方法读取表中的行以收集统计信息。value是指定的比例，必须介于1到100之间。scan by percent 100和scan by full具有相同的行为。
+
+SCAN BY MINVALUE value
+按指定的最小数目对表中的行进行采样以计算统计信息。value是采样的最小数目，可以是从0到n的总行数。
+
+WITH INDEX value
+基于给定列上的索引读取列的信息以计算统计信息。value是等高直方图中桶的数目。
+
+通过索引建立统计信息通常会比直接扫描表快得多，但前提是指定的列或一组列上必须建有索引。
+
+NORECOMPUTE
+指定应禁用统计的自动重新计算功能。如果指定了该选项，则即使表中的数据进行了更新，统计信息也不会自动更新。
+
+
+	REMARK = 
+只有在表上才可以建立统计信息，不管表中是否有数据，都是可以新建一个统计的。
+
+ 
+
+但是需要注意的是，create statistics只是建立了这样一个统计并给出了缺省的统计方式，包括采样方式，是否基于索引等等，却并不去进行真正的统计值的计算。统计值的计算需要显示的调用update statistics。这样做的原因是因为有些统计可能是非常耗时的，把建立统计和实际计算统计值的行为分开可以让训练有素的管理员先创建一个统计并将统计的计算和更新在以后进行合理的调度。
+
+ 
+
+创建统计信息可以同时指定表中的几列，系统将会用指定的统计方法对同时指定的列分别计算该列的统计结果。
+
+ 
+
+统计的各种可选方式只能指定其中一种，比如，不能又指定scan by percent同时又指定scan by full。虽然可能scan by percent 100和scan by full具有同样的行为。当然，在建立统计的时候也可以根本不指定其中任何一种方式，这种情况下，系统会按照缺省的方式来建立该统计。
+
+ 
+
+在我们的系统中，一个统计是由统计的名称和在其上的表名唯一确定的，这也就是说，用户可以在不同的表上建立相同名称的统计，虽然这样的命名我们是不推荐的。
+	EXAMPLE = 
+建立一个基于全扫描方式的统计
+假定我们现在有一张名为USER的表，并对该表中用户的年龄AGE列建立一个基于全扫描的统计
+CREATE STATISTICS stat_user_age 
+
+    ON USER(AGE) 
+
+    SCAN BY FULL;
+
+建立一个基于按比例采样方式的统计
+如果表中的元组过多，全扫描的方式会产生很大的系统开销，因此，可以指定统计的采样方式为按比例产生采样结果。在下例中，系统将会自动抽取USER表AGE中25%的元组来进行采样。
+CREATE STATISTICS stat_user_age
+
+    ON USER(AGE)
+
+    SCAN BY PERCENT 25;
+
+建立一个基于最少值采样方式的统计
+系统也支持采样指定元组数的采样方式，在这种情况下，系统将随机抽取指定的元组数来生成统计信息。当然，如果表中的元素小于指定的最少采样值，系统将以全扫描采样方式来计算和更新统计。
+CREATE STATISTICS stat_user_age
+
+    ON USER(AGE)
+
+    SCAN BY MINVALUE 1000;
+
+建立一个基于索引的统计
+假设我们在USER表的AGE列建立了索引，那么我们就可以指定统计基于索引进行，通常，基于索引的统计速度会快很多。
+
+用户也可以不指定WITH INDEX后的值，这样，系统会使用缺省值来生成这个统计。
+CREATE STATISTICS stat_user_age 
+
+    ON USER(AGE) 
+
+    WITH INDEX 100;
+
+
+	REF = 
+ALTER STATISTICS
+DROP STATISTICS
+UPDATE STATISTICS
+
+SYNTAX_END
+

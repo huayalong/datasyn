@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.datasync.mapper.DsNodeCoreConfigMapper">
+    
+    <resultMap type="DsNodeCoreConfig" id="DsNodeCoreConfigResult">
+        <result property="id"    column="ID"    />
+        <result property="coreName"    column="CORE_NAME"    />
+        <result property="isMaster"    column="IS_MASTER"    />
+        <result property="nodeIp"    column="NODE_IP"    />
+        <result property="createTime"    column="CREATE_TIME"    />
+    </resultMap>
+
+    <sql id="selectDsNodeCoreConfigVo">
+        select ID, core_name, IS_MASTER, NODE_IP, CREATE_TIME from DS_NODE_CORE_CONFIG
+    </sql>
+
+    <select id="selectDsNodeCoreConfigList" parameterType="DsNodeCoreConfig" resultMap="DsNodeCoreConfigResult">
+        <include refid="selectDsNodeCoreConfigVo"/>
+        <where>  
+            <if test="coreName != null  and coreName != ''"> and core_name like concat('%', #{coreName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectDsNodeCoreConfigById" parameterType="Long" resultMap="DsNodeCoreConfigResult">
+        <include refid="selectDsNodeCoreConfigVo"/>
+        where ID = #{id}
+    </select>
+        
+    <insert id="insertDsNodeCoreConfig" parameterType="DsNodeCoreConfig">
+        insert into DS_NODE_CORE_CONFIG
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="coreName != null">core_name,</if>
+            <if test="isMaster != null">IS_MASTER,</if>
+            <if test="nodeIp != null">NODE_IP,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="coreName != null">#{coreName},</if>
+            <if test="isMaster != null">#{isMaster},</if>
+            <if test="nodeIp != null">#{nodeIp},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDsNodeCoreConfig" parameterType="DsNodeCoreConfig">
+        update DS_NODE_CORE_CONFIG
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="coreName != null">core_name = #{coreName},</if>
+            <if test="isMaster != null">IS_MASTER = #{isMaster},</if>
+            <if test="nodeIp != null">NODE_IP = #{nodeIp},</if>
+        </trim>
+        where ID = #{id}
+    </update>
+
+    <delete id="deleteDsNodeCoreConfigById" parameterType="Long">
+        delete from DS_NODE_CORE_CONFIG where ID = #{id}
+    </delete>
+
+    <delete id="deleteDsNodeCoreConfigByIds" parameterType="String">
+        delete from DS_NODE_CORE_CONFIG where ID in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <resultMap type="DsConfigResult" id="CoreConfigResult">
+        <result property="coreName"    column="CORE_NAME"    />
+        <result property="isMaster"    column="IS_MASTER"    />
+        <result property="nodeIp"    column="NODE_IP"    />
+        <collection  property="dbConfigList" javaType="java.util.List" resultMap="NodeDbConfigResult" />
+        <collection  property="sameDBSyncConfigList" javaType="java.util.List" resultMap="SameDataSyncConfigResult" />
+    </resultMap>
+
+    <resultMap type="DsNodeDbConfig" id="NodeDbConfigResult">
+        <result property="nodeId"    column="NODE_ID"    />
+        <result property="coreName"    column="core_name"    />
+        <result property="instancePort"    column="INSTANCE_PORT"    />
+        <result property="instanceDb"    column="INSTANCE_DB"    />
+        <result property="userName"    column="USER_NAME"    />
+        <result property="passWord"    column="PASS_WORD"    />
+        <result property="instanceName"    column="INSTANCE_NAME"    />
+        <result property="instanceIp"    column="INSTANCE_IP"    />
+    </resultMap>
+
+    <resultMap type="DsSameDataDbConfig" id="SameDataSyncConfigResult">
+        <result property="sourceDbId"    column="SOURCE_DB_ID"    />
+        <result property="targetDbId"    column="TARGET_DB_ID"    />
+        <result property="sourceDbName"    column="SOURCE_DB_NAME"    />
+        <result property="targetDbName"    column="TARGET_DB_NAME"    />
+        <result property="sourceSchema"    column="SOURCE_SCHEMA"    />
+        <result property="targetSchema"    column="TARGET_SCHEMA"    />
+        <result property="sourceTable"    column="SOURCE_TABLE"    />
+        <result property="targetTable"    column="TARGET_TABLE"    />
+        <result property="isUse"          column="IS_USE"    />
+    </resultMap>
+
+
+    <select id="selectCoreConfig" resultMap="CoreConfigResult">
+        SELECT
+            cc.core_name, cc.IS_MASTER, cc.NODE_IP,
+            dc.NODE_ID, dc.INSTANCE_PORT, dc.INSTANCE_DB, dc.USER_NAME, dc.PASS_WORD, dc.INSTANCE_NAME, dc.INSTANCE_IP,
+            dd.SOURCE_DB_ID, dd.TARGET_DB_ID, dd.SOURCE_TABLE, dd.TARGET_TABLE, dd.SOURCE_SCHEMA, dd.TARGET_SCHEMA,dd.IS_USE
+        FROM DS_NODE_CORE_CONFIG cc
+        LEFT JOIN DS_NODE_DB_CONFIG dc ON cc.NODE_IP = dc.INSTANCE_IP
+        LEFT JOIN DS_SAME_DATA_DBCONFIG dd ON dd.SOURCE_DB_ID = dc.id
+    </select>
+
+
+
+    <select id="selectAll" resultMap="DsNodeCoreConfigResult">
+        <include refid="selectDsNodeCoreConfigVo"/>
+    </select>
+
+</mapper>

@@ -1,0 +1,226 @@
+#!/bin/bash
+#
+# Init file for Oscar server daemon
+#
+# chkconfig: 2345 55 25
+# description: Oscar server daemon
+#
+# processname: oscar
+
+
+# source function library
+#. /etc/rc.d/init.d/functions
+
+# pull in sysconfig settings
+
+
+export SZ_OSCAR_HOME=$2
+export LD_LIBRARY_PATH="$SZ_OSCAR_HOME"/bin:$LD_LIBRARY_PATH
+
+RETVAL=0
+DBNAME=$3
+OPTIONS="-o normal -d $DBNAME"
+SERVICE_NAME=oscardb_$3d
+
+check_exec()
+{
+    if [ -z "$SZ_OSCAR_HOME" ] ; then
+        echo "SZ_OSCAR_HOME not found,use \".\" as SZ_OSCAR_HOME"
+        export SZ_OSCAR_HOME="."
+    fi
+    OSCARD="$SZ_OSCAR_HOME/bin/oscar"
+
+    if [ -f "$OSCARD" -a -x "$OSCARD" ] ; then
+        RETVAL=0
+    else
+        echo "Cannot find executable file $OSCARD"
+        RETVAL=1
+    fi
+    return $RETVAL
+}
+
+check_oscar_pid()
+{
+    if [ -a "$SZ_OSCAR_HOME/admin/$DBNAME.db" ] ; then
+        OSCAR_STATUS=`cat $SZ_OSCAR_HOME/admin/$DBNAME.db`
+        
+        # 碰到空文件，可能是后台进程刚建还未修改，等一等
+        if [ -z $OSCAR_STATUS ] ; then
+            sleep 1;
+        fi
+
+        # 仅$PID是正运行的进程pid，该kill才可能返回0
+        PID=`echo $OSCAR_STATUS | cut -f1 -d":"`
+        kill -s 0 $PID >/dev/null 2>&1
+        RETVAL=$?
+        
+        if [ "$RETVAL" -eq "0" ] ; then 
+            # 查看/proc/$PID/status里的进程名，为oscar说明实例已启动
+            RETVAL=`cat /proc/$PID/status | grep Name: | grep oscar | wc -l`
+            if [ "$RETVAL" -ne "0" ] ; then
+              RETVAL=`cat /proc/$PID/cmdline | tr '\0' ' ' | grep -w $DBNAME | wc -l`
+              if [ "$RETVAL" -ne "0" ] ; then
+                echo "$OSCARD $OPTIONS running at $OSCAR_STATUS" 
+                return 0
+              fi
+            fi
+            
+            # 脚本可以考虑删除过期db文件，但后台也能处理，暂时让db文件都由后台进程来写
+            #echo "remove outdated db file. content is:  $OSCAR_STATUS"
+            #rm $SZ_OSCAR_HOME/admin/$DBNAME.db
+        fi
+    fi
+    
+    return 1
+}
+
+start()
+{
+    echo "Starting oscar $OPTIONS:"
+    check_exec
+    RETVAL=$?
+    # 检测不到程序，不可能启动成功
+    if [ "$RETVAL" -ne "0" ] ; then
+        return 1
+    fi
+    
+    check_oscar_pid
+    RETVAL=$?
+   
+    # 实例还没被启动，可以启动
+    if [ "$RETVAL" -ne "0" ] ; then
+        $OSCARD $OPTIONS >/dev/null 2>&1 &
+        RETVAL=$?
+        if [ "$RETVAL" -eq "0" ] ; then
+            # 放到subsys目录，系统关机前能以服务停库
+            # 注意：严格要求以普通用户运行时，会删除含该绝对目录的行
+            touch /var/lock/subsys/$SERVICE_NAME
+            sleep 2
+            OSCAR_STATUS=`cat $SZ_OSCAR_HOME/admin/$DBNAME.db 2>/dev/null`
+            if [ -z $OSCAR_STATUS ]; then
+               echo "Database $DBNAME startup failed"
+               return 1
+            else
+                NUM=1
+                str='#'
+                ch=('|' '\' '-' '/')
+                index=0
+                until [ $NUM -gt 15 ]
+                do
+                    grep -q  "SYSMULTIUSER"  $SZ_OSCAR_HOME/admin/$DBNAME.db
+                    if [ $? -eq 0 ]; then
+                        echo "Database $DBNAME startup success"
+                        return 0
+                    else
+                        printf "[%-15s][%ds][%c]\r" $str $(($NUM*2)) ${ch[$index]}
+                        str+='#'
+                        let NUM++
+                        let index=NUM%3
+                        sleep 2
+                    fi
+                done
+                printf "\n"
+                echo "Timeout. Manually check whether the service starts successfully."
+                return 0
+            fi
+        fi
+    fi
+
+    echo "Database $DBNAME startup failed"
+    return 1
+}
+
+stop()
+{
+    echo "Stopping oscar $OPTIONS:"
+    check_exec
+    RETVAL=$?
+    # 检测不到程序，状态则认为已关闭
+    if [ "$RETVAL" -ne "0" ] ; then
+        return 0
+    fi
+
+    check_oscar_pid
+    RETVAL=$?
+
+    # 实例还未被启动，不需要再关
+    if [ "$RETVAL" -ne "0" ] ; then
+        echo "$OSCARD $OPTIONS not running"
+        return 0
+    fi
+
+    PID=`cat $SZ_OSCAR_HOME/admin/$DBNAME.db | cut -f1 -d":"`
+    kill -s 2 $PID >/dev/null 2>&1 &
+    sleep 2
+    kill -s 0 $PID >/dev/null 2>&1
+    RETVAL=$?
+    NUM=1
+    # 等待结束直到30s
+    str='#'
+    ch=('|' '\' '-' '/')
+    index=0
+    while [ "$RETVAL" -eq "0" ]
+    do
+        if [ $NUM -gt 15 ] ; then
+            break
+        fi
+        printf "[%-15s][%ds][%c]\r" $str $(($NUM*2)) ${ch[$index]}
+        str+='#'
+        let index=NUM%3
+        sleep 2
+        kill -s 0 $PID >/dev/null 2>&1
+        RETVAL=$?
+        NUM=$[NUM+1]   
+    done
+    
+    if [ "$RETVAL" -eq "0" ] ; then
+        echo "Database $DBNAME shutdown failed"
+        return 1
+    else
+        echo "Database $DBNAME shutdown success"
+        rm -f /var/lock/subsys/$SERVICE_NAME
+        return 0
+    fi
+}
+
+status()
+{
+    check_exec
+    RETVAL=$?
+    # 检测不到程序，状态则认为已关闭
+    if [ "$RETVAL" -ne "0" ] ; then
+        return 1
+    fi
+    
+    check_oscar_pid
+    RETVAL=$?
+
+    if [ "$RETVAL" -ne "0" ] ; then
+        echo "$OSCARD $OPTIONS not running"
+        return 1
+    else
+        return 0
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac
+
+exit $?
+

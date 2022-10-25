@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改同构数据同步配置')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-sameDbConf-edit" th:object="${dsSameDataDbconfig}">
+            <input name="id" th:field="*{id}" type="hidden">
+            <div class="form-group">
+                <label class="col-sm-3 control-label is-required">源数据源：</label>
+                <div class="col-sm-8">
+                    <select id="sourceDbId" name="sourceDbId" class="form-control select2-multiple" required>
+                        <option th:each="db:${dbList}" th:value="${db.id}" th:text="${db.instanceName}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label is-required">目标数据源：</label>
+                <div class="col-sm-8">
+                    <select id="targetDbId" name="targetDbId" class="form-control select2-multiple" required>
+                        <option th:each="db:${dbList}" th:value="${db.id}" th:text="${db.instanceName}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label is-required">源模式：</label>
+                <div class="col-sm-8">
+                    <select id="sourceSchema" name="sourceSchema" class="form-control select2-multiple" required>
+                        <option th:each="schema:${sourceSchemas}" th:value="${schema}" th:text="${schema}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label is-required">目标模式：</label>
+                <div class="col-sm-8">
+                    <select id="targetSchema" name="targetSchema" class="form-control select2-multiple" required>
+                        <option th:each="schema:${targetSchemas}" th:value="${schema}" th:text="${schema}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label is-required">源表名：</label>
+                <div class="col-sm-8">
+                    <select id="sourceTable" name="sourceTable" class="form-control select2-multiple" required>
+                        <option th:each="sTable:${sourceTables}" th:value="${sTable}" th:text="${sTable}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label is-required">目标表名：</label>
+                <div class="col-sm-8">
+                    <select id="targetTable" name="targetTable" class="form-control select2-multiple" required>
+                        <option th:each="tTable:${targetTables}" th:value="${tTable}" th:text="${tTable}"></option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "ds/sameDbConf";
+
+        $(function() {
+            // 回显下拉框默认选中
+            var sourceDbId = [[${dsSameDataDbconfig.sourceDbId}]];
+            var targetDbId = [[${dsSameDataDbconfig.targetDbId}]];
+            var sourceSchema = [[${dsSameDataDbconfig.sourceSchema}]];
+            var targetSchema = [[${dsSameDataDbconfig.targetSchema}]];
+            var sourceTable = [[${dsSameDataDbconfig.sourceTable}]];
+            var targetTable = [[${dsSameDataDbconfig.targetTable}]];
+            $("#sourceDbId option").each(function(){
+                if($(this).val() == sourceDbId){
+                    $(this).attr('selected', true);
+                }
+            })
+            $("#targetDbId option").each(function(){
+                if($(this).val() == targetDbId){
+                    $(this).attr('selected', true);
+                }
+            })
+            $("#sourceSchema option").each(function(){
+                if($(this).val() == sourceSchema){
+                    $(this).attr('selected', true);
+                }
+            })
+            $("#targetSchema option").each(function(){
+                if($(this).val() == targetSchema){
+                    $(this).attr('selected', true);
+                }
+            })
+            $("#sourceTable option").each(function(){
+                if($(this).val() == sourceTable){
+                    $(this).attr('selected', true);
+                }
+            })
+            $("#targetTable option").each(function(){
+                if($(this).val() == targetTable){
+                    $(this).attr('selected', true);
+                }
+            })
+
+
+            // 源数据源改变
+            $("#sourceDbId").change(function() {
+                var html = '';
+                var sourceDbId = $("#sourceDbId").val();
+                $.get(prefix + "/getAllSchema", {"sourceId" : sourceDbId}, function(result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.each(result.data, function(index,item){
+                            html +='<option value="' + item + '">' + item + '</option>'
+                        });
+                        $("#sourceSchema").html(html);
+                        $("#sourceSchema").trigger("change");
+                    } else {
+                        $.modal.alertError("连接数据源失败：" + result.msg);
+                    }
+                    $.modal.closeLoading();
+                });
+            });
+
+            // 目标数据源改变
+            $("#targetDbId").change(function() {
+                var html = '';
+                var targetDbId = $("#sourceDbId").val();
+                $.get(prefix + "/getAllSchema", {"sourceId" : sourceDbId}, function(result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.each(result.data, function(index,item){
+                            html +='<option value="' + item + '">' + item + '</option>'
+                        });
+                        $("#targetSchema").html(html);
+                        $("#targetSchema").trigger("change");
+                    } else {
+                        $.modal.alertError("连接数据源失败：" + result.msg);
+                    }
+                    $.modal.closeLoading();
+                });
+            });
+            // 源模式改变
+            $("#sourceSchema").change(function() {
+                var html = '';
+                var sourceDbId = $("#sourceDbId").val();
+                var sourceSchema = $("#sourceSchema").val();
+                $.get(prefix + "/getAllTablesBySchema", {"sourceId" : sourceDbId, "schema": sourceSchema}, function(result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.each(result.data, function(index,item){
+                            html +='<option value="' + item + '">' + item + '</option>'
+                        });
+                        $("#sourceTable").html(html);
+                    } else {
+                        $.modal.alertError("连接数据源失败：" + result.msg);
+                    }
+                    $.modal.closeLoading();
+                });
+            });
+            // 目标模式改变
+            $("#targetSchema").change(function() {
+                var html = '';
+                var targetDbId = $("#targetDbId").val();
+                var targetSchema = $("#targetSchema").val();
+                $.get(prefix + "/getAllTablesBySchema", {"sourceId" : targetDbId, "schema": targetSchema}, function(result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.each(result.data, function(index,item){
+                            html +='<option value="' + item + '">' + item + '</option>'
+                        });
+                        $("#targetTable").html(html);
+                    } else {
+                        $.modal.alertError("连接数据源失败：" + result.msg);
+                    }
+                    $.modal.closeLoading();
+                });
+
+            });
+        })
+
+
+        $("#form-sameDbConf-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-sameDbConf-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

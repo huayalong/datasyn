@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.datasync.mapper.DsNodeDbConfigMapper">
+    
+    <resultMap type="DsNodeDbConfig" id="DsNodeDbConfigResult">
+        <result property="id"    column="ID"    />
+        <result property="nodeId"    column="NODE_ID"    />
+        <result property="coreName"    column="core_name"    />
+        <result property="instancePort"    column="INSTANCE_PORT"    />
+        <result property="instanceDb"    column="INSTANCE_DB"    />
+        <result property="userName"    column="USER_NAME"    />
+        <result property="passWord"    column="PASS_WORD"    />
+        <result property="instanceName"    column="INSTANCE_NAME"    />
+        <result property="instanceIp"    column="INSTANCE_IP"    />
+        <result property="createTime"    column="CREATE_TIME"    />
+    </resultMap>
+
+    <sql id="selectDsNodeDbConfigVo">
+        select ID, NODE_ID, INSTANCE_PORT, INSTANCE_DB, USER_NAME, PASS_WORD, INSTANCE_NAME, INSTANCE_IP, CREATE_TIME
+        from DS_NODE_DB_CONFIG dc
+    </sql>
+
+    <select id="selectDsNodeDbConfigList" parameterType="DsNodeDbConfig" resultMap="DsNodeDbConfigResult">
+        SELECT dc.ID, dc.NODE_ID, dc.INSTANCE_PORT, dc.INSTANCE_DB, dc.USER_NAME, dc.PASS_WORD, dc.INSTANCE_NAME,
+            dc.INSTANCE_IP, dc.CREATE_TIME, cc.core_name
+        FROM DS_NODE_DB_CONFIG dc
+        LEFT JOIN DS_NODE_CORE_CONFIG cc ON cc.id = dc.node_id
+        <where>  
+            <if test="nodeId != null  and nodeId != ''"> and dc.NODE_ID = #{nodeId}</if>
+            <if test="instanceIp != null  and instanceIp != ''"> and dc.INSTANCE_IP = #{instanceIp}</if>
+            <if test="instanceName != null  and instanceName != ''"> and dc.INSTANCE_NAME like concat('%', #{instanceName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectDsNodeDbConfigById" parameterType="Long" resultMap="DsNodeDbConfigResult">
+        <include refid="selectDsNodeDbConfigVo"/>
+        where ID = #{id}
+    </select>
+    <select id="selectDsNodeDbConfigByIds" resultMap="DsNodeDbConfigResult">
+        <include refid="selectDsNodeDbConfigVo"/>
+        where ID in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectAll" resultMap="DsNodeDbConfigResult">
+        <include refid="selectDsNodeDbConfigVo"/>
+    </select>
+
+    <insert id="insertDsNodeDbConfig" parameterType="DsNodeDbConfig">
+        insert into DS_NODE_DB_CONFIG
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">ID,</if>
+            <if test="nodeId != null">NODE_ID,</if>
+            <if test="instancePort != null">INSTANCE_PORT,</if>
+            <if test="instanceDb != null">INSTANCE_DB,</if>
+            <if test="userName != null">USER_NAME,</if>
+            <if test="passWord != null">PASS_WORD,</if>
+            <if test="instanceName != null">INSTANCE_NAME,</if>
+            <if test="instanceIp != null">INSTANCE_IP,</if>
+            <if test="createTime != null">CREATE_TIME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="nodeId != null">#{nodeId},</if>
+            <if test="instancePort != null">#{instancePort},</if>
+            <if test="instanceDb != null">#{instanceDb},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="passWord != null">#{passWord},</if>
+            <if test="instanceName != null">#{instanceName},</if>
+            <if test="instanceIp != null">#{instanceIp},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDsNodeDbConfig" parameterType="DsNodeDbConfig">
+        update DS_NODE_DB_CONFIG
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="nodeId != null">NODE_ID = #{nodeId},</if>
+            <if test="instancePort != null">INSTANCE_PORT = #{instancePort},</if>
+            <if test="instanceDb != null">INSTANCE_DB = #{instanceDb},</if>
+            <if test="userName != null">USER_NAME = #{userName},</if>
+            <if test="passWord != null">PASS_WORD = #{passWord},</if>
+            <if test="instanceName != null">INSTANCE_NAME = #{instanceName},</if>
+            <if test="instanceIp != null">INSTANCE_IP = #{instanceIp},</if>
+            <if test="createTime != null">CREATE_TIME = #{createTime},</if>
+        </trim>
+        where ID = #{id}
+    </update>
+
+    <delete id="deleteDsNodeDbConfigById" parameterType="Long">
+        delete from DS_NODE_DB_CONFIG where ID = #{id}
+    </delete>
+
+    <delete id="deleteDsNodeDbConfigByIds" parameterType="String">
+        delete from DS_NODE_DB_CONFIG where ID in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

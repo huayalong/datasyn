@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.datasync.mapper.BinlogFileMapper">
+    
+    <resultMap type="BinlogFile" id="BinlogFileResult">
+    	<result property="logFileName"  column="logfile_name"      />
+        <result property="fileSize"    column="file_size"    />
+    </resultMap>
+
+    
+    <select id="selectBinlogFile" resultMap="BinlogFileResult">
+        select logfile_name, file_size from v_sys_binary_logs
+    </select>
+
+    
+</mapper>

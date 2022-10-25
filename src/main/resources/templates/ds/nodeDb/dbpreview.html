@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('用户列表')"/>
+    <th:block th:include="include :: layout-latest-css"/>
+    <th:block th:include="include :: ztree-css"/>
+</head>
+<body class="gray-bg">
+<div class="ui-layout-west">
+    <input id="dbConfId" name="dbConfId" value="${dbConfId}" type="hidden">
+    <div class="box box-main">
+        <div class="ui-layout-content">
+            <div id="tree" class="ztree"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="ui-layout-center">
+    <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: layout-latest-js"/>
+<th:block th:include="include :: ztree-js"/>
+<script th:inline="javascript">
+    var dbConfId = [[${dbConfId}]];
+    var prefix = ctx + "ds/nodeDb";
+
+    $(function () {
+        var panehHidden = false;
+        if ($(this).width() < 769) {
+            panehHidden = true;
+        }
+        $('body').layout({initClosed: panehHidden, west__size: 185});
+        // 回到顶部绑定
+        if ($.fn.toTop !== undefined) {
+            var opt = {
+                win: $('.ui-layout-center'),
+                doc: $('.ui-layout-center')
+            };
+            $('#scroll-up').toTop(opt);
+        }
+
+        // 获取左侧模式树形列表，
+        $.modal.loading("正在查询中，请稍候...");
+        $.post(prefix + "/testConn", {"id" : dbConfId}, function(result) {
+            if (result.code == web_status.SUCCESS) {
+                querySchemaTree();
+            } else {
+                $.modal.alertError("连接数据源失败：" + result.msg);
+            }
+            $.modal.closeLoading();
+        });
+
+    });
+
+    function querySchemaTree() {
+        var url = prefix + "/schemaTableTree?id=" + dbConfId;
+        var options = {
+            url: url,
+            expandLevel: 2,
+            onClick: zOnClick
+        };
+        $.tree.init(options);
+
+        function zOnClick(event, treeId, treeNode) {
+            if(treeNode.pId){
+                ajaxColumns(treeNode.id, treeNode.pId);
+            }
+        }
+    }
+
+    // 动态获取列
+    function ajaxColumns(tableName, dbSchema) {
+        var url = prefix + "/getColumnsBySchemaAndTable";
+        $.modal.loading("正在查询中，请稍候...");
+        $.post(
+            url, {"id" : dbConfId, "dbSchema" : dbSchema, "tableName" : tableName},
+            function(result) {
+                if (result.code == web_status.SUCCESS) {
+                    setColumns(result.data, dbSchema, tableName);
+                } else if (result.code == web_status.WARNING) {
+                    $.modal.alertWarning(result.msg)
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+            }
+        );
+    }
+    // 设置列
+    function setColumns(list, dbSchema, tableName) {
+        var columns = [];
+        list.forEach(function(item) {
+            columns.push({
+                field : item.field,
+                title : item.title
+            })
+        });
+        if(!table.get(table.options.id)){
+            initTable(columns, dbSchema, tableName);
+        } else {
+            refreshTable(columns, dbSchema, tableName);
+        }
+    }
+
+    // 初始化表格
+    function initTable(columns, dbSchema, tableName){
+        console.log(columns)
+        var options = {
+            url: prefix + "/selectDataBySchemaAndTable?id=" + dbConfId + "&schema=" + dbSchema + "&tableName=" + tableName,
+            showSearch: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            columns: columns
+        };
+        $.table.init(options);
+    }
+
+    // 刷新表格
+    function refreshTable(columns, dbSchema, tableName) {
+        var options = {
+            url: prefix + "/selectDataBySchemaAndTable?id=" + dbConfId + "&schema=" + dbSchema + "&tableName=" + tableName,
+            columns: columns
+        };
+        $("#" + table.options.id).bootstrapTable('refreshOptions',options);
+    }
+
+
+</script>
+</body>
+
+</html>

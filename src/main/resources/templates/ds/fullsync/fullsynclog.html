@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('数据同步实时日志监控')" />
+</head>
+<body class="gray-bg" style="background-color: #1b1b26;">
+ 
+    <div id="onMessage" class="wrapper wrapper-content animated fadeInRight" style="overflow-y:scroll;color:#cfd3d6;line-height: 30px;">
+       
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: echarts-js" />
+    
+     <script type="text/javascript">
+         $(document).ready(function() {
+            if ("WebSocket" in window) {
+               console.log("您的浏览器支持 WebSocket!");
+               // 打开一个 web socket
+               var ws = new WebSocket("ws://localhost:8002/ws/message");
+               ws.onopen = function() {
+                  console.log("与服务器建立连接成功！")
+               };
+               // 接收消息
+               ws.onmessage = function (evt) {
+                  var tmp = document.getElementById('onMessage').innerHTML + evt.data + "</br>";
+                  document.getElementById('onMessage').innerHTML = tmp;
+               };
+               // 关闭 websocket
+               ws.onclose = function() {
+                  alert("连接已关闭...");
+               };
+            } else {
+               // 浏览器不支持 WebSocket
+               alert("您的浏览器不支持 WebSocket!");
+            }
+         })
+
+         function submitHandler() {
+             var url = ctx + "ds/fullsync/fullSyncData";
+             $.post(url, {"id" : [[${id}]]}, function(result) {
+                 if (result.code == web_status.SUCCESS) {
+                     $.modal.alertSuccess("同步完成！");
+                 } else if (result.code == web_status.WARNING) {
+                     $.modal.alertWarning(result.msg)
+                 } else {
+                     $.modal.alertError(result.msg);
+                 }
+                 $.modal.closeLoading();
+             });
+         }
+      </script>
+</body>
+</html>

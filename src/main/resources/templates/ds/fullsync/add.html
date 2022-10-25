@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增全量数据同步配置')" />
+</head>
+<body class="white-bg">
+    <div class="main-content">
+        <form class="form-horizontal" id="form-fullsync-add">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">同步级别：</label>
+                        <div class="col-sm-8">
+                            <div class="radio-box" th:each="dict : ${@dict.getType('sync_level')}">
+                                <input type="radio" th:id="${'syncLevel_' + dict.dictCode}" name="syncLevel" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                                <label th:for="${'syncLevel_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">源数据源：</label>
+                        <div class="col-sm-8">
+                            <select id="sourceDbId" name="sourceDbId" class="form-control select2-multiple" required>
+                                <option th:each="db:${dbList}" th:value="${db.id}" th:text="${db.instanceName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">目标数据源：</label>
+                        <div class="col-sm-8">
+                            <select id="targetDbId" name="targetDbId" class="form-control select2-multiple" required>
+                                <option th:each="db:${dbList}" th:value="${db.id}" th:text="${db.instanceName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" id="schemaLevel">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">源数据库模式：</label>
+                        <div class="col-sm-8">
+                            <input id="sourceSchema" name="sourceSchema" class="form-control" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">目标数据库模式：</label>
+                        <div class="col-sm-8">
+                            <input id="targetSchema" name="targetSchema" class="form-control" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" id="tableLevel">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">源表名：</label>
+                        <div class="col-sm-8">
+                            <input id="sourceTable" name="sourceTable" class="form-control" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label is-required">目标表名：</label>
+                        <div class="col-sm-8">
+                            <input id="targetTable" name="targetTable" class="form-control" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            var sync_level = $("input[type='radio']:checked").val();;
+            if(sync_level == '1'){
+                $("#schemaLevel").hide();
+                $("#tableLevel").hide();
+                $("#sourceSchema").prop("required", false);
+                $("#targetSchema").prop("required", false);
+                $("#sourceTable").prop("required", false);
+                $("#targetTable").prop("required", false);
+            }else if(sync_level == '2'){
+                $("#schemaLevel").show();
+                $("#tableLevel").hide();
+                $("#sourceSchema").prop("required", true);
+                $("#targetSchema").prop("required", true);
+                $("#sourceTable").prop("required", false);
+                $("#targetTable").prop("required", false);
+            }else{
+                $("#schemaLevel").show();
+                $("#tableLevel").show();
+                $("#sourceSchema").prop("required", true);
+                $("#targetSchema").prop("required", true);
+                $("#sourceTable").prop("required", true);
+                $("#targetTable").prop("required", true);
+            }
+
+            // 同步级别改变事件
+            $('input[type=radio]').change(function() {
+                if(this.value == '1'){
+                    $("#schemaLevel").hide();
+                    $("#tableLevel").hide();
+                    $("#sourceSchema").prop("required", false);
+                    $("#targetSchema").prop("required", false);
+                    $("#sourceTable").prop("required", false);
+                    $("#targetTable").prop("required", false);
+                    $("#sourceSchema").val("");
+                    $("#targetSchema").val("");
+                    $("#sourceTable").val("");
+                    $("#targetTable").val("");
+                }else if(this.value == '2'){
+                    $("#schemaLevel").show();
+                    $("#tableLevel").hide();
+                    $("#sourceSchema").prop("required", true);
+                    $("#targetSchema").prop("required", true);
+                    $("#sourceTable").prop("required", false);
+                    $("#targetTable").prop("required", false);
+                    $("#sourceTable").val("");
+                    $("#targetTable").val("");
+                }else{
+                    $("#schemaLevel").show();
+                    $("#tableLevel").show();
+                    $("#sourceSchema").prop("required", true);
+                    $("#targetSchema").prop("required", true);
+                    $("#sourceTable").prop("required", true);
+                    $("#targetTable").prop("required", true);
+                }
+            });
+        });
+
+        var prefix = ctx + "ds/fullsync"
+        $("#form-fullsync-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-fullsync-add').serialize());
+            }
+        }
+
+    </script>
+</body>
+</html>

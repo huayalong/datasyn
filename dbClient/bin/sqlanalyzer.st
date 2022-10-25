@@ -1,0 +1,14 @@
+st.application.name=sqlanalyzer
+st.class.path=sqlanalyzer_obf.jar;lib/geronimo-stax-api_1.0_spec-1.0.jar;lib/log4j.jar;lib/rsyntaxtextarea.jar;lib/ant.jar;lib/antlr-3.5.2-complete.jar;lib/dom4j.jar;lib/jcommon-1.0.17.jar;lib/kunststoff.jar;lib/jide-common.jar;lib/looks.jar;lib/OscarHelp.jar;lib/oscarJDBC.jar;lib/lookandfeel.jar;lib/jide-components.jar;lib/syntheticaBlueIce.jar;lib/synthetica.jar;lib/activation.jar;lib/dbswing.jar;lib/mail.jar;lib/anywhere.jar;lib/jide-grids.jar;lib/jfreechart-1.0.14.jar;lib/commons-io-2.2.jar;lib/jhbasic.jar;lib/autocomplete.jar;lib/dx.jar;lib/forms.jar;lib/rtextCommon.jar;lib/antlr.jar;lib/commons-lang3-3.1.jar;lib/poi-3.10.1-20140818.jar;lib/poi-ooxml-schemas-3.10.1-20140818.jar;lib/poi-ooxml-3.10.1-20140818.jar;lib/javacsv.jar;lib/xmlbeans-2.3.0.jar;lib/stax-api-1.0.1.jar;lib/poi-scratchpad-3.8-20120326.jar;lib/commons-io-2.2.jar;lib/datepicker.jar;
+st.command.line.args=
+st.main.class=com.oscar.queryanalyze.MainFrame
+st.current.vm=  
+st.current.vm.dir=../jre
+st.nl.java.option.java.heap.size.max=1024
+st.nl.java.option.java.heap.size.min=128
+st.nl.java.option.additional=
+st.nl.valid.vm.list=1.5+
+st.stderr.redirect=../log/client/sqlanalyzer.log
+st.stdout.redirect=../log/client/sqlanalyzer.log
+st.system.property=
+st.user.dir=.

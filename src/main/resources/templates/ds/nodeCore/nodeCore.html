@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('节点中心配置列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>节点名称：</label>
+                                <input type="text" name="coreName"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="ds:nodeCore:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="ds:nodeCore:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="ds:nodeCore:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="ds:nodeCore:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+                <a class="btn btn-primary" onclick="syncBinlog()">
+                    <i class="fa fa-recycle"></i> 初始化BinLog位移
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('ds:nodeCore:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('ds:nodeCore:remove')}]];
+        var prefix = ctx + "ds/nodeCore";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "节点中心配置",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'coreName',
+                    title: '节点名称'
+                },
+                {
+                    visible: editFlag == 'hidden' ? false : true,
+                    title: '是否主节点',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return statusTools(row);
+                    }
+                },
+                {
+                    field: 'nodeIp',
+                    title: '节点ip'
+                },
+                {
+                    field: 'createTime',
+                    title: '入库时间'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+
+        /* 是否主节点状态显示 */
+        function statusTools(row) {
+            if (row.isMaster == 1) {
+                return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="changeMaster(\''+ row.id  + '\',\'0\')"></i>';
+            } else {
+                return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="changeMaster(\''+ row.id  + '\',\'1\')"></i>';
+            }
+        }
+
+        /* 主节点改变 */
+        function changeMaster(id, isMaster) {
+            var msg = "确认要撤销主节点吗？";
+            if (isMaster == '0') {
+                msg = "确认要强制升级为主节点吗？";
+            }
+            $.modal.confirm(msg, function() {
+                $.operate.post(prefix + "/edit", { "id": id, "isMaster": isMaster});
+            })
+        }
+
+        // 初始化日志结束值
+        function syncBinlog() {
+            var url = prefix + "/syncBinlog";
+            $.operate.get(url,function (result){
+                $.modal.alertSuccess(result.msg)
+            })
+        }
+
+    </script>
+</body>
+</html>

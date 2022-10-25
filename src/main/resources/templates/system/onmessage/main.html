@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('实时末端数据监控')" />
+</head>
+<body class="gray-bg" style="background-color: #1b1b26;">
+ 
+    <div class="row  border-bottom dashboard-header">
+         <a href="javascript:WebSocketTest()" style="color:#047be2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;开启 WebSocket实时数据监控</a>
+    </div>
+
+    <div id="onMessage" class="wrapper wrapper-content animated fadeInRight" style="overflow-y:scroll;color:#cfd3d6;line-height: 30px;">
+       
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: echarts-js" />
+    
+     <script type="text/javascript">
+
+
+
+         function WebSocketTest()
+         {
+            if ("WebSocket" in window)
+            {
+               console.log("您的浏览器支持 WebSocket!");
+               
+               // 打开一个 web socket
+               var ws = new WebSocket("ws://localhost:8002/ws/message");
+              
+               ws.onopen = function()
+               {
+                  // Web Socket 已连接上，使用 send() 方法发送数据
+                    //ws.send("发送数据");
+                  console.log("与服务器建立连接成功！")
+               };
+               
+               ws.onmessage = function (evt) 
+               { 
+                  var received_msg = evt.data;
+                  var tmp = received_msg + "</br>" + document.getElementById('onMessage').innerHTML;
+                  document.getElementById('onMessage').innerHTML=tmp;
+               };
+                
+               ws.onclose = function()
+               { 
+                  // 关闭 websocket
+                  alert("连接已关闭..."); 
+               };
+            }
+            
+            else
+            {
+               // 浏览器不支持 WebSocket
+               alert("您的浏览器不支持 WebSocket!");
+            }
+         }
+      </script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+#!/bin/sh
+#################################################################################################
+#
+# 神通 Java 启动器 version 1.0
+#
+# Copyright (c) 2020 天津神舟通用数据技术有限公司 All rights reserved
+#
+#  此脚本会执行以下操作：
+#	1) 解析当前目录下与此脚本同名的.st文件
+#	2) 寻找有效的Java
+#	3) 利用.st文件中获取的执行信息，启动相应的Java进程
+#
+#  若要正确启动Java程序，.st文件必须包含以下内容
+#	1)  st.class.path  java classpath
+#	2)  st.main.class  java 启动类
+#
+#  注意：
+#   1)  java 命令行参数，即可以写在.st文件中，也可以在执行此脚本时指定；
+#       并且，显式指定的命令行参数会覆盖.st文件指定的参数；
+#   2)  若指定参数 -console 时，标准输出强制重定向到控制台
+#   3)  st文件中的所有路径，都认为是相对于此脚本路径的相对路径
+#
+#  export ST_DEBUG=1  开启打印调试信息，不运行
+#  export ST_DEBUG=2  开启打印调试信息，同时运行jar包
+#
+#################################################################################################
+
+st_version="1.0"
+oridir=`pwd`
+cmdLineArgsSize=$#
+cmdLineArgs=$*
+# 确保thisScript为绝对路径
+thisScript="$0"
+case $thisScript in
+	/*)
+	;;
+	*)
+		thisScript="`pwd`/$thisScript"
+	;;
+esac
+
+# 打印调试信息
+debugOut()
+{
+	case "$ST_DEBUG" in
+		""     )
+			echo "$1" >> /dev/null
+		;;
+		*      )
+			echo "$1"
+		;;
+	esac
+}
+# 将符号链接转化为目标文件
+if [ -x /bin/ls ]; then
+	lsCMD="/bin/ls"
+elif [ -x /usr/bin/ls ]; then
+	lsCMD="/usr/bin/ls"
+else
+	lsCMD="ls"
+fi
+resolveLink()
+{
+	rl_linked="true"
+	rl_operand="$1"
+	rl_origDir="`dirname "$1"`"
+
+	# bypass the whole thing if this isnt a link
+	rl_ls=`$lsCMD -l "$rl_operand"`
+	case "$rl_ls" in
+		*"->"*)
+		;;
+		*)
+			resolvedLink="$rl_operand"
+			return
+		;;
+	esac 
+	
+	while [ "$rl_linked" = "true" ]; do
+		# if the operand is not of an abs path, get its abs path
+		case "$rl_operand" in
+			/*)
+				rl_origDir=`dirname "$rl_operand"`
+			;;
+			\./*)
+				rl_origDir=`pwd`
+				rl_operand="$rl_origDir/$rl_operand"
+			;;
+			*)
+				rl_operand="$rl_origDir/$rl_operand"
+			;;
+		esac
+		#
+		# the prevPrev hack is here because .../java often points to .java_wrapper.
+		# at the end of the resolution rl_operand actually points to garbage
+		# signifying it is done resolving the link.  So prev is actually .java_wrapper.
+		# but we want the one just before that, its the real vm starting poiint we want
+		#
+		rl_prevOperand="$rl_operand"
+		rl_ls=`$lsCMD -l "$rl_operand"`
+		# get the output ls into a list
+		set x $rl_ls
+		# get rid of x and file info from ls -l
+		shift 9
+		
+		#is this a link?
+		case "$rl_ls" in
+			*"->"*)
+				rl_linked="true"
+				# is a link, shift past the "->"
+				rl_linker=""
+				while [ "$1" != "->" -a $# -gt 1 ]; do
+					rl_linker="$rl_linker $1"
+					shift
+				done
+	
+				if [ "$1" = "->" ]; then
+					shift
+				fi
+			;;
+			*)
+				# not a link, the rest must be the targets name
+				rl_linked="false"
+			;;
+		esac
+		# now grab what's left 
+		rl_linkee="$*"
+
+		# debugOut "Following link to LAX $rl_linker -> $rl_linkee"
+
+		if [ "$rl_linked" = "true" -a "`basename "$rl_linkee"`" != "$vmScript" ]; then
+			# set to true incase the thing linked to is also a link and we can
+			# try again.  The current think linked to now becomes the operand
+			rl_operand="$rl_linkee"
+			# if the linkee is not abs, make it abs relative to the linker
+			case "$rl_operand" in
+				/*)
+				;;
+				*)
+					rl_operand="$rl_origDir/$rl_operand"
+				;;
+			esac
+		else
+			# otherwise, this operand is not a link itself and we are done
+			rl_resolvedLink="$rl_prevOperand"
+			# however, do not resolve the last leg of a VMs linked scripts. this will
+			# disrupt their scripts.  it is expecting a link to the .java* script
+			# let us believe it is not linked and continue on...
+			if [ "`basename "$rl_linkee"`" = "$vmScript" ]; then
+				rl_linked="false"
+			fi
+		fi
+		# make sure the path returned is absolute
+		case "$rl_operand" in
+			\.\/*)
+				rl_operand="`pwd`/$rl_operand"
+			;;
+		esac
+	done
+
+	# remove "/./" in paths, make it "/"
+	# i,e,  "/a/b/./c" becomes "/a/b/c"
+	resolvedLink=`echo "$rl_resolvedLink" |  sed 's,/\./,/,'`
+}
+
+#############################################################
+# 解析st文件
+#############################################################
+
+resolveLink "$thisScript"
+absLauncherName="$resolvedLink"
+absLauncherDir=`dirname "$absLauncherName"`
+cd "$absLauncherDir"
+stfname="$absLauncherName.st"
+
+if [ ! -r "$stfname" ]; then
+	debugOut "Can not find ${stfname} "
+	exit;
+else 
+	debugOut "[7m========= Analyze File ==============================================[0m"
+fi
+# 使用for循环，因为 while read 循环在子进程执行，导致变量赋值在loop循环外取不到结果
+OFS="$IFS"
+# 没有使用IFS=$'\n'这种写法，某些shell不支持，比如dash，会将其解析为字符n，而不是换行符
+IFS="
+"
+set -f
+for line in `cat "$stfname" | sed $'s/\r$//'`; do
+	IFS="="
+	set $line
+	IFS="
+"
+	key="${1}"
+	shift
+	value="$@"
+
+	# 去掉两端的空格
+	key="$(echo "${key}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+	value="$(echo "${value}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+	if [ "x${key}" = "x" ] || [ "x${value}" = "x" ]; then
+		continue
+	fi
+
+	case "$key" in
+		st.current.vm.dir*)
+			st_jre_path="${absLauncherDir}/$value"
+		;;
+		st.class.path*)
+			st_class_path="$value"
+		;;
+		st.main.class*)
+			st_main_class="$value"
+		;;
+		st.command.line.args*)
+			st_cmd_args="$value"
+		;;
+		st.nl.java.option.java.heap.size.max*)
+			st_vm_xmx="${value}m"
+		;;
+		st.nl.java.option.java.heap.size.min*)
+			st_vm_xms="${value}m"
+		;;
+		st.nl.java.option.additional*)
+			st_vm_additional="$value"
+		;;
+		st.stdout.redirect*)
+			st_std_out="$value"
+			case "$value" in
+				[Cc][Oo][Nn][Ss][Oo][Ll][Ee]*) st_std_out="console" ;;
+				*) st_std_out="$value" ;;
+			esac
+		;;
+		st.stderr.redirect*)
+			case "$value" in
+				[Cc][Oo][Nn][Ss][Oo][Ll][Ee]*) st_std_err="console" ;;
+				*) st_std_err="$value" ;;
+			esac
+		;;
+		st.stdin.redirect*)
+			case "$value" in
+				[Cc][Oo][Nn][Ss][Oo][Ll][Ee]*) st_std_in="console" ;;
+				*) st_std_in="$value" ;;
+			esac
+			st_std_in="$value"
+		;;
+		st.nl.valid.vm.list*)
+			st_min_java="$value"
+		;;
+		st.system.property*)
+			st_sys_property="$value"
+		;;
+		st.user.dir*)
+			st_user_dir="${absLauncherDir}/$value"
+		;;
+	esac
+done
+set +f
+IFS="$OFS"
+debugOut "reading ${stfname}................... OK."
+if [ "${st_class_path:-""}" = "" ]; then
+	echo "The classpath specified in the st properties file is invalid."
+	exit;
+fi
+if [ "${st_main_class:-""}" = "" ]; then
+	echo "The main class specified in the st properties file is invalid."
+	exit;
+fi
+# 需要将st.class.path转换为绝对路径，避免classpath受到st_user_dir的影响
+st_class_path=`echo "$st_class_path" | sed 's^;^:^g'`
+OFS="$IFS"
+IFS=":"
+set x $st_class_path; shift
+tmp_lcp=""
+while test $# -gt 0; do
+	case "$1" in
+		\/*)
+			if [ "$tmp_lcp" = "" ]; then
+				tmp_lcp="$1"
+			else
+				tmp_lcp="$tmp_lcp:$1"
+			fi
+		;;
+		*)
+			if [ "$tmp_lcp" = "" ]; then
+				tmp_lcp="${absLauncherDir}/$1"
+			else
+				tmp_lcp="$tmp_lcp:${absLauncherDir}/$1"
+			fi
+		;;
+	esac
+	shift
+done
+st_class_path="$tmp_lcp"
+IFS="$OFS"
+# 使用显式指定的命令行参数覆盖st文件中的命令行参数
+if [ "$cmdLineArgsSize" -gt 0 ]; then
+	st_cmd_args="$cmdLineArgs"
+	case "$cmdLineArgs" in
+		*-[Cc][Oo][Nn][Ss][Oo][Ll][Ee]*) 
+			st_std_in="console";
+			st_std_err="console";
+			st_std_out="console";
+		;;
+	esac
+fi
+# 处理重定向
+if [ "x${st_std_in}" = "x" ]; then
+	st_std_in="console";
+fi
+if [ "x${st_std_err}" = "x" ]; then
+	st_std_err="console";
+fi
+if [ "x${st_std_out}" = "x" ]; then
+	st_std_out="console";
+fi
+
+if [ "${st_std_in}" != "console" ]; then
+	st_std_in="${absLauncherDir}/$st_std_in";
+fi
+if [ "${st_std_out}" != "console" ]; then
+	st_std_out="${absLauncherDir}/$st_std_out";
+fi
+if [ "${st_std_err}" != "console" ]; then
+	st_std_err="${absLauncherDir}/$st_std_err";
+fi
+
+debugOut "st properties analyze................... OK."
+
+#############################################################
+# 寻找有效的Java
+#############################################################
+
+debugOut "[7m========= Finding Java ==============================================[0m"
+actvm=""
+# 先看下显式指定的Java是否可用，不可用的话在PATH中寻找可用的JAVA
+if [ "x${st_jre_path}" != "x" ]; then
+	# 约定指定的Java路径是jre目录
+	actvm="${st_jre_path}/bin/java"
+	if [ -e "$actvm" -a \( ! -d "$actvm" \) ]; then
+		if [ ! -x "$actvm" ]; then
+			chmod a+x $actvm
+		fi
+		$actvm -version > /dev/null 2> /dev/null
+		if [ "$?" -ne "0" ]; then
+			# 指定的Java不可用
+			actvm=""
+		fi
+	else
+		actvm=""
+	fi
+fi
+
+if [ "x${actvm}" = "x" ]; then
+	# 在PATH中寻找Java
+	VM_SEARCH_PATH="$PATH"
+	OFS="$IFS"
+	IFS=":"
+	set x $VM_SEARCH_PATH; shift
+	IFS="$OFS"
+	for pathDir in $*; do
+		actvm="$pathDir/java"
+		if [ -e "$actvm" -a \( ! -d "$actvm" \) ]; then
+			if [ ! -x "$actvm" ]; then
+				chmod a+x $actvm
+			fi
+			$actvm -version > /dev/null 2> /dev/null
+			if [ "$?" -ne "0" ]; then
+				actvm=""
+			else
+				break
+			fi
+		fi
+	done
+fi
+if [ "x${actvm}" = "x" ]; then
+	echo "No Java virtual machine could be found."
+	exit;
+fi
+debugOut "Using Java:............................. $actvm"
+
+debugOut "[7m========= All vm_options ============================================[0m"
+debugOut "st_version.............................. \"$st_version\""
+debugOut "classpath............................... \"$st_class_path\""
+debugOut "main class.............................. \"$st_main_class\""
+debugOut "java path............................... \"$st_jre_path\""
+debugOut "user directory.......................... \"$st_user_dir\""
+debugOut "stdout to............................... \"$st_std_out\""
+debugOut "sterr to................................ \"$st_std_err\""
+debugOut "stin to................................. \"$st_std_in\""
+debugOut "install directory....................... \"$absLauncherDir\""
+debugOut "option system property.................. ${st_sys_property:-"none"}"
+debugOut "option jvm arguments.................... ${st_vm_additional:-"none"}"
+debugOut "option max heap size.................... ${st_vm_xmx:-"none"}"
+debugOut "option min heap size.................... ${st_vm_xms:-"none"}"
+debugOut "option app arguments.................... ${st_cmd_args:-"none"}"
+
+#############################################################
+# 拼接执行语句
+#############################################################
+debugOut "[7m========= Exec Java =================================================[0m"
+# 处理虚拟机参数
+vm_options=""
+if [ "x${st_vm_xmx}" != "x" ]; then
+	vm_options="$vm_options -Xmx${st_vm_xmx}"
+fi
+
+if [ "x${st_vm_xms}" != "x" ]; then
+	vm_options="$vm_options -Xms${st_vm_xms}"
+fi
+
+if [ "x${st_vm_additional}" != "x" ]; then
+	vm_options="$vm_options ${st_vm_additional}"
+fi
+
+# 处理 system property
+java_props=""
+if [ "x${st_sys_property}" != "x" ]; then
+	OFS="$IFS"
+	IFS=";"
+	set x $st_sys_property; shift
+	IFS="$OFS"
+	for prop in $*; do
+		java_props="$java_props -D${prop}"
+	done
+fi
+
+if [ "x${st_user_dir}" != "x" ]; then
+	java_props="$java_props -Duser.dir=${st_user_dir}"
+fi
+
+commond="$actvm $vm_options $java_props -cp "$st_class_path" $st_main_class $st_cmd_args"
+debugOut "commond.................... ${commond}"
+# 处理重定向
+# 如果路径不存在，创建之
+if [ "${st_std_out}" != "console" ]; then
+	stdoutDir=`dirname "$st_std_out"`
+	if [ ! -d "$stdoutDir" ]; then
+		mkdir -p $stdoutDir
+	fi
+	exec >> ${st_std_out}
+fi
+if [ "${st_std_err}" != "console" ]; then
+	stderrDir=`dirname "$st_std_err"`
+	if [ ! -d "$stderrDir" ]; then
+		mkdir -p $stderrDir
+	fi
+	exec 2>>${st_std_err}
+fi
+if [ "${st_std_in}" != "console" ]; then
+	exec < ${st_std_in}
+fi
+
+if [ "${ST_DEBUG}" != "1" ]; then
+	exec $commond
+fi
+
+exitValue=$?
+cd "$oridir"
+exit $exitValue
